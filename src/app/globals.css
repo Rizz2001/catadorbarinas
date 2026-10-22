@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-catador-blue: #00227B;
+  --color-catador-blue-light: #0A38A8;
+  --color-catador-blue-dark: #001754;
+
+  --color-catador-amber: #E07A1F;
+  --color-catador-amber-dark: #C85A08;
+  --color-catador-amber-light: #FFF7ED;
+
+  --color-catador-discount: #EF4444;
+  --color-catador-discount-bg: #FEF2F2;
+
+  --color-catador-bg: #F8FAFC;
+  --color-catador-card: #FFFFFF;
+  --color-catador-border: #E2E8F0;
+}
+
+:root {
+  --primary-catador: #00227B;
+  --primary-light: #0A38A8;
+  --primary-dark: #001754;
+
+  --accent-amber: #E07A1F;
+  --accent-amber-dark: #C85A08;
+  --accent-amber-light: #FFF7ED;
+
+  --alert-discount: #EF4444;
+  --alert-discount-bg: #FEF2F2;
+
+  --surface-bg: #F8FAFC;
+  --surface-card: #FFFFFF;
+  --surface-border: #E2E8F0;
+
+  --foreground: #0F172A;
+  --background: #F8FAFC;
+}
+
+body {
+  background-color: var(--surface-bg);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar sutil estilo retail */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Utilidad para badges con pulso suave */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.92; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2.5s infinite ease-in-out;
+}

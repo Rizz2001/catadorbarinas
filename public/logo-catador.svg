@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="100%" height="100%">
+  <defs>
+    <linearGradient id="barrelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E07A1F"/>
+      <stop offset="100%" stop-color="#C85A08"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00227B"/>
+      <stop offset="100%" stop-color="#0A38A8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Emblema Óvalo Azul y Barril -->
+  <g transform="translate(10, 8)">
+    <!-- Silueta óvalo azul de fondo -->
+    <ellipse cx="32" cy="32" rx="30" ry="28" fill="url(#blueGrad)"/>
+
+    <!-- Barril estilizado en ámbar -->
+    <g transform="translate(14, 16) scale(0.9)">
+      <path d="M4 8 C4 4, 28 4, 28 8 L30 26 C30 30, 2 30, 2 26 Z" fill="url(#barrelGrad)"/>
+      <ellipse cx="16" cy="8" rx="12" ry="4" fill="#E07A1F" stroke="#8B3E03" stroke-width="1"/>
+      <ellipse cx="16" cy="26" rx="14" ry="4" fill="#C85A08" stroke="#8B3E03" stroke-width="1"/>
+      <!-- Aros de metal del barril -->
+      <path d="M2.5 13 C8 15, 24 15, 29.5 13" stroke="#2D1F17" stroke-width="1.8" fill="none"/>
+      <path d="M1.5 21 C8 23, 24 23, 30.5 21" stroke="#2D1F17" stroke-width="1.8" fill="none"/>
+    </g>
+
+    <!-- Silueta Copa de Vino en Blanco -->
+    <path d="M42 22 C42 27, 46 29, 48 29 L48 35 L44 35 L44 37 L52 37 L52 35 L48 35 L48 29 C50 29, 54 27, 54 22 Z" fill="#FFFFFF" opacity="0.95"/>
+  </g>
+
+  <!-- Tipografía Oficial -->
+  <text x="82" y="32" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="11" fill="#E07A1F" letter-spacing="1.5">DISTRIBUIDORA</text>
+  <text x="82" y="52" font-family="system-ui, -apple-system, sans-serif" font-weight="900" font-size="20" fill="#00227B" letter-spacing="0.2">GRAN CATADOR</text>
+  <text x="82" y="66" font-family="system-ui, -apple-system, sans-serif" font-weight="700" font-size="10" fill="#64748B" letter-spacing="0.8">BODEGÓN &amp; LICORERÍA</text>
+</svg>
