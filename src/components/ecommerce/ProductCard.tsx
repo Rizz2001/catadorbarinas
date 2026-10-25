@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Star, Check } from 'lucide-react';
 import { Product } from '@/types';
@@ -53,17 +54,25 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
       ) : null}
 
       {/* Imagen del Producto */}
-      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-slate-50 flex items-center justify-center p-2 mb-2">
+      <Link
+        href={`/producto/${product.id}${product.codGrupo ? `?grupo=${product.codGrupo}` : ''}`}
+        className="relative aspect-square w-full overflow-hidden rounded-lg bg-slate-50 flex items-center justify-center p-2 mb-2 block"
+      >
         <Image
           src={imageSrc}
           alt={product.name}
           fill
           sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
-          className="object-contain transition-transform duration-300 group-hover:scale-105"
+          className={cn(
+            'object-contain transition-transform duration-300',
+            !imageSrc || imageSrc === IMAGE_FALLBACKS.product || imageSrc.includes('logo')
+              ? 'p-6 opacity-75'
+              : 'group-hover:scale-105'
+          )}
           onError={() => setImageSrc(IMAGE_FALLBACKS.product)}
           loading="lazy"
         />
-      </div>
+      </Link>
 
       {/* Detalles del Producto */}
       <div className="flex flex-col flex-1">
@@ -71,15 +80,19 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
           {product.brand}
         </span>
 
-        <h3
-          className={cn(
-            'font-semibold text-slate-800 line-clamp-2 mt-0.5 group-hover:text-catador-blue transition-colors',
-            isCompact ? 'text-xs min-h-[32px]' : 'text-sm min-h-[40px]'
-          )}
-          title={product.name}
+        <Link
+          href={`/producto/${product.id}${product.codGrupo ? `?grupo=${product.codGrupo}` : ''}`}
         >
-          {product.name}
-        </h3>
+          <h3
+            className={cn(
+              'font-semibold text-slate-800 line-clamp-2 mt-0.5 group-hover:text-catador-blue transition-colors',
+              isCompact ? 'text-xs min-h-[32px]' : 'text-sm min-h-[40px]'
+            )}
+            title={product.name}
+          >
+            {product.name}
+          </h3>
+        </Link>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mt-1 mb-2">

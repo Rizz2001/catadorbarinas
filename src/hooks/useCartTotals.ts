@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { convertUsdToVes, DEFAULT_BCV_RATE } from '@/lib/currency';
 import { CartTotals } from '@/types';
 
@@ -13,6 +14,7 @@ import { CartTotals } from '@/types';
 export function useCartTotals(): CartTotals {
   const items = useCartStore((state) => state.items);
   const bcvRate = useBcvStore((state) => state.rateInfo?.rate ?? DEFAULT_BCV_RATE);
+  const storeConfig = useStoreConfigStore((state) => state.config);
 
   return useMemo(() => {
     let subtotalUsd = 0;
@@ -29,7 +31,9 @@ export function useCartTotals(): CartTotals {
       }
     });
 
-    const shippingUsd = subtotalUsd > 30 || subtotalUsd === 0 ? 0 : 2.0;
+    const freeThreshold = storeConfig?.delivery_gratis_minimo_usd ?? 30.0;
+    const baseShipping = storeConfig?.delivery_base_usd ?? 2.0;
+    const shippingUsd = subtotalUsd >= freeThreshold || subtotalUsd === 0 ? 0 : baseShipping;
     const totalUsd = subtotalUsd + shippingUsd;
 
     const subtotalVes = convertUsdToVes(subtotalUsd, bcvRate);
@@ -48,5 +52,5 @@ export function useCartTotals(): CartTotals {
       totalVes,
       itemCount,
     };
-  }, [items, bcvRate]);
+  }, [items, bcvRate, storeConfig]);
 }

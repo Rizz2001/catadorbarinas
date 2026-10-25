@@ -3,3 +3,5 @@ export * from './FeaturedDealsBox';
 export * from './WeeklyTrendsBento';
 export * from './HeroBanner';
 export * from './LiveCatalogSection';
+export * from './ProductDetailView';
+

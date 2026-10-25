@@ -1,5 +1,6 @@
 import { Product } from '../types';
 import { adaptFoxDataProducts, RawFoxDataProductDto } from '../adapters/foxdata.adapter';
+import { getProductImagesMap } from './cms.service';
 
 interface TokenCache {
   token: string;
@@ -119,12 +120,13 @@ export async function fetchArticulosSmartVentas(
       url += `?codSubgrupo=${codSubgrupo}`;
     }
 
-    const [articulosRes, existenciasMap] = await Promise.all([
+    const [articulosRes, existenciasMap, imagesMap] = await Promise.all([
       fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
         next: { revalidate: 60 },
       }),
       fetchExistenciasBodegonMap(),
+      getProductImagesMap(),
     ]);
 
     if (!articulosRes.ok) {
@@ -135,9 +137,80 @@ export async function fetchArticulosSmartVentas(
     const json = await articulosRes.json();
     const rawList: RawFoxDataProductDto[] = json.data || json || [];
 
-    return adaptFoxDataProducts(rawList, existenciasMap);
+    return adaptFoxDataProducts(rawList, existenciasMap, imagesMap);
   } catch (err) {
     console.error('Error obteniendo artículos de FoxData:', err);
     return [];
   }
 }
+
+/**
+ * Busca un producto individual por ID (codArticulo o SKU) a través de los grupos de FoxData
+ */
+export async function fetchProductById(
+  id: string,
+  groupHint?: string
+): Promise<Product | null> {
+  try {
+    if (groupHint) {
+      const products = await fetchArticulosSmartVentas(groupHint);
+      const match = products.find((p) => p.id === id || p.sku === id);
+      if (match) return match;
+    }
+
+    const priorityGroups = ['01', '02', '09', '11', '05', '14', '08', '03'];
+    for (const grupo of priorityGroups) {
+      if (grupo === groupHint) continue;
+      const products = await fetchArticulosSmartVentas(grupo);
+      const match = products.find((p) => p.id === id || p.sku === id);
+      if (match) return match;
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`Error buscando producto con id ${id}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Busca artículos en SmartVentas coincidentes por nombre, marca o SKU
+ */
+export async function searchProducts(
+  query: string,
+  codGrupo?: string
+): Promise<Product[]> {
+  const term = query.toLowerCase().trim();
+  if (!term) return [];
+
+  try {
+    const targetGroups = codGrupo && codGrupo !== 'all'
+      ? [codGrupo]
+      : ['01', '02', '09', '11', '05', '14', '08', '03'];
+
+    const groupPromises = targetGroups.map((g) => fetchArticulosSmartVentas(g));
+    const results = await Promise.all(groupPromises);
+    const allProducts = results.flat();
+
+    const matches = allProducts.filter((p) => {
+      return (
+        p.name.toLowerCase().includes(term) ||
+        p.brand.toLowerCase().includes(term) ||
+        p.sku.toLowerCase().includes(term) ||
+        p.description.toLowerCase().includes(term)
+      );
+    });
+
+    matches.sort((a, b) => {
+      if (a.inStock && !b.inStock) return -1;
+      if (!a.inStock && b.inStock) return 1;
+      return 0;
+    });
+
+    return matches;
+  } catch (error) {
+    console.error('Error al buscar productos en SmartVentas:', error);
+    return [];
+  }
+}
+

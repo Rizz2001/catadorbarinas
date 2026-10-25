@@ -1,37 +1,21 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
-import { X, Trash2, Plus, Minus, ShoppingBag, Send } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { formatPrices, formatUsd, formatVes } from '@/lib/currency';
-import { APP_CONFIG, IMAGE_FALLBACKS } from '@/constants/config';
+import { IMAGE_FALLBACKS } from '@/constants/config';
 
 export function CartDrawer() {
-  const { items, isOpen, closeCart, updateQuantity, removeItem, clearCart } = useCartStore();
+  const { items, isOpen, closeCart, updateQuantity, removeItem } = useCartStore();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
   const totals = useCartTotals();
 
   if (!isOpen) return null;
-
-  const handleWhatsAppCheckout = () => {
-    let message = `${APP_CONFIG.whatsappDefaultMessage}\n\n`;
-    items.forEach(({ product, quantity }) => {
-      const p = formatPrices(product.priceUsd * quantity, bcvRate);
-      message += `• ${quantity}x ${product.name} - ${p.usdFormatted} (${p.vesFormatted})\n`;
-    });
-
-    message += `\n*Subtotal:* ${formatUsd(totals.subtotalUsd)} / ${formatVes(totals.subtotalVes)}`;
-    message += `\n*Envío:* ${totals.shippingUsd === 0 ? 'Gratis' : `${formatUsd(totals.shippingUsd)} / ${formatVes(totals.shippingVes)}`}`;
-    message += `\n*TOTAL A PAGAR:* ${formatUsd(totals.totalUsd)} / ${formatVes(totals.totalVes)}`;
-    message += `\n*Tasa BCV:* Bs. ${bcvRate.toFixed(2)}/$`;
-    message += `\n\nPor favor confirmar disponibilidad y método de pago (Pago Móvil / Zelle / Efectivo).`;
-
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/${APP_CONFIG.whatsappNumber}?text=${encoded}`, '_blank');
-  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -41,8 +25,8 @@ export function CartDrawer() {
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-in fade-in"
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <aside className="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <aside className="w-screen max-w-md bg-white shadow-2xl flex flex-col overflow-x-hidden">
           {/* Cabecera del Drawer */}
           <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
             <div className="flex items-center gap-2">
@@ -54,7 +38,8 @@ export function CartDrawer() {
             </div>
             <button
               onClick={closeCart}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+              aria-label="Cerrar carrito"
+              className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
             >
               <X className="h-5 w-5" />
             </button>
@@ -71,7 +56,7 @@ export function CartDrawer() {
                 </p>
                 <button
                   onClick={closeCart}
-                  className="mt-5 rounded-lg bg-catador-blue px-4 py-2 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
+                  className="mt-5 rounded-lg bg-catador-blue px-4 py-2 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors cursor-pointer"
                 >
                   Explorar Productos
                 </button>
@@ -104,7 +89,7 @@ export function CartDrawer() {
                         <div className="flex items-center border border-slate-200 rounded-md bg-white">
                           <button
                             onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="p-1 text-slate-500 hover:text-slate-800"
+                            className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
@@ -113,14 +98,14 @@ export function CartDrawer() {
                           </span>
                           <button
                             onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="p-1 text-slate-500 hover:text-slate-800"
+                            className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
                           >
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
                         <button
                           onClick={() => removeItem(product.id)}
-                          className="text-slate-400 hover:text-red-500 p-1"
+                          className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -161,12 +146,22 @@ export function CartDrawer() {
                 </div>
               </div>
 
-              <button
-                onClick={handleWhatsAppCheckout}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 py-3 text-xs font-bold text-white shadow-sm transition-colors"
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light py-3 text-sm font-extrabold text-white shadow-md transition-colors"
               >
-                <Send className="h-4 w-4" /> Confirmar Pedido por WhatsApp
-              </button>
+                <span>Pagar Pedido en Línea</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+
+              <Link
+                href="/carrito"
+                onClick={closeCart}
+                className="w-full min-h-[44px] flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 py-2.5 text-xs font-bold text-slate-700 transition-colors"
+              >
+                Ver Detalle del Carrito
+              </Link>
             </div>
           )}
         </aside>

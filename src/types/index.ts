@@ -44,6 +44,8 @@ export interface Product {
   dealEndsAt?: string; // ISO date string
   isWeeklyTrend?: boolean;
   isStarProduct?: boolean; // Para el producto destacado central del Bento Grid
+  codGrupo?: string;
+  codSubgrupo?: string;
   badges?: string[];
   attributes?: Record<string, string>;
 }
@@ -81,3 +83,58 @@ export interface CartTotals {
   totalVes: number;
   itemCount: number;
 }
+
+export interface Banner {
+  id: string;
+  titulo: string;
+  subtitulo?: string | null;
+  badge_texto?: string | null;
+  boton_texto: string;
+  boton_url: string;
+  imagen_url?: string | null;
+  tipo: 'hero' | 'promocion_grid' | 'secundario';
+  promo_titulo?: string | null;
+  promo_precio?: number | null;
+  promo_badge?: string | null;
+  promo_ahorro?: string | null;
+  activo: boolean;
+  orden: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface StoreConfig {
+  id: string;
+  nombre_tienda: string;
+  razon_social: string;
+  rif: string;
+  telefono_atencion: string;
+  direccion_fisica: string;
+  horario_despacho: string;
+  delivery_base_usd: number;
+  delivery_gratis_minimo_usd: number;
+  pago_movil_banco: string;
+  pago_movil_telefono: string;
+  pago_movil_cedula: string;
+  zelle_email: string;
+  zelle_titular: string;
+  bcv_tasa_manual?: number | null;
+  bcv_usar_manual: boolean;
+  logo_url?: string | null;
+  logo_alto_px?: number | null;
+  logo_ancho_px?: number | null;
+  updated_at?: string;
+}
+
+export interface ProductImageMapping {
+  codigo_articulo: string;
+  nombre_articulo?: string | null;
+  imagen_url: string;
+  nombre_archivo: string;
+  formato?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export * from './supabase';
+

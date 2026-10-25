@@ -109,7 +109,7 @@ export function LiveCatalogSection({
       </div>
 
       {/* Barra de Píldoras de Grupos */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full min-w-0 max-w-full">
         {activeGroups.map((group) => {
           const isActive = group.CodGrupo === selectedGroup;
           return (
@@ -131,7 +131,7 @@ export function LiveCatalogSection({
 
       {/* Subgrupos del Grupo Seleccionado */}
       {subgroups.length > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1 bg-slate-100/70 p-2 rounded-xl border border-slate-200/80">
+        <div className="flex items-center gap-1.5 overflow-x-auto py-1 bg-slate-100/70 p-2 rounded-xl border border-slate-200/80 w-full min-w-0 max-w-full">
           <span className="text-[11px] font-bold text-slate-500 uppercase px-2 shrink-0">
             Subgrupos:
           </span>

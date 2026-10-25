@@ -10,8 +10,9 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
+# testing & local audit scripts
 /coverage
+/scripts/
 
 # next.js
 /.next/

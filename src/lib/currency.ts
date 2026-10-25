@@ -3,7 +3,7 @@ import type { DualPriceResult } from '../types';
 /**
  * Tasa BCV de respaldo oficial en caso de desconexión o fallo de API
  */
-export const DEFAULT_BCV_RATE = 43.62;
+export const DEFAULT_BCV_RATE = 886.23;
 
 /**
  * Formatea un número al estándar monetario estadounidense:

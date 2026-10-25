@@ -98,7 +98,10 @@ function resolveDepartmentByGroup(codGrupo?: string): DepartmentSlug {
  * ADAPTADOR OFICIAL FOXDATA
  * Transforma un producto crudo de FoxData a la interfaz canónica de producto de Gran Catador.
  */
-export function adaptFoxDataProduct(raw: RawFoxDataProductDto): Product {
+export function adaptFoxDataProduct(
+  raw: RawFoxDataProductDto,
+  imagesMap?: Map<string, string>
+): Product {
   // En SmartVentas / Saint, el precio de venta al detal en divisas de Bodegón está en precioVentDiv5
   const candidatePrices = [
     raw.precioVentDiv5,
@@ -118,8 +121,20 @@ export function adaptFoxDataProduct(raw: RawFoxDataProductDto): Product {
   const rawOriginalPrice = raw.precio_regular_usd ?? raw.precio_regular;
   const originalPriceUsd = rawOriginalPrice ? Number(rawOriginalPrice) : undefined;
 
-  // Sanitización de imágenes con fallback oficial
+  const id = String(raw.codArticulo ?? raw.id ?? raw.codigo ?? raw.sku ?? Math.random().toString(36).substring(7));
+  const sku = raw.sku ?? raw.codigo ?? `GC-${id.padStart(6, '0')}`;
+  const rawCode = (raw.codArticulo ?? raw.sku ?? raw.codigo ?? id).trim();
+
+  // Buscar imagen WebP cargada en el CMS por código de barras / SKU
+  const cmsImage =
+    imagesMap?.get(rawCode) ??
+    imagesMap?.get(rawCode.toLowerCase()) ??
+    (raw.codArticulo ? imagesMap?.get(raw.codArticulo.trim()) : undefined) ??
+    (raw.sku ? imagesMap?.get(raw.sku.trim()) : undefined);
+
+  // Sanitización de imágenes con prioridad a la imagen oficial subida en el CMS
   const imageSources = [
+    cmsImage,
     raw.imagenUrl,
     ...(raw.imagenes ?? raw.fotos ?? raw.images ?? []),
   ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
@@ -127,8 +142,6 @@ export function adaptFoxDataProduct(raw: RawFoxDataProductDto): Product {
   const images = imageSources.length > 0 ? imageSources : [IMAGE_FALLBACKS.product];
 
   const name = (raw.nombre ?? raw.descripcion ?? raw.name ?? 'Producto Gran Catador').trim();
-  const id = String(raw.codArticulo ?? raw.id ?? raw.codigo ?? raw.sku ?? Math.random().toString(36).substring(7));
-  const sku = raw.sku ?? raw.codigo ?? `GC-${id.padStart(6, '0')}`;
 
   const slug =
     raw.slug ??
@@ -169,15 +182,18 @@ export function adaptFoxDataProduct(raw: RawFoxDataProductDto): Product {
     dealEndsAt: raw.fecha_fin_oferta,
     isWeeklyTrend: Boolean(raw.es_tendencia),
     isStarProduct: Boolean(raw.es_estrella),
+    codGrupo: raw.codGrupo,
+    codSubgrupo: raw.codSubgrupo,
   };
 }
 
 /**
- * Transforma una lista de artículos de FoxData vinculándolos opcionalmente con existencias
+ * Transforma una lista de artículos de FoxData vinculándolos opcionalmente con existencias y fotos CMS
  */
 export function adaptFoxDataProducts(
   rawList: RawFoxDataProductDto[],
-  existenciasMap?: Map<string, number>
+  existenciasMap?: Map<string, number>,
+  imagesMap?: Map<string, string>
 ): Product[] {
   if (!Array.isArray(rawList)) return [];
 
@@ -186,7 +202,7 @@ export function adaptFoxDataProducts(
     .map((item) => {
       const artId = item.codArticulo ?? String(item.id);
       const stock = existenciasMap?.has(artId) ? existenciasMap.get(artId) : item.existencia;
-      return adaptFoxDataProduct({ ...item, existencia: stock });
+      return adaptFoxDataProduct({ ...item, existencia: stock }, imagesMap);
     })
     .sort((a, b) => {
       if (a.inStock && !b.inStock) return -1;

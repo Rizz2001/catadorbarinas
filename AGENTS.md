@@ -14,6 +14,7 @@ Este archivo rige de forma estricta todo el desarrollo en este repositorio.
 
 ## 1. Skills Obligatorias Activas
 - **UI / UX E-commerce:** `.agent/skills/catador-ecommerce-ui/SKILL.md` (Paleta oficial `#00227B` y `#E07A1F`, Header de 3 niveles, Bento Grid 5 columnas, Deals Countdown Timer).
+- **Universal Responsive UI:** `.agent/skills/universal-responsive-ui/SKILL.md` (Diseño omni-dispositivo 320px–1920px+, mobile-first, zero horizontal overflow, touch targets >= 44px, safe areas, bimonetarismo adaptable).
 - **Clean & Scalable Architecture:** `.agent/skills/clean-scalable-architecture/SKILL.md` (Sistema de archivos estricto, regla de adaptadores, política de cero código muerto, límite de 180-200 líneas por componente).
 
 ## 2. Sistema de Archivos y Responsabilidades
