@@ -6,14 +6,18 @@ import Image from 'next/image';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { formatPrices, formatUsd, formatVes } from '@/lib/currency';
 import { IMAGE_FALLBACKS } from '@/constants/config';
+import { cn } from '@/lib/utils';
 
 export function CartDrawer() {
   const { items, isOpen, closeCart, updateQuantity, removeItem } = useCartStore();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
   const totals = useCartTotals();
+  const storeConfig = useStoreConfigStore((state) => state.config);
+  const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
 
   if (!isOpen) return null;
 
@@ -64,16 +68,20 @@ export function CartDrawer() {
             ) : (
               items.map(({ product, quantity }) => {
                 const itemPrices = formatPrices(product.priceUsd * quantity, bcvRate);
-                return (
-                  <div key={product.id} className="py-3 flex gap-3 items-center">
-                    <div className="relative h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden p-1">
-                      <Image
-                        src={product.images[0] || IMAGE_FALLBACKS.product}
-                        alt={product.name}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
+                  const rawImg = product.images?.[0];
+                  const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
+                  const itemImg = isNoImg ? cmsLogo : rawImg;
+
+                  return (
+                    <div key={product.id} className="py-3 flex gap-3 items-center">
+                      <div className="relative h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-slate-200 overflow-hidden p-1">
+                        <Image
+                          src={itemImg}
+                          alt={product.name}
+                          fill
+                          className={cn('object-contain', isNoImg ? 'p-2 opacity-80' : '')}
+                        />
+                      </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-semibold text-slate-800 truncate">
                         {product.name}

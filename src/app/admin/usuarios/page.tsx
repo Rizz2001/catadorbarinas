@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { Users, Search, Shield, User, Bike, Loader2, Check } from 'lucide-react';
+import { Users, Search, Loader2, Edit3 } from 'lucide-react';
 import { Database } from '@/types/supabase';
+import { EditUserModal } from '@/components/admin/EditUserModal';
 
 type PerfilRow = Database['public']['Tables']['perfiles']['Row'];
 
@@ -11,6 +12,7 @@ export default function AdminUsuariosPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [editingUser, setEditingUser] = useState<PerfilRow | null>(null);
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -30,7 +32,10 @@ export default function AdminUsuariosPage() {
   }, []);
 
   useEffect(() => {
-    fetchUsers();
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchUsers]);
 
   const handleRoleChange = async (targetUserId: string, newRole: string) => {
@@ -54,6 +59,10 @@ export default function AdminUsuariosPage() {
     }
   };
 
+  const handleUserSaved = (updatedUser: PerfilRow) => {
+    setUsers((prev) => prev.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+  };
+
   const filteredUsers = users.filter(
     (u) =>
       u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,7 +79,7 @@ export default function AdminUsuariosPage() {
           </div>
           <div>
             <h1 className="text-xl font-black text-slate-900 tracking-tight">Gestión de Usuarios y Roles</h1>
-            <p className="text-xs text-slate-500">Control de permisos de acceso al CMS, clientes y repartidores</p>
+            <p className="text-xs text-slate-500">Control de datos de clientes, permisos del CMS y repartidores</p>
           </div>
         </div>
 
@@ -105,7 +114,8 @@ export default function AdminUsuariosPage() {
                   <th className="p-3.5">Cédula / RIF</th>
                   <th className="p-3.5">Teléfono</th>
                   <th className="p-3.5">Dirección</th>
-                  <th className="p-3.5">Rol en Plataforma</th>
+                  <th className="p-3.5">Rol / Permisos</th>
+                  <th className="p-3.5 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-slate-700">
@@ -139,6 +149,16 @@ export default function AdminUsuariosPage() {
                           {isUpdating && <Loader2 className="h-3.5 w-3.5 animate-spin text-catador-blue" />}
                         </div>
                       </td>
+                      <td className="p-3.5 text-right">
+                        <button
+                          type="button"
+                          onClick={() => setEditingUser(u)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 hover:border-catador-blue text-slate-700 hover:text-catador-blue font-bold text-xs bg-white shadow-2xs transition-colors cursor-pointer"
+                        >
+                          <Edit3 className="h-3.5 w-3.5" />
+                          <span>Modificar</span>
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
@@ -147,6 +167,13 @@ export default function AdminUsuariosPage() {
           </div>
         )}
       </div>
+
+      <EditUserModal
+        user={editingUser}
+        isOpen={!!editingUser}
+        onClose={() => setEditingUser(null)}
+        onSaveSuccess={handleUserSaved}
+      />
     </main>
   );
 }

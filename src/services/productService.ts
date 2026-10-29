@@ -15,10 +15,9 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 /**
- * Ofertas Destacadas basadas en productos reales de SmartVentas con stock
+ * Deriva las Ofertas Destacadas en memoria a partir de una lista ya cargada de productos
  */
-export async function getFeaturedDeals(): Promise<Product[]> {
-  const all = await getAllProducts();
+export function deriveFeaturedDeals(all: Product[]): Product[] {
   const inStock = all.filter((p) => p.inStock);
   const candidates = inStock.length >= 6 ? inStock : all;
   return candidates.slice(0, 6).map((p, idx) => ({
@@ -30,23 +29,23 @@ export async function getFeaturedDeals(): Promise<Product[]> {
 }
 
 /**
- * Tendencias de la Semana basadas en productos reales de SmartVentas
+ * Deriva las Tendencias de la Semana en memoria
  */
-export async function getWeeklyTrends(): Promise<Product[]> {
-  const all = await getAllProducts();
+export function deriveWeeklyTrends(all: Product[]): Product[] {
   const inStock = all.filter((p) => p.inStock);
-  const candidates = inStock.length >= 10 ? inStock.slice(5, 10) : all.slice(0, 5);
-  return candidates.map((p) => ({
+  const pool = inStock.length >= 8 ? inStock : all;
+  return pool.slice(0, 12).map((p, idx) => ({
     ...p,
     isWeeklyTrend: true,
+    discountPercentage: idx % 3 === 0 ? 10 : undefined,
+    originalPriceUsd: idx % 3 === 0 ? Number((p.priceUsd * 1.10).toFixed(2)) : undefined,
   }));
 }
 
 /**
- * Producto Estrella basado en el inventario real de Bodegón
+ * Deriva el Producto Estrella en memoria
  */
-export async function getStarProduct(): Promise<Product | undefined> {
-  const all = await getAllProducts();
+export function deriveStarProduct(all: Product[]): Product | undefined {
   const inStock = all.filter((p) => p.inStock && p.priceUsd > 20);
   const star = inStock[0] || all[0];
   if (!star) return undefined;
@@ -54,4 +53,28 @@ export async function getStarProduct(): Promise<Product | undefined> {
     ...star,
     isStarProduct: true,
   };
+}
+
+/**
+ * Ofertas Destacadas basadas en productos reales de SmartVentas con stock
+ */
+export async function getFeaturedDeals(): Promise<Product[]> {
+  const all = await getAllProducts();
+  return deriveFeaturedDeals(all);
+}
+
+/**
+ * Tendencias de la Semana basadas en productos reales de SmartVentas
+ */
+export async function getWeeklyTrends(): Promise<Product[]> {
+  const all = await getAllProducts();
+  return deriveWeeklyTrends(all);
+}
+
+/**
+ * Producto Estrella basado en el inventario real de Bodegón
+ */
+export async function getStarProduct(): Promise<Product | undefined> {
+  const all = await getAllProducts();
+  return deriveStarProduct(all);
 }

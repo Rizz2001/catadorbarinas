@@ -4,31 +4,40 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, X, Loader2, ArrowRight } from 'lucide-react';
+import { Search, X, Loader2, ArrowRight, ShoppingCart, Check } from 'lucide-react';
 import { Product } from '@/types';
 import { formatPrices } from '@/lib/currency';
 import { useBcvStore } from '@/store/useBcvStore';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
+import { useCartStore } from '@/store/useCartStore';
 import { IMAGE_FALLBACKS } from '@/constants/config';
+import { cn } from '@/lib/utils';
 
 export function HeaderSearch() {
   const router = useRouter();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const storeConfig = useStoreConfigStore((state) => state.config);
+  const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
+  const addItem = useCartStore((state) => state.addItem);
 
   const [term, setTerm] = useState('');
   const [results, setResults] = useState<Product[]>([]);
   const [totalMatches, setTotalMatches] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [addedId, setAddedId] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounce search effect
   useEffect(() => {
     if (term.trim().length < 2) {
-      setResults([]);
-      setTotalMatches(0);
-      setIsOpen(false);
-      return;
+      const resetTimer = setTimeout(() => {
+        setResults([]);
+        setTotalMatches(0);
+        setIsOpen(false);
+      }, 0);
+      return () => clearTimeout(resetTimer);
     }
 
     const timer = setTimeout(async () => {
@@ -51,15 +60,24 @@ export function HeaderSearch() {
     return () => clearTimeout(timer);
   }, [term]);
 
-  // Click outside to close
+  // Click outside y tecla Escape para cerrar
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
         setIsOpen(false);
       }
     };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,39 +137,82 @@ export function HeaderSearch() {
             ) : (
               results.map((product) => {
                 const prices = formatPrices(product.priceUsd, bcvRate);
+                const rawImg = product.images?.[0];
+                const hasNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
+                const imgSrc = hasNoImg ? cmsLogo : rawImg;
+                const isItemAdded = addedId === product.id;
+
                 return (
                   <Link
                     key={product.id}
                     href={`/producto/${product.id}${product.codGrupo ? `?grupo=${product.codGrupo}` : ''}`}
                     onClick={() => setIsOpen(false)}
-                    className="p-3 flex items-center gap-3 hover:bg-slate-50 transition-colors"
+                    className="p-3 flex items-center gap-3 hover:bg-slate-50 transition-colors group"
                   >
-                    <div className="relative h-12 w-12 shrink-0 rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden">
+                    <div className="relative h-12 w-12 shrink-0 rounded-xl bg-slate-50 border border-slate-100 p-1 overflow-hidden flex items-center justify-center">
                       <Image
-                        src={product.images[0] || IMAGE_FALLBACKS.product}
+                        src={imgSrc}
                         alt={product.name}
                         fill
-                        className="object-contain"
+                        className={cn(
+                          'object-contain transition-transform duration-200',
+                          hasNoImg ? 'p-2 opacity-80' : 'group-hover:scale-105'
+                        )}
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <span className="text-[10px] font-bold uppercase text-slate-400 truncate block">
-                        {product.brand}
-                      </span>
-                      <h4 className="text-xs font-bold text-slate-800 truncate">{product.name}</h4>
-                      <p className="text-[11px] font-extrabold text-catador-blue mt-0.5">
-                        {prices.usdFormatted} <span className="text-slate-500 font-semibold">({prices.vesFormatted})</span>
-                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[10px] font-black uppercase text-amber-600/80 tracking-wider truncate">
+                          {product.brand}
+                        </span>
+                        {product.inStock ? (
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-full">
+                            En Stock
+                          </span>
+                        ) : (
+                          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-full">
+                            Agotado
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-xs font-bold text-slate-900 truncate group-hover:text-catador-blue transition-colors">
+                        {product.name}
+                      </h4>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-xs font-black text-slate-900">{prices.usdFormatted}</span>
+                        <span className="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200/60">
+                          {prices.vesFormatted}
+                        </span>
+                      </div>
                     </div>
-                    {product.inStock ? (
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                        En Stock
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full shrink-0">
-                        Agotado
-                      </span>
-                    )}
+
+                    {/* Botón de Agregar Rápido al Carrito */}
+                    <button
+                      type="button"
+                      disabled={!product.inStock}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        addItem(product, 1);
+                        setAddedId(product.id);
+                        setTimeout(() => setAddedId(null), 1200);
+                      }}
+                      aria-label={`Agregar ${product.name} al carrito`}
+                      className={cn(
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all cursor-pointer shadow-2xs',
+                        !product.inStock
+                          ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                          : isItemAdded
+                          ? 'bg-emerald-600 text-white scale-105'
+                          : 'bg-slate-100 text-slate-700 hover:bg-catador-blue hover:text-white'
+                      )}
+                    >
+                      {isItemAdded ? (
+                        <Check className="h-4 w-4 stroke-[3]" />
+                      ) : (
+                        <ShoppingCart className="h-4 w-4" />
+                      )}
+                    </button>
                   </Link>
                 );
               })

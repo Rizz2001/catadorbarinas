@@ -1,6 +1,6 @@
 /**
  * Constantes globales de configuración para Gran Catador / Bodegón del Catador.
- * Prohibido hardcodear estos valores en componentes.
+ * Estricta fidelidad con la API de FoxData / SmartVentas.
  */
 
 export const APP_CONFIG = {
@@ -10,7 +10,7 @@ export const APP_CONFIG = {
   country: 'Venezuela',
   address: 'Av. Alberto Arvelo Torrealba, Barinas, Edo. Barinas',
   phone: '+58 414-0000000',
-  whatsappNumber: '584140000000', // Formato internacional para wa.me sin signos
+  whatsappNumber: '584140000000',
   whatsappDefaultMessage: '¡Hola Gran Catador! Me gustaría confirmar el siguiente pedido:',
   freeShippingThresholdUsd: 30.0,
   flatShippingRateUsd: 2.0,
@@ -24,13 +24,20 @@ export const IMAGE_FALLBACKS = {
   logoText: 'Gran Catador',
 } as const;
 
+/**
+ * Grupos comerciales oficiales sincronizados 100% con SmartVentas (FoxData)
+ */
 export const DEPARTMENTS = [
-  { id: '1', name: 'Licores & Vinos', slug: 'licores-vinos', icon: 'Wine' },
-  { id: '2', name: 'Víveres & Despensa', slug: 'viveres', icon: 'ShoppingBasket' },
-  { id: '3', name: 'Charcutería & Quesos', slug: 'charcuteria-quesos', icon: 'Sandwich' },
-  { id: '4', name: 'Carnicería & Aves', slug: 'carniceria', icon: 'Beef' },
-  { id: '5', name: 'Snacks & Dulcería', slug: 'snacks-dulces', icon: 'Cookie' },
-  { id: '6', name: 'Bebidas & Refrescos', slug: 'bebidas-refrescos', icon: 'CupSoda' },
-  { id: '7', name: 'Cuidado Personal', slug: 'cuidado-personal', icon: 'Sparkles' },
-  { id: '8', name: 'Hogar & Limpieza', slug: 'hogar-limpieza', icon: 'Home' },
+  { id: '01', name: 'Licores', slug: '01', icon: 'Wine' },
+  { id: '09', name: 'Cervezas', slug: '09', icon: 'CupSoda' },
+  { id: '02', name: 'Refrescos', slug: '02', icon: 'CupSoda' },
+  { id: '11', name: 'Alimentos & Despensa', slug: '11', icon: 'ShoppingBasket' },
+  { id: '05', name: 'Confitería & Snacks', slug: '05', icon: 'Cookie' },
+  { id: '03', name: 'Hielos', slug: '03', icon: 'Sparkles' },
+  { id: '08', name: 'Agua', slug: '08', icon: 'CupSoda' },
+  { id: '14', name: 'Jugos & Lácteas', slug: '14', icon: 'Sandwich' },
+  { id: '07', name: 'Carbón', slug: '07', icon: 'Flame' },
+  { id: '06', name: 'Vasos & Platos', slug: '06', icon: 'ShoppingBag' },
+  { id: '04', name: 'Cigarrillos & Fósforos', slug: '04', icon: 'Tag' },
+  { id: '10', name: 'Varios', slug: '10', icon: 'Tag' },
 ] as const;

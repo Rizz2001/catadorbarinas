@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, ChevronDown, Flame, Sparkles } from 'lucide-react';
+import { Menu, ChevronDown, Flame } from 'lucide-react';
 import { DEPARTMENTS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
@@ -76,19 +76,19 @@ export function HeaderNav() {
         {/* Enlaces Rápidos de Navegación */}
         <div className="hidden lg:flex items-center gap-6 text-xs font-semibold">
           <Link href="/catalogo/01" className="hover:text-catador-amber transition-colors">
-            Licores &amp; Vinos
+            Licores
           </Link>
           <Link href="/catalogo/09" className="hover:text-catador-amber transition-colors">
             Cervezas
           </Link>
           <Link href="/catalogo/11" className="hover:text-catador-amber transition-colors">
-            Víveres &amp; Alimentos
+            Alimentos
           </Link>
           <Link href="/catalogo/02" className="hover:text-catador-amber transition-colors">
-            Refrescos &amp; Bebidas
+            Refrescos
           </Link>
           <Link href="/catalogo/05" className="hover:text-catador-amber transition-colors">
-            Snacks &amp; Dulces
+            Confitería
           </Link>
           <Link href="/catalogo" className="hover:text-catador-amber transition-colors font-bold text-catador-amber">
             Ver Todo el Catálogo

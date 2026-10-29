@@ -59,7 +59,9 @@ export function useOrderChat({
   useEffect(() => {
     if (!pedidoId) return;
 
-    cargarHistorial();
+    const timer = setTimeout(() => {
+      cargarHistorial();
+    }, 0);
 
     const channelName = `pedido-chat-${pedidoId}`;
     const channel = supabase.channel(channelName, {
@@ -121,6 +123,7 @@ export function useOrderChat({
     channelRef.current = channel;
 
     return () => {
+      clearTimeout(timer);
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
       }

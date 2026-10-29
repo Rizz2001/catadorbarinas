@@ -1,17 +1,6 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import { Header, CartDrawer, Footer } from '@/components/layout';
-
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
+import { Header, CartDrawer, BottomNav, Footer } from '@/components/layout';
 
 export const metadata: Metadata = {
   title: 'Gran Catador | Distribuidora & Bodegón del Catador Barinas',
@@ -25,14 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="es" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden">
         <Header />
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 pb-16 md:pb-0">{children}</div>
         <CartDrawer />
+        <BottomNav />
         <Footer />
       </body>
     </html>

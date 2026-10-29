@@ -6,12 +6,16 @@ import Image from 'next/image';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
-import { formatPrices, formatUsd, formatVes } from '@/lib/currency';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
+import { formatPrices } from '@/lib/currency';
 import { IMAGE_FALLBACKS } from '@/constants/config';
+import { cn } from '@/lib/utils';
 
 export function CartItemList() {
   const { items, updateQuantity, removeItem, clearCart } = useCartStore();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const storeConfig = useStoreConfigStore((state) => state.config);
+  const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
 
   if (items.length === 0) {
     return (
@@ -52,6 +56,10 @@ export function CartItemList() {
           const itemPrices = formatPrices(product.priceUsd * quantity, bcvRate);
           const unitPrices = formatPrices(product.priceUsd, bcvRate);
 
+          const rawImg = product.images?.[0];
+          const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
+          const itemImg = isNoImg ? cmsLogo : rawImg;
+
           return (
             <div
               key={product.id}
@@ -61,10 +69,10 @@ export function CartItemList() {
               <div className="flex items-center gap-3.5 flex-1 min-w-0">
                 <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 overflow-hidden">
                   <Image
-                    src={product.images[0] || IMAGE_FALLBACKS.product}
+                    src={itemImg}
                     alt={product.name}
                     fill
-                    className="object-contain"
+                    className={cn('object-contain', isNoImg ? 'p-2 opacity-80' : '')}
                   />
                 </div>
                 <div className="min-w-0 flex-1">

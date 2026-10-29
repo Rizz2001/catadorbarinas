@@ -9,6 +9,7 @@ import {
   ConfigDeliverySection,
   ConfigBancariaSection,
   ConfigBcvSection,
+  ConfigCatalogoSection,
 } from '@/components/admin/config';
 
 export default function AdminConfiguracionPage() {
@@ -24,7 +25,8 @@ export default function AdminConfiguracionPage() {
 
   useEffect(() => {
     if (config) {
-      setForm(config);
+      const timer = setTimeout(() => setForm(config), 0);
+      return () => clearTimeout(timer);
     }
   }, [config]);
 
@@ -95,6 +97,7 @@ export default function AdminConfiguracionPage() {
         <form onSubmit={handleSubmit} className="space-y-6 text-xs">
           <ConfigIdentidadSection form={form} onChange={handleChange} onQuickSave={handleQuickSaveLogo} />
           <ConfigDeliverySection form={form} onChange={handleChange} />
+          <ConfigCatalogoSection form={form} onChange={handleChange} />
           <ConfigBancariaSection form={form} onChange={handleChange} />
           <ConfigBcvSection form={form} onChange={handleChange} />
 

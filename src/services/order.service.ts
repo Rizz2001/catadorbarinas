@@ -282,3 +282,21 @@ export async function updateOrderStatus(
 
   return true;
 }
+
+/**
+ * Elimina un pedido y sus registros asociados (items, pagos, mensajes)
+ */
+export async function deleteOrder(pedidoId: string): Promise<boolean> {
+  const supabaseAdmin = getSupabaseAdmin();
+  try {
+    await supabaseAdmin.from('pedido_mensajes').delete().eq('pedido_id', pedidoId);
+    await supabaseAdmin.from('pagos_pedido').delete().eq('pedido_id', pedidoId);
+    await supabaseAdmin.from('pedido_items').delete().eq('pedido_id', pedidoId);
+    await supabaseAdmin.from('pedidos').delete().eq('id', pedidoId);
+  } catch (err) {
+    console.warn('Error eliminando orden de Supabase:', err);
+  }
+
+  memoryOrders.delete(pedidoId);
+  return true;
+}

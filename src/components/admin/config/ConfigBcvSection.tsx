@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { RefreshCw, Coins, AlertCircle } from 'lucide-react';
 import { StoreConfig } from '@/types';
 import { useBcvStore } from '@/store/useBcvStore';
@@ -12,11 +12,11 @@ interface ConfigBcvSectionProps {
 
 export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
   const { rateInfo, fetchRate, isLoading } = useBcvStore();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-4">

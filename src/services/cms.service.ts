@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase/client';
-import { Banner, StoreConfig, ProductImageMapping } from '@/types';
+import { Banner, StoreConfig, ProductImageMapping, QuickCategory } from '@/types';
 
 // ============================================================================
 // BANNERS
@@ -53,6 +53,45 @@ export async function upsertBanner(banner: Partial<Banner>): Promise<Banner> {
 
 export async function deleteBanner(id: string): Promise<void> {
   const { error } = await supabase.from('banners').delete().eq('id', id);
+  if (error) throw error;
+}
+
+// ============================================================================
+// CATEGORÍAS RÁPIDAS (ACCESOS DIRECTOS DEL HERO)
+// ============================================================================
+export async function getQuickCategories(onlyActive = true): Promise<QuickCategory[]> {
+  try {
+    let query = supabase.from('categorias_rapidas').select('*').order('orden', { ascending: true });
+    if (onlyActive) {
+      query = query.eq('activo', true);
+    }
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data || []) as QuickCategory[];
+  } catch (err) {
+    console.error('Error cargando categorías rápidas:', err);
+    return [];
+  }
+}
+
+export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise<QuickCategory> {
+  const payload: Record<string, unknown> = {
+    ...item,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from('categorias_rapidas')
+    .upsert(payload)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data as QuickCategory;
+}
+
+export async function deleteQuickCategory(id: string): Promise<void> {
+  const { error } = await supabase.from('categorias_rapidas').delete().eq('id', id);
   if (error) throw error;
 }
 

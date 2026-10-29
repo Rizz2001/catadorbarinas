@@ -1,14 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { Star, Sparkles, ShoppingBag, ArrowRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
+import { Sparkles, Flame, TrendingUp, Star, ArrowRight } from 'lucide-react';
 import { Product } from '@/types';
 import { ProductCard } from './ProductCard';
-import { formatPrices } from '@/lib/currency';
-import { useBcvStore } from '@/store/useBcvStore';
-import { useCartStore } from '@/store/useCartStore';
-import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 interface WeeklyTrendsBentoProps {
@@ -16,126 +12,90 @@ interface WeeklyTrendsBentoProps {
   starProduct?: Product;
 }
 
-export function WeeklyTrendsBento({ products, starProduct }: WeeklyTrendsBentoProps) {
-  const [activeTab, setActiveTab] = useState<'bestseller' | 'deals' | 'new'>('bestseller');
-  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
-  const addItem = useCartStore((state) => state.addItem);
+type TabType = 'bestseller' | 'deals' | 'new';
 
-  const heroItem = starProduct || products[0];
-  const sideItems = products.filter((p) => p.id !== heroItem?.id);
-  const leftItems = sideItems.slice(0, 2);
-  const rightItems = sideItems.slice(2, 4);
+export function WeeklyTrendsBento({ products }: WeeklyTrendsBentoProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('bestseller');
 
-  const heroPrices = heroItem ? formatPrices(heroItem.priceUsd, bcvRate) : null;
+  // Filtrado reactivo según la pestaña seleccionada
+  const sortedProducts = useMemo(() => {
+    const list = [...products];
+    if (activeTab === 'deals') {
+      return list.sort((a, b) => (b.discountPercentage || 0) - (a.discountPercentage || 0));
+    }
+    if (activeTab === 'new') {
+      return [...list].reverse();
+    }
+    // 'bestseller' (Por defecto)
+    return list.sort((a, b) => (b.reviewsCount || 0) - (a.reviewsCount || 0));
+  }, [products, activeTab]);
+
+  // Selección compacta de 5 productos de tendencia para una fila equilibrada
+  const displayItems = sortedProducts.slice(0, 5);
 
   return (
     <section className="space-y-4">
-      {/* Cabecera con Pestañas de Filtro */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-catador-amber" />
-          <h2 className="text-xl md:text-2xl font-bold text-slate-900 tracking-tight">
-            Tendencias de la Semana
-          </h2>
+      {/* Cabecera compacta con Pestañas y Enlace rápido */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-3">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-catador-amber">
+            <TrendingUp className="h-4 w-4" />
+          </div>
+          <div>
+            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              Tendencias de la Semana
+              <span className="hidden sm:inline-flex text-[10px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300/60">
+                Top 5
+              </span>
+            </h2>
+            <p className="text-[11px] text-slate-500">
+              Artículos con mayor demanda en Barinas y disponibilidad inmediata
+            </p>
+          </div>
         </div>
 
-        {/* Píldoras de Filtro */}
-        <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 self-start sm:self-auto shadow-2xs">
-          <button
-            onClick={() => setActiveTab('bestseller')}
-            className={cn(
-              'px-3 py-1 text-xs font-semibold rounded-lg transition-colors',
-              activeTab === 'bestseller'
-                ? 'bg-catador-blue text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            )}
+        {/* Píldoras de Filtro y Link de catálogo */}
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="flex items-center gap-1 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80 shadow-2xs">
+            {[
+              { id: 'bestseller' as const, label: 'Más Vendidos', icon: Flame },
+              { id: 'deals' as const, label: 'Ofertas Top', icon: Sparkles },
+              { id: 'new' as const, label: 'Novedades', icon: Star },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                onClick={() => setActiveTab(id)}
+                className={cn(
+                  'flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer',
+                  activeTab === id
+                    ? 'bg-catador-blue text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                )}
+              >
+                <Icon className="h-3 w-3" />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+
+          <Link
+            href="/catalogo"
+            className="hidden md:inline-flex items-center gap-1 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors ml-1"
           >
-            Más Vendidos
-          </button>
-          <button
-            onClick={() => setActiveTab('deals')}
-            className={cn(
-              'px-3 py-1 text-xs font-semibold rounded-lg transition-colors',
-              activeTab === 'deals'
-                ? 'bg-catador-blue text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            )}
-          >
-            Ofertas
-          </button>
-          <button
-            onClick={() => setActiveTab('new')}
-            className={cn(
-              'px-3 py-1 text-xs font-semibold rounded-lg transition-colors',
-              activeTab === 'new'
-                ? 'bg-catador-blue text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            )}
-          >
-            Novedades
-          </button>
+            Ver más <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
 
-      {/* Bento Grid Asimétrico de 5 Columnas en Desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        {/* Columnas Izquierdas (1 y 2) */}
-        <div className="space-y-4 flex flex-col justify-between">
-          {leftItems[0] && <ProductCard product={leftItems[0]} />}
-          {leftItems[1] && <ProductCard product={leftItems[1]} />}
-        </div>
-
-        {/* Columna Central: Producto Estrella (row-span-2) */}
-        {heroItem && (
-          <div className="lg:col-span-1 flex flex-col rounded-2xl bg-gradient-to-b from-white to-slate-50 border-2 border-catador-blue/30 p-5 shadow-card hover:shadow-card-hover transition-all relative overflow-hidden group">
-            <span className="self-start rounded-full bg-catador-amber px-2.5 py-1 text-[11px] font-bold text-white shadow-xs mb-3 flex items-center gap-1">
-              <Star className="h-3 w-3 fill-current" /> Estrella de la Semana
-            </span>
-
-            <div className="relative aspect-4/5 w-full my-auto overflow-hidden rounded-xl bg-white p-3 flex items-center justify-center">
-              <Image
-                src={heroItem.images[0] || IMAGE_FALLBACKS.product}
-                alt={heroItem.name}
-                fill
-                sizes="(max-width: 1024px) 100vw, 25vw"
-                className="object-contain transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
-
-            <div className="mt-4 pt-3 border-t border-slate-200">
-              <span className="text-xs font-semibold text-catador-amber uppercase">
-                {heroItem.brand}
-              </span>
-              <h3 className="text-base font-bold text-slate-900 line-clamp-2 mt-0.5">
-                {heroItem.name}
-              </h3>
-
-              {heroPrices && (
-                <div className="my-2.5">
-                  <p className="text-xl font-extrabold text-catador-blue leading-none">
-                    {heroPrices.usdFormatted}
-                  </p>
-                  <p className="text-xs font-semibold text-slate-600 mt-1">
-                    {heroPrices.vesFormatted}
-                  </p>
-                </div>
-              )}
-
-              <button
-                onClick={() => addItem(heroItem, 1)}
-                className="w-full mt-2 flex items-center justify-center gap-2 rounded-xl bg-catador-blue px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-catador-blue-light transition-colors"
-              >
-                <ShoppingBag className="h-4 w-4" /> Agregar al Carrito
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Columnas Derechas (4 y 5) */}
-        <div className="space-y-4 flex flex-col justify-between">
-          {rightItems[0] && <ProductCard product={rightItems[0]} />}
-          {rightItems[1] && <ProductCard product={rightItems[1]} />}
-        </div>
+      {/* Fila Única Esbelta y Simétrica (5 Columnas en Desktop) */}
+      <div
+        key={activeTab}
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5 animate-in fade-in-50 duration-300 fill-mode-both"
+      >
+        {displayItems.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
     </section>
   );

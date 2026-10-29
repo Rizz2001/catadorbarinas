@@ -5,3 +5,4 @@ export * from './ConfigLogoSliders';
 export * from './ConfigDeliverySection';
 export * from './ConfigBancariaSection';
 export * from './ConfigBcvSection';
+export * from './ConfigCatalogoSection';

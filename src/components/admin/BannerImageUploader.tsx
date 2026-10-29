@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Upload, X, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Loader2 } from 'lucide-react';
 import { uploadBannerImage } from '@/services/cms.service';
 
 interface BannerImageUploaderProps {

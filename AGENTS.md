@@ -13,9 +13,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 Este archivo rige de forma estricta todo el desarrollo en este repositorio.
 
 ## 1. Skills Obligatorias Activas
-- **UI / UX E-commerce:** `.agent/skills/catador-ecommerce-ui/SKILL.md` (Paleta oficial `#00227B` y `#E07A1F`, Header de 3 niveles, Bento Grid 5 columnas, Deals Countdown Timer).
-- **Universal Responsive UI:** `.agent/skills/universal-responsive-ui/SKILL.md` (Diseño omni-dispositivo 320px–1920px+, mobile-first, zero horizontal overflow, touch targets >= 44px, safe areas, bimonetarismo adaptable).
-- **Clean & Scalable Architecture:** `.agent/skills/clean-scalable-architecture/SKILL.md` (Sistema de archivos estricto, regla de adaptadores, política de cero código muerto, límite de 180-200 líneas por componente).
+- **UI / UX E-commerce:** `.agents/skills/catador-ecommerce-ui/SKILL.md` (Paleta oficial `#00227B` y `#E07A1F`, Header de 3 niveles, Bento Grid 5 columnas, Deals Countdown Timer).
+- **Universal Responsive UI:** `.agents/skills/universal-responsive-ui/SKILL.md` (Diseño omni-dispositivo 320px–1920px+, mobile-first, zero horizontal overflow, touch targets >= 44px, safe areas, bimonetarismo adaptable).
+- **Clean & Scalable Architecture:** `.agents/skills/clean-scalable-architecture/SKILL.md` (Sistema de archivos estricto, regla de adaptadores, política de cero código muerto, límite de 180-200 líneas por componente).
+- **Browser Automation & Testing:** `.agents/skills/agent-browser/SKILL.md` (Pruebas E2E, accesibilidad y validación en vivo con agent-browser de Vercel Labs).
 
 ## 2. Sistema de Archivos y Responsabilidades
 - `src/app/`: Rutas, layouts y páginas (`page.tsx`, `layout.tsx`). Prohibido colocar lógica de negocio o componentes complejos aquí.

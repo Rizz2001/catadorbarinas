@@ -54,20 +54,35 @@ export async function PATCH(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { targetUserId, newRole } = body;
+  const { targetUserId, newRole, rol, nombre, cedula, telefono, direccion } = body;
 
-  if (!targetUserId || !['cliente', 'admin', 'repartidor'].includes(newRole)) {
-    return NextResponse.json({ error: 'Parámetros inválidos' }, { status: 400 });
+  if (!targetUserId) {
+    return NextResponse.json({ error: 'targetUserId es requerido' }, { status: 400 });
   }
+
+  const roleToSet = rol || newRole;
+  if (roleToSet && !['cliente', 'admin', 'repartidor'].includes(roleToSet)) {
+    return NextResponse.json({ error: 'Rol inválido' }, { status: 400 });
+  }
+
+  const updatePayload: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+  };
+
+  if (roleToSet) updatePayload.rol = roleToSet;
+  if (nombre !== undefined) updatePayload.nombre = nombre?.trim() || null;
+  if (cedula !== undefined) updatePayload.cedula = cedula?.trim() || null;
+  if (telefono !== undefined) updatePayload.telefono = telefono?.trim() || null;
+  if (direccion !== undefined) updatePayload.direccion = direccion?.trim() || null;
 
   const { error: updateError } = await supabaseAdmin
     .from('perfiles')
-    .update({ rol: newRole, updated_at: new Date().toISOString() })
+    .update(updatePayload)
     .eq('id', targetUserId);
 
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, updated: updatePayload });
 }

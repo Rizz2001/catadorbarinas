@@ -22,7 +22,8 @@ export function AdminSidebar() {
 
   const handleSignOut = async () => {
     await signOutUser();
-    window.location.href = '/login';
+    router.push('/login');
+    router.refresh();
   };
 
   const navContent = (

@@ -4,7 +4,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Shield, RefreshCw, ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { PedidoConDetalles, PedidoRow, EstadoPedido, EstadoPago } from '@/types';
+import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { AdminOrderQueue, AdminOrderDetail } from '@/components/admin';
 import { OrderLiveChat } from '@/components/orders';
 import { soundFx } from '@/lib/sound';
@@ -36,7 +36,9 @@ export default function AdminPedidosCommandCenterPage() {
   }, []);
 
   useEffect(() => {
-    loadOrders();
+    const timer = setTimeout(() => {
+      loadOrders();
+    }, 0);
 
     // 2. Suscripción en Tiempo Real para Nuevas Órdenes y Actualizaciones
     const channel = supabase
@@ -44,8 +46,7 @@ export default function AdminPedidosCommandCenterPage() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'pedidos' },
-        (payload: { new: Record<string, unknown> }) => {
-          const newOrder = payload.new as unknown as PedidoRow;
+        () => {
           if (soundEnabled) soundFx.playOrderAlert();
           loadOrders();
         }
@@ -76,6 +77,7 @@ export default function AdminPedidosCommandCenterPage() {
       .subscribe();
 
     return () => {
+      clearTimeout(timer);
       supabase.removeChannel(channel);
     };
   }, [loadOrders, soundEnabled]);
@@ -102,6 +104,29 @@ export default function AdminPedidosCommandCenterPage() {
       console.error('Error actualizando pedido:', err);
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  // Eliminar Pedido
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      const res = await fetch(`/api/pedidos/${orderId}`, {
+        method: 'DELETE',
+      });
+      if (res.ok) {
+        setOrders((prev) => {
+          const updated = prev.filter((o) => o.id !== orderId);
+          setSelectedOrder((current) => {
+            if (current?.id === orderId) {
+              return updated[0] || null;
+            }
+            return current;
+          });
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error('Error eliminando pedido:', err);
     }
   };
 
@@ -181,6 +206,7 @@ export default function AdminPedidosCommandCenterPage() {
           <AdminOrderDetail
             order={selectedOrder}
             onUpdateStatus={handleUpdateStatus}
+            onDeleteOrder={handleDeleteOrder}
             isUpdating={isUpdating}
           />
         </div>

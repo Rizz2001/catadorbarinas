@@ -105,13 +105,14 @@ export function Footer() {
 
         {/* Departamentos */}
         <div className="space-y-3">
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Departamentos</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Departamentos SmartVentas</h4>
           <ul className="space-y-2 text-slate-400">
-            <li><Link href="/catalogo?depto=licores-vinos" className="hover:text-catador-amber">Licores & Vinos</Link></li>
-            <li><Link href="/catalogo?depto=viveres" className="hover:text-catador-amber">Víveres & Despensa</Link></li>
-            <li><Link href="/catalogo?depto=charcuteria-quesos" className="hover:text-catador-amber">Charcutería & Quesos</Link></li>
-            <li><Link href="/catalogo?depto=carniceria" className="hover:text-catador-amber">Carnicería</Link></li>
-            <li><Link href="/catalogo?depto=snacks-dulces" className="hover:text-catador-amber">Snacks & Golosinas</Link></li>
+            <li><Link href="/catalogo/01" className="hover:text-catador-amber">Licores</Link></li>
+            <li><Link href="/catalogo/09" className="hover:text-catador-amber">Cervezas</Link></li>
+            <li><Link href="/catalogo/11" className="hover:text-catador-amber">Alimentos</Link></li>
+            <li><Link href="/catalogo/02" className="hover:text-catador-amber">Refrescos</Link></li>
+            <li><Link href="/catalogo/05" className="hover:text-catador-amber">Confitería</Link></li>
+            <li><Link href="/catalogo/03" className="hover:text-catador-amber">Hielos</Link></li>
           </ul>
         </div>
 

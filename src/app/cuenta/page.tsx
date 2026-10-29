@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { User, Package, MapPin, Save, Loader2, ArrowRight, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Package, Save, Loader2, ArrowRight, Clock, CheckCircle2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { PedidoConDetalles } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
@@ -37,7 +37,8 @@ function CuentaContent() {
 
   useEffect(() => {
     if (tabParam === 'pedidos') {
-      setActiveTab('pedidos');
+      const timer = setTimeout(() => setActiveTab('pedidos'), 0);
+      return () => clearTimeout(timer);
     }
   }, [tabParam]);
 

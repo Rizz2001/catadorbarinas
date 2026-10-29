@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Lock, Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { signInWithEmail } from '@/services/auth.service';
 import { supabase } from '@/lib/supabase/client';
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get('redirect') || '';
 

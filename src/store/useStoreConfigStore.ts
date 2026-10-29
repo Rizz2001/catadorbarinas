@@ -25,6 +25,8 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   logo_url: '/logo-catador.svg',
   logo_alto_px: 44,
   logo_ancho_px: 200,
+  catalogo_titulo: 'Catálogo Bodegón & Supermercado (Depósito 01)',
+  catalogo_subtitulo: 'Inventario en tiempo real sincronizado con precios oficiales en $ USD y Bs. BCV',
 };
 
 interface StoreConfigState {

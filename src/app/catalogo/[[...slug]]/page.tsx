@@ -10,7 +10,7 @@ import {
 import { CatalogBrowser } from '@/components/catalog';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
+export const revalidate = 60;
 
 interface CatalogPageProps {
   params: Promise<{ slug?: string[] }>;

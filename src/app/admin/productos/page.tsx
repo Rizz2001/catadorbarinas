@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Upload, Search, CheckCircle2, Loader2, AlertCircle, Barcode, FileImage } from 'lucide-react';
+import { Camera, Upload, Search, CheckCircle2, Loader2, Barcode, FileImage } from 'lucide-react';
 import { ProductImageMapping } from '@/types';
 import { getProductImages, uploadProductWebpImage, deleteProductWebpImage } from '@/services/cms.service';
 import { ProductImageCard } from '@/components/admin';

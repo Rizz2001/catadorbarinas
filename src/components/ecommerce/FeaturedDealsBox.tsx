@@ -12,13 +12,15 @@ interface FeaturedDealsBoxProps {
 }
 
 export function FeaturedDealsBox({ products, targetEndTime }: FeaturedDealsBoxProps) {
-  const [isMounted, setIsMounted] = React.useState(false);
-  const defaultEndTime = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const isMounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
+  const [defaultEndTime] = React.useState(
+    () => new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+  );
   const timeLeft = useCountdown(targetEndTime || defaultEndTime);
-
-  React.useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   if (!products || products.length === 0) return null;
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingBag, Heart, User } from 'lucide-react';
+import { ShoppingBag, Heart } from 'lucide-react';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { formatUsd } from '@/lib/currency';
@@ -43,8 +43,30 @@ export function HeaderMain() {
           </Link>
 
           {/* Buscador Central Desktop */}
-          <div className="hidden md:flex flex-1 justify-center max-w-2xl">
+          <div className="hidden md:flex flex-col flex-1 max-w-2xl">
             <HeaderSearch />
+            <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500 overflow-hidden">
+              <span className="font-extrabold text-slate-600 shrink-0 text-[10px] uppercase tracking-wider">
+                Popular:
+              </span>
+              <div className="flex items-center gap-2 overflow-hidden truncate">
+                {[
+                  { name: "Buchanan's", query: "Buchanan's" },
+                  { name: 'Santa Teresa 1796', query: 'Santa Teresa' },
+                  { name: 'Polar Pilsen', query: 'Polar' },
+                  { name: 'Corona', query: 'Corona' },
+                  { name: 'Harina P.A.N.', query: 'Harina' },
+                ].map((item) => (
+                  <Link
+                    key={item.name}
+                    href={`/buscar?q=${encodeURIComponent(item.query)}`}
+                    className="text-slate-600 hover:text-catador-blue hover:underline whitespace-nowrap transition-colors"
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Acciones de Usuario & Carrito */}

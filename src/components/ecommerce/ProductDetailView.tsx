@@ -8,6 +8,7 @@ import { Product } from '@/types';
 import { formatPrices } from '@/lib/currency';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
@@ -17,12 +18,18 @@ interface ProductDetailViewProps {
 
 export function ProductDetailView({ product }: ProductDetailViewProps) {
   const router = useRouter();
-  const [selectedImage, setSelectedImage] = useState<string>(
-    product.images[0] || IMAGE_FALLBACKS.product
-  );
+  const storeConfig = useStoreConfigStore((state) => state.config);
+  const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
+
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [hasError, setHasError] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdded, setIsAdded] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+
+  const rawImage = selectedImage || product.images?.[0];
+  const isNoImage = !rawImage || rawImage === IMAGE_FALLBACKS.product || rawImage.includes('logo');
+  const activeImage = (isNoImage || hasError) ? cmsLogo : rawImage;
 
   const addItem = useCartStore((state) => state.addItem);
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
@@ -75,17 +82,17 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
             </span>
           )}
           <Image
-            src={selectedImage}
+            src={activeImage}
             alt={product.name}
             fill
             priority
             className={cn(
               'object-contain transition-transform duration-300',
-              !selectedImage || selectedImage === IMAGE_FALLBACKS.product || selectedImage.includes('logo')
+              activeImage === cmsLogo
                 ? 'p-12 opacity-80'
                 : 'p-4 hover:scale-105'
             )}
-            onError={() => setSelectedImage(IMAGE_FALLBACKS.product)}
+            onError={() => setHasError(true)}
           />
         </div>
 
@@ -96,10 +103,13 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               <button
                 key={idx}
                 type="button"
-                onClick={() => setSelectedImage(img)}
+                onClick={() => {
+                  setSelectedImage(img);
+                  setHasError(false);
+                }}
                 className={cn(
                   'relative h-16 w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden transition-all',
-                  selectedImage === img
+                  (selectedImage === img || (!selectedImage && idx === 0))
                     ? 'border-catador-blue ring-2 ring-catador-blue/20'
                     : 'border-slate-200 hover:border-slate-400'
                 )}

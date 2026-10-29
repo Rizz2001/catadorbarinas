@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrderById, updateOrderStatus } from '@/services/order.service';
+import { getOrderById, updateOrderStatus, deleteOrder } from '@/services/order.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,5 +32,16 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
   } catch (error) {
     console.error(`Error actualizando pedido ${id}:`, error);
     return NextResponse.json({ error: 'Error al actualizar el pedido' }, { status: 500 });
+  }
+}
+
+export async function DELETE(_request: NextRequest, { params }: RouteContext) {
+  const { id } = await params;
+  try {
+    await deleteOrder(id);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error(`Error eliminando pedido ${id}:`, error);
+    return NextResponse.json({ error: 'Error al eliminar el pedido' }, { status: 500 });
   }
 }

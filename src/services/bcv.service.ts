@@ -17,7 +17,14 @@ const DOLAR_API_URL = 'https://ve.dolarapi.com/v1/dolares';
  * Consulta la tasa oficial del BCV desde DolarApi (https://ve.dolarapi.com/v1/dolares).
  * Filtra el registro con fuente === 'oficial' correspondiente a la tasa oficial del Banco Central de Venezuela.
  */
+let cachedBcvRate: { data: BcvRateInfo; expiresAt: number } | null = null;
+
 export async function fetchBcvRateFromDolarApi(): Promise<BcvRateInfo> {
+  const now = Date.now();
+  if (cachedBcvRate && cachedBcvRate.expiresAt > now) {
+    return cachedBcvRate.data;
+  }
+
   try {
     const res = await fetch(DOLAR_API_URL, {
       next: { revalidate: 1800 }, // Revalida cada 30 minutos en Next.js
@@ -37,11 +44,13 @@ export async function fetchBcvRateFromDolarApi(): Promise<BcvRateInfo> {
       throw new Error('No se encontró el registro oficial en la respuesta de DolarApi');
     }
 
-    return {
+    const result: BcvRateInfo = {
       rate: Number(oficial.promedio.toFixed(4)),
       lastUpdated: oficial.fechaActualizacion || new Date().toISOString(),
       source: 'BCV',
     };
+    cachedBcvRate = { data: result, expiresAt: now + 900000 };
+    return result;
   } catch (error) {
     console.error('Error al consultar DolarApi para tasa oficial BCV:', error);
     return {

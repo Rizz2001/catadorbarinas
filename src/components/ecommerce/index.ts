@@ -4,4 +4,4 @@ export * from './WeeklyTrendsBento';
 export * from './HeroBanner';
 export * from './LiveCatalogSection';
 export * from './ProductDetailView';
-
+export * from './TrustValueBar';

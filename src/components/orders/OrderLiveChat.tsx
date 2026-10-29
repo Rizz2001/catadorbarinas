@@ -34,12 +34,14 @@ export function OrderLiveChat({
   } = useOrderChat({ pedidoId, usuarioRol, usuarioNombre, usuarioId });
 
   const [inputTexto, setInputTexto] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Auto-scroll al último mensaje
+  // Auto-scroll local al último mensaje sin alterar el scroll global de la página
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
     marcarComoLeidos();
   }, [mensajes, otherTyping, marcarComoLeidos]);
 
@@ -91,7 +93,7 @@ export function OrderLiveChat({
       </div>
 
       {/* Contenedor de Mensajes */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50 text-xs">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/50 text-xs">
         {cargando ? (
           <div className="h-full flex items-center justify-center text-slate-400 gap-2">
             <Loader2 className="h-4 w-4 animate-spin text-catador-blue" />
@@ -158,8 +160,6 @@ export function OrderLiveChat({
             </span>
           </div>
         )}
-
-        <div ref={messagesEndRef} />
       </div>
 
       {/* Respuestas rápidas si se pasan */}

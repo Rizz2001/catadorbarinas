@@ -84,6 +84,8 @@ export interface CartTotals {
   itemCount: number;
 }
 
+export type BannerType = 'hero' | 'promo_1' | 'promo_2' | 'promo_3' | 'promocion_grid' | 'secundario' | string;
+
 export interface Banner {
   id: string;
   titulo: string;
@@ -92,13 +94,25 @@ export interface Banner {
   boton_texto: string;
   boton_url: string;
   imagen_url?: string | null;
-  tipo: 'hero' | 'promocion_grid' | 'secundario';
+  tipo: BannerType;
   promo_titulo?: string | null;
   promo_precio?: number | null;
   promo_badge?: string | null;
   promo_ahorro?: string | null;
   activo: boolean;
   orden: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface QuickCategory {
+  id: string;
+  nombre: string;
+  descripcion: string;
+  url: string;
+  icono: string;
+  orden: number;
+  activo: boolean;
   created_at?: string;
   updated_at?: string;
 }
@@ -123,6 +137,8 @@ export interface StoreConfig {
   logo_url?: string | null;
   logo_alto_px?: number | null;
   logo_ancho_px?: number | null;
+  catalogo_titulo?: string | null;
+  catalogo_subtitulo?: string | null;
   updated_at?: string;
 }
 
