@@ -3,10 +3,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ChevronRight, ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  ArrowLeft,
+  Loader2,
+  AlertCircle,
+  MessageSquareText,
+  ReceiptText,
+} from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { PedidoConDetalles, PedidoRow } from '@/types';
 import { OrderLiveStepper, OrderReceiptCard, OrderLiveChat } from '@/components/orders';
+import { cn } from '@/lib/utils';
 
 export default function OrderLiveRoomPage() {
   const params = useParams();
@@ -15,8 +23,8 @@ export default function OrderLiveRoomPage() {
   const [order, setOrder] = useState<PedidoConDetalles | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mobileTab, setMobileTab] = useState<'chat' | 'recibo'>('chat');
 
-  // 1. Cargar datos del pedido
   useEffect(() => {
     if (!id) return;
     let isMounted = true;
@@ -39,7 +47,6 @@ export default function OrderLiveRoomPage() {
 
     fetchOrder();
 
-    // 2. Suscripción en Tiempo Real a cambios del pedido (Estado de despacho y pago)
     const channel = supabase
       .channel(`pedido-status-${id}`)
       .on(
@@ -97,8 +104,7 @@ export default function OrderLiveRoomPage() {
   }
 
   return (
-    <main className="container mx-auto px-4 py-6 md:py-8 space-y-6 max-w-7xl">
-      {/* Breadcrumb de Navegación */}
+    <main className="container mx-auto px-4 py-5 md:py-8 space-y-5 max-w-7xl">
       <nav className="flex items-center gap-2 text-xs text-slate-500">
         <Link href="/" className="hover:text-catador-blue transition-colors">
           Inicio
@@ -117,7 +123,7 @@ export default function OrderLiveRoomPage() {
             Sala en Vivo • Pedido #{order.numero_orden}
           </h1>
           <p className="text-xs text-slate-500">
-            Seguimiento de despacho y canal directo con el administrador de Gran Catador
+            Atención directa con el administrador y seguimiento de despacho en tiempo real
           </p>
         </div>
         <Link
@@ -128,22 +134,59 @@ export default function OrderLiveRoomPage() {
         </Link>
       </div>
 
-      {/* Grid Principal: Stepper y Recibo a la Izquierda (7 cols), Chat en Vivo a la Derecha (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div className="lg:col-span-7 space-y-6">
-          {/* Stepper en Tiempo Real */}
-          <OrderLiveStepper estado={order.estado_pedido} />
+      {/* Selector de Pestañas en Móvil (Chat en Vivo vs Recibo/Estado) */}
+      <div className="lg:hidden grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1.5 border border-slate-200">
+        <button
+          type="button"
+          onClick={() => setMobileTab('chat')}
+          className={cn(
+            'flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-extrabold transition-all cursor-pointer',
+            mobileTab === 'chat'
+              ? 'bg-catador-blue text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+          )}
+        >
+          <MessageSquareText className="h-4 w-4" />
+          <span>Chat en Vivo</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('recibo')}
+          className={cn(
+            'flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-extrabold transition-all cursor-pointer',
+            mobileTab === 'recibo'
+              ? 'bg-catador-blue text-white shadow-sm'
+              : 'text-slate-600 hover:text-slate-900'
+          )}
+        >
+          <ReceiptText className="h-4 w-4" />
+          <span>Estado y Recibo</span>
+        </button>
+      </div>
 
-          {/* Recibo Digital Bimonetario */}
+      {/* Grid Principal */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div
+          className={cn(
+            'lg:col-span-7 space-y-6',
+            mobileTab === 'recibo' ? 'block' : 'hidden lg:block'
+          )}
+        >
+          <OrderLiveStepper estado={order.estado_pedido} />
           <OrderReceiptCard order={order} />
         </div>
 
-        {/* Panel de Chat en Tiempo Real */}
-        <div className="lg:col-span-5 lg:sticky lg:top-20">
+        <div
+          className={cn(
+            'lg:col-span-5 lg:sticky lg:top-20',
+            mobileTab === 'chat' ? 'block' : 'hidden lg:block'
+          )}
+        >
           <OrderLiveChat
             pedidoId={order.id}
             usuarioRol="cliente"
             usuarioNombre={order.cliente_nombre}
+            numeroOrden={order.numero_orden}
             quickReplies={[
               '¿Me mandan las bebidas bien frías?',
               'Acabo de subir el comprobante de pago',
