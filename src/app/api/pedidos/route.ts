@@ -10,9 +10,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, order: newOrder });
   } catch (error) {
     console.error('Error procesando pedido en API:', error);
+    const message =
+      error instanceof Error ? error.message : 'Error al procesar el pedido';
     return NextResponse.json(
-      { error: 'Error al procesar el pedido' },
-      { status: 500 }
+      { error: message },
+      { status: 400 }
     );
   }
 }

@@ -3,16 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { formatPrices } from '@/lib/currency';
+import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 export function CartItemList() {
-  const { items, updateQuantity, removeItem, clearCart } = useCartStore();
+  const { items, updateQuantity, removeItem, clearCart, lastStockWarning } = useCartStore();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
   const storeConfig = useStoreConfigStore((state) => state.config);
   const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
@@ -51,10 +52,21 @@ export function CartItemList() {
         </button>
       </div>
 
+      {lastStockWarning && (
+        <div className="mx-4 mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 flex items-center gap-2 text-xs font-bold text-amber-800">
+          <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
+          <span>{lastStockWarning}</span>
+        </div>
+      )}
+
       <div className="divide-y divide-slate-100 p-4 sm:p-5 space-y-4">
-        {items.map(({ product, quantity }) => {
-          const itemPrices = formatPrices(product.priceUsd * quantity, bcvRate);
-          const unitPrices = formatPrices(product.priceUsd, bcvRate);
+        {items.map(({ product, quantity, purchaseMode }) => {
+          const mode = purchaseMode || 'unidad';
+          const unitPriceUsd = getEffectivePriceUsd(product, mode);
+          const itemPrices = formatPrices(unitPriceUsd * quantity, bcvRate);
+          const unitPrices = formatPrices(unitPriceUsd, bcvRate);
+          const unitsPerItem = getUnitsPerPurchaseMode(product, mode);
+          const totalBaseUnits = quantity * unitsPerItem;
 
           const rawImg = product.images?.[0];
           const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
@@ -62,10 +74,9 @@ export function CartItemList() {
 
           return (
             <div
-              key={product.id}
+              key={`${product.id}-${mode}`}
               className="pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
-              {/* Información y Miniatura */}
               <div className="flex items-center gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
                 <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 overflow-hidden">
                   <Image
@@ -77,34 +88,47 @@ export function CartItemList() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block truncate">
-                    {product.brand}
-                  </span>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 sm:truncate" title={product.name}>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider truncate">
+                      {product.brand}
+                    </span>
+                    <span
+                      className={cn(
+                        'text-[10px] font-black uppercase px-2 py-0.5 rounded-full',
+                        mode === 'caja'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-slate-100 text-slate-700'
+                      )}
+                    >
+                      {mode === 'caja' ? `Por Caja (${unitsPerItem} und)` : 'Por Unidad'}
+                    </span>
+                  </div>
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 sm:truncate mt-0.5">
                     {product.name}
                   </h3>
                   <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
-                    Unitario: <span className="font-bold text-slate-700">{unitPrices.usdFormatted}</span> ({unitPrices.vesFormatted})
+                    Precio {mode === 'caja' ? 'Caja' : 'Unidad'}:{' '}
+                    <span className="font-bold text-slate-700">{unitPrices.usdFormatted}</span> (
+                    {unitPrices.vesFormatted}) •{' '}
+                    <span className="text-emerald-700 font-semibold">
+                      Total: {totalBaseUnits} botellas/und
+                    </span>
                   </p>
                 </div>
               </div>
 
-              {/* Controles de Cantidad y Subtotal por ítem */}
               <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
-                {/* Stepper con área táctil >= 38px */}
                 <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs">
                   <button
-                    onClick={() => updateQuantity(product.id, quantity - 1)}
+                    onClick={() => updateQuantity(product.id, quantity - 1, mode)}
                     className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-l-xl cursor-pointer"
                     aria-label="Disminuir cantidad"
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="w-8 text-center text-xs font-bold text-slate-800">
-                    {quantity}
-                  </span>
+                  <span className="w-8 text-center text-xs font-bold text-slate-800">{quantity}</span>
                   <button
-                    onClick={() => updateQuantity(product.id, quantity + 1)}
+                    onClick={() => updateQuantity(product.id, quantity + 1, mode)}
                     className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-r-xl cursor-pointer"
                     aria-label="Aumentar cantidad"
                   >
@@ -112,19 +136,15 @@ export function CartItemList() {
                   </button>
                 </div>
 
-                {/* Subtotal del Item */}
                 <div className="text-right min-w-[85px]">
-                  <p className="text-sm font-extrabold text-catador-blue">
-                    {itemPrices.usdFormatted}
-                  </p>
+                  <p className="text-sm font-extrabold text-catador-blue">{itemPrices.usdFormatted}</p>
                   <p className="text-[10px] font-semibold text-slate-500 font-mono">
                     {itemPrices.vesFormatted}
                   </p>
                 </div>
 
-                {/* Eliminar Ítem */}
                 <button
-                  onClick={() => removeItem(product.id)}
+                  onClick={() => removeItem(product.id, mode)}
                   className="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                   aria-label={`Eliminar ${product.name}`}
                 >

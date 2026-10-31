@@ -98,7 +98,13 @@ export async function deleteQuickCategory(id: string): Promise<void> {
 // ============================================================================
 // CONFIGURACIÓN DE LA TIENDA
 // ============================================================================
+let cachedStoreConfig: { data: StoreConfig | null; expiry: number } | null = null;
+
 export async function getStoreConfig(): Promise<StoreConfig | null> {
+  const now = Date.now();
+  if (cachedStoreConfig && cachedStoreConfig.expiry > now) {
+    return cachedStoreConfig.data;
+  }
   try {
     const { data, error } = await supabase
       .from('configuracion_tienda')
@@ -107,7 +113,9 @@ export async function getStoreConfig(): Promise<StoreConfig | null> {
       .single();
 
     if (error) throw error;
-    return data as StoreConfig;
+    const result = data as StoreConfig;
+    cachedStoreConfig = { data: result, expiry: now + 20000 };
+    return result;
   } catch (err) {
     console.error('Error cargando configuración:', err);
     return null;
@@ -115,6 +123,7 @@ export async function getStoreConfig(): Promise<StoreConfig | null> {
 }
 
 export async function updateStoreConfig(config: Partial<StoreConfig>): Promise<StoreConfig> {
+  cachedStoreConfig = null;
   const { data, error } = await supabase
     .from('configuracion_tienda')
     .upsert({
@@ -265,3 +274,6 @@ export async function uploadStoreLogo(file: File): Promise<string> {
   const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(filePath);
   return publicUrl;
 }
+
+export * from './cms-catalog.service';
+

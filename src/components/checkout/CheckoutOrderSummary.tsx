@@ -2,9 +2,10 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
-import { CartItem } from '@/types';
+import { ShieldCheck, ArrowRight, Loader2, Truck, Bike } from 'lucide-react';
+import { CartItem, DeliveryQuoteResult } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
+import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 
 interface CheckoutOrderSummaryProps {
@@ -16,6 +17,7 @@ interface CheckoutOrderSummaryProps {
   totalUsd: number;
   totalVes: number;
   bcvRate: number;
+  deliveryQuote?: DeliveryQuoteResult;
   isSubmitting: boolean;
   onProcessOrder: () => void;
 }
@@ -29,51 +31,79 @@ export function CheckoutOrderSummary({
   totalUsd,
   totalVes,
   bcvRate,
+  deliveryQuote,
   isSubmitting,
   onProcessOrder,
 }: CheckoutOrderSummaryProps) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
       <h3 className="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3">
-        Resumen de la Orden ({items.reduce((acc, it) => acc + it.quantity, 0)} productos)
+        Resumen de la Orden ({items.reduce((acc, it) => acc + it.quantity, 0)} ítems)
       </h3>
 
-      {/* Lista de productos resumida */}
       <div className="max-h-56 overflow-y-auto space-y-2.5 pr-1 text-xs">
-        {items.map(({ product, quantity }) => (
-          <div key={product.id} className="flex items-center gap-2.5 justify-between">
-            <div className="flex items-center gap-2 min-w-0">
-              <div className="relative h-10 w-10 shrink-0 rounded-lg bg-slate-50 border p-1 overflow-hidden">
-                <Image
-                  src={product.images[0] || IMAGE_FALLBACKS.product}
-                  alt={product.name}
-                  fill
-                  sizes="40px"
-                  className="object-contain"
-                />
+        {items.map(({ product, quantity, purchaseMode }) => {
+          const mode = purchaseMode || 'unidad';
+          const effectivePrice = getEffectivePriceUsd(product, mode);
+          const unitsPerBox = getUnitsPerPurchaseMode(product, mode);
+
+          return (
+            <div key={`${product.id}-${mode}`} className="flex items-center gap-2.5 justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="relative h-10 w-10 shrink-0 rounded-lg bg-slate-50 border p-1 overflow-hidden">
+                  <Image
+                    src={product.images[0] || IMAGE_FALLBACKS.product}
+                    alt={product.name}
+                    fill
+                    sizes="40px"
+                    className="object-contain"
+                  />
+                </div>
+                <div className="truncate">
+                  <p className="font-semibold text-slate-800 truncate">{product.name}</p>
+                  <p className="text-[10px] text-slate-600">
+                    {quantity}x {mode === 'caja' ? `Caja (${unitsPerBox} und)` : 'Unidad'} •{' '}
+                    {formatUsd(effectivePrice)}
+                  </p>
+                </div>
               </div>
-              <div className="truncate">
-                <p className="font-semibold text-slate-800 truncate">{product.name}</p>
-                <p className="text-[10px] text-slate-600">{quantity}x • {formatUsd(product.priceUsd)}</p>
-              </div>
+              <span className="font-bold text-slate-900 shrink-0">
+                {formatUsd(effectivePrice * quantity)}
+              </span>
             </div>
-            <span className="font-bold text-slate-900 shrink-0">
-              {formatUsd(product.priceUsd * quantity)}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Desglose Bimonetario */}
+      {/* Desglose Bimonetario y Transporte */}
       <div className="pt-3 border-t border-slate-100 space-y-1.5 text-xs text-slate-600">
         <div className="flex justify-between">
-          <span>Subtotal</span>
-          <span className="font-semibold text-slate-800">{formatUsd(subtotalUsd)} / {formatVes(subtotalVes)}</span>
-        </div>
-        <div className="flex justify-between">
-          <span>Delivery Barinas</span>
+          <span>Subtotal Mercancía</span>
           <span className="font-semibold text-slate-800">
-            {shippingUsd === 0 ? <span className="text-emerald-600 font-bold">¡Gratis!</span> : `${formatUsd(shippingUsd)} / ${formatVes(shippingVes)}`}
+            {formatUsd(subtotalUsd)} / {formatVes(subtotalVes)}
+          </span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="flex items-center gap-1">
+            {deliveryQuote?.transportType === 'vehiculo_carga' ? (
+              <Truck className="h-3.5 w-3.5 text-amber-600" />
+            ) : (
+              <Bike className="h-3.5 w-3.5 text-catador-blue" />
+            )}
+            <span>
+              {deliveryQuote?.transportType === 'vehiculo_carga'
+                ? 'Delivery Vehículo (Carga)'
+                : deliveryQuote?.transportType === 'pickup'
+                ? 'Retiro Pick-Up'
+                : 'Delivery Motorizado'}
+            </span>
+          </span>
+          <span className="font-semibold text-slate-800">
+            {shippingUsd === 0 ? (
+              <span className="text-emerald-600 font-bold">¡Gratis!</span>
+            ) : (
+              `${formatUsd(shippingUsd)} / ${formatVes(shippingVes)}`
+            )}
           </span>
         </div>
         <div className="flex justify-between text-[11px] text-slate-600">
@@ -82,18 +112,20 @@ export function CheckoutOrderSummary({
         </div>
       </div>
 
-      {/* Total a Pagar */}
       <div className="pt-3 border-t border-slate-200 flex items-baseline justify-between">
         <div>
-          <span className="block text-xs font-bold text-slate-500 uppercase tracking-wide">Total a Pagar</span>
-          <span className="text-2xl font-black text-catador-blue tracking-tight">{formatUsd(totalUsd)}</span>
+          <span className="block text-xs font-bold text-slate-500 uppercase tracking-wide">
+            Total a Pagar
+          </span>
+          <span className="text-2xl font-black text-catador-blue tracking-tight">
+            {formatUsd(totalUsd)}
+          </span>
         </div>
         <div className="text-right">
           <span className="text-sm font-black text-slate-800 block">{formatVes(totalVes)}</span>
         </div>
       </div>
 
-      {/* Botón Acción Principal */}
       <button
         type="button"
         disabled={isSubmitting || items.length === 0}
@@ -103,7 +135,7 @@ export function CheckoutOrderSummary({
         {isSubmitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Verificando y Creando Pedido...</span>
+            <span>Verificando Stock y Creando Pedido...</span>
           </>
         ) : (
           <>
@@ -115,7 +147,7 @@ export function CheckoutOrderSummary({
 
       <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-600 pt-1">
         <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
-        <span>Pago y seguimiento en vivo 100% dentro de la web</span>
+        <span>Validación matemática de inventario en tiempo real</span>
       </div>
     </div>
   );

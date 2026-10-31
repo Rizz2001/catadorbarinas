@@ -10,6 +10,7 @@ import { formatPrices } from '@/lib/currency';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartStore } from '@/store/useCartStore';
+import { supabase } from '@/lib/supabase/client';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +20,35 @@ export function HeaderSearch() {
   const storeConfig = useStoreConfigStore((state) => state.config);
   const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
   const addItem = useCartStore((state) => state.addItem);
+  const [userInfo, setUserInfo] = useState<{
+    id?: string;
+    name?: string;
+    email?: string;
+  }>({});
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(({ data: { user } }: { data: { user: { id: string; email?: string } | null } }) => {
+      if (!user || !active) return;
+      supabase
+        .from('perfiles')
+        .select('nombre')
+        .eq('id', user.id)
+        .single()
+        .then(({ data: p }: { data: { nombre?: string } | null }) => {
+          if (active) {
+            setUserInfo({
+              id: user.id,
+              email: user.email,
+              name: p?.nombre || user.email?.split('@')[0],
+            });
+          }
+        });
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const [term, setTerm] = useState('');
   const [results, setResults] = useState<Product[]>([]);
@@ -43,7 +73,16 @@ export function HeaderSearch() {
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(term.trim())}&limit=6`);
+        const params = new URLSearchParams({
+          q: term.trim(),
+          limit: '6',
+          log: 'true',
+        });
+        if (userInfo.id) params.set('userId', userInfo.id);
+        if (userInfo.name) params.set('userName', userInfo.name);
+        if (userInfo.email) params.set('userEmail', userInfo.email);
+
+        const res = await fetch(`/api/search?${params.toString()}`);
         if (res.ok) {
           const data = await res.json();
           setResults(data.products || []);
@@ -55,10 +94,10 @@ export function HeaderSearch() {
       } finally {
         setIsLoading(false);
       }
-    }, 250);
+    }, 350);
 
     return () => clearTimeout(timer);
-  }, [term]);
+  }, [term, userInfo.id, userInfo.email, userInfo.name]);
 
   // Click outside y tecla Escape para cerrar
   useEffect(() => {

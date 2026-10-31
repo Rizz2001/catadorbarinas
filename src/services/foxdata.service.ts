@@ -1,6 +1,6 @@
 import { Product } from '../types';
 import { adaptFoxDataProducts, RawFoxDataProductDto } from '../adapters/foxdata.adapter';
-import { getProductImagesMap } from './cms.service';
+import { getProductImagesMap, getProductCmsConfigsMap, getStoreConfig } from './cms.service';
 import {
   DEFAULT_GROUPS,
   DEFAULT_SUBGROUPS,
@@ -118,8 +118,8 @@ interface CacheItem<T> {
   expiresAt: number;
 }
 
-const memoryGroupProductsCache = new Map<string, CacheItem<Product[]>>();
-const inflightGroupPromises = new Map<string, Promise<Product[]>>();
+const memoryRawGroupCache = new Map<string, CacheItem<RawFoxDataProductDto[]>>();
+const inflightRawGroupPromises = new Map<string, Promise<RawFoxDataProductDto[]>>();
 let memoryExistenciasCache: CacheItem<Map<string, number>> | null = null;
 let inflightExistenciasPromise: Promise<Map<string, number>> | null = null;
 let memoryGroupsCache: CacheItem<{ CodGrupo: string; Nombre: string; SmartVentas?: number }[]> | null = null;
@@ -252,17 +252,16 @@ export async function fetchExistenciasBodegonMap(): Promise<Map<string, number>>
 }
 
 /**
- * Obtiene y cachea TODOS los artículos de un grupo completo en FoxData (Cache 3 min).
- * Nunca cachea arreglos vacíos si ocurre un error de red.
+ * Descarga y cachea los DTOs crudos de un grupo en FoxData (Cache 3 min).
  */
-async function fetchFullGroupArticulos(codGrupo: string): Promise<Product[]> {
+async function fetchRawGroupArticulos(codGrupo: string): Promise<RawFoxDataProductDto[]> {
   const now = Date.now();
-  const cached = memoryGroupProductsCache.get(codGrupo);
+  const cached = memoryRawGroupCache.get(codGrupo);
   if (cached && cached.expiresAt > now) {
     return cached.data;
   }
 
-  const inflight = inflightGroupPromises.get(codGrupo);
+  const inflight = inflightRawGroupPromises.get(codGrupo);
   if (inflight) {
     return inflight;
   }
@@ -272,22 +271,18 @@ async function fetchFullGroupArticulos(codGrupo: string): Promise<Product[]> {
       const token = await getFoxDataToken();
       const url = `${API_BASE}/api/v1/syn/articulos/grupo/${codGrupo}`;
 
-      const [articulosRes, existenciasMap, imagesMap] = await Promise.all([
-        fetchWithRetry(
-          url,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              ...FOXDATA_HEADERS,
-            },
-            next: { revalidate: 120 },
+      const articulosRes = await fetchWithRetry(
+        url,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...FOXDATA_HEADERS,
           },
-          2,
-          8000
-        ),
-        fetchExistenciasBodegonMap(),
-        getProductImagesMap(),
-      ]);
+          next: { revalidate: 120 },
+        },
+        2,
+        8000
+      );
 
       if (!articulosRes.ok) {
         return [];
@@ -295,24 +290,51 @@ async function fetchFullGroupArticulos(codGrupo: string): Promise<Product[]> {
 
       const json = await articulosRes.json();
       const rawList: RawFoxDataProductDto[] = json.data || json || [];
-      const adapted = adaptFoxDataProducts(rawList, existenciasMap, imagesMap);
 
-      if (adapted.length > 0) {
-        memoryGroupProductsCache.set(codGrupo, {
-          data: adapted,
+      if (Array.isArray(rawList) && rawList.length > 0) {
+        memoryRawGroupCache.set(codGrupo, {
+          data: rawList,
           expiresAt: Date.now() + 180000,
         });
       }
-      return adapted;
+      return Array.isArray(rawList) ? rawList : [];
     } catch {
       return [];
     } finally {
-      inflightGroupPromises.delete(codGrupo);
+      inflightRawGroupPromises.delete(codGrupo);
     }
   })();
 
-  inflightGroupPromises.set(codGrupo, promise);
+  inflightRawGroupPromises.set(codGrupo, promise);
   return promise;
+}
+
+/**
+ * Obtiene y adapta TODOS los artículos de un grupo completo en FoxData fusionando
+ * en tiempo real fotos CMS, existencias del Depósito 01 y configuraciones del CMS.
+ */
+async function fetchFullGroupArticulos(
+  codGrupo: string,
+  includeHidden = false
+): Promise<Product[]> {
+  const [rawList, existenciasMap, imagesMap, cmsConfigMap, storeConfig] = await Promise.all([
+    fetchRawGroupArticulos(codGrupo),
+    fetchExistenciasBodegonMap(),
+    getProductImagesMap(),
+    getProductCmsConfigsMap(),
+    getStoreConfig(),
+  ]);
+
+  const globalAllowBackorder = Boolean(storeConfig?.permitir_venta_sin_stock_global);
+
+  return adaptFoxDataProducts(
+    rawList,
+    existenciasMap,
+    imagesMap,
+    cmsConfigMap,
+    globalAllowBackorder,
+    includeHidden
+  );
 }
 
 /**
@@ -321,9 +343,10 @@ async function fetchFullGroupArticulos(codGrupo: string): Promise<Product[]> {
  */
 export async function fetchArticulosSmartVentas(
   codGrupo: string = '01',
-  codSubgrupo?: string
+  codSubgrupo?: string,
+  includeHidden = false
 ): Promise<Product[]> {
-  const allGroupProducts = await fetchFullGroupArticulos(codGrupo);
+  const allGroupProducts = await fetchFullGroupArticulos(codGrupo, includeHidden);
 
   if (!codSubgrupo || codSubgrupo === 'todos') {
     return allGroupProducts;
@@ -338,7 +361,6 @@ export async function fetchArticulosSmartVentas(
 }
 
 const ALL_ACTIVE_GROUPS = ['01', '02', '09', '11', '05', '14', '08', '03', '06', '10', '07', '04'];
-const memoryProductByIdCache = new Map<string, CacheItem<Product | null>>();
 
 /**
  * Busca un producto individual por ID (codArticulo o SKU) en SmartVentas
@@ -347,31 +369,18 @@ export async function fetchProductById(
   id: string,
   groupHint?: string
 ): Promise<Product | null> {
-  const now = Date.now();
-  const cacheKey = `${id}-${groupHint || 'any'}`;
-  const cached = memoryProductByIdCache.get(cacheKey);
-  if (cached && cached.expiresAt > now) {
-    return cached.data;
-  }
-
   try {
     if (groupHint) {
-      const products = await fetchFullGroupArticulos(groupHint);
+      const products = await fetchFullGroupArticulos(groupHint, false);
       const match = products.find((p) => p.id === id || p.sku === id);
-      if (match) {
-        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 120000 });
-        return match;
-      }
+      if (match) return match;
     }
 
     for (const grupo of ALL_ACTIVE_GROUPS) {
       if (grupo === groupHint) continue;
-      const products = await fetchFullGroupArticulos(grupo);
+      const products = await fetchFullGroupArticulos(grupo, false);
       const match = products.find((p) => p.id === id || p.sku === id);
-      if (match) {
-        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 120000 });
-        return match;
-      }
+      if (match) return match;
     }
 
     return null;
@@ -393,7 +402,8 @@ function normalizeSearchText(text: string): string {
  */
 export async function searchProducts(
   query: string,
-  codGrupo?: string
+  codGrupo?: string,
+  includeHidden = false
 ): Promise<Product[]> {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return [];
@@ -406,11 +416,12 @@ export async function searchProducts(
 
     const allProducts: Product[] = [];
 
-    // Cargar en lotes seguros de 4 grupos para máxima velocidad sin saturar sockets de FoxData
     const batchSize = 4;
     for (let i = 0; i < targetGroups.length; i += batchSize) {
       const batch = targetGroups.slice(i, i + batchSize);
-      const batchResults = await Promise.all(batch.map((g) => fetchFullGroupArticulos(g)));
+      const batchResults = await Promise.all(
+        batch.map((g) => fetchFullGroupArticulos(g, includeHidden))
+      );
       allProducts.push(...batchResults.flat());
     }
 
@@ -431,4 +442,40 @@ export async function searchProducts(
   } catch {
     return [];
   }
+}
+
+/**
+ * Obtiene los productos curados desde el CMS para "1. Tendencias" y "2. Ofertas Destacadas",
+ * completando automáticamente con inventario real en stock cuando sea necesario.
+ */
+export async function fetchHomeCuratedSections(): Promise<{
+  dealsProducts: Product[];
+  trendsProducts: Product[];
+}> {
+  const primaryGroups = ['01', '09', '02', '11', '05'];
+  const groupLists = await Promise.all(primaryGroups.map((g) => fetchFullGroupArticulos(g, false)));
+  const pool = groupLists.flat();
+  const inStockPool = pool.filter((p) => p.inStock && p.priceUsd > 0);
+  const basePool = inStockPool.length >= 6 ? inStockPool : pool;
+
+  const cmsDeals = basePool.filter((p) => p.isDealOfTheDay);
+  const cmsTrends = basePool.filter((p) => p.isWeeklyTrend);
+
+  const dealsProducts = [...cmsDeals];
+  for (const item of basePool) {
+    if (dealsProducts.length >= 8) break;
+    if (!dealsProducts.some((d) => d.id === item.id)) {
+      dealsProducts.push(item);
+    }
+  }
+
+  const trendsProducts = [...cmsTrends];
+  for (const item of basePool) {
+    if (trendsProducts.length >= 12) break;
+    if (!trendsProducts.some((t) => t.id === item.id)) {
+      trendsProducts.push(item);
+    }
+  }
+
+  return { dealsProducts, trendsProducts };
 }

@@ -1,4 +1,4 @@
-import { Product, DepartmentSlug } from '@/types';
+import { Product, DepartmentSlug, ProductCmsConfig } from '@/types';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { resolveCategoryMetadata } from '@/constants/fallback-products';
 
@@ -97,12 +97,24 @@ function resolveDepartmentByGroup(codGrupo?: string): DepartmentSlug {
 
 /**
  * ADAPTADOR OFICIAL FOXDATA
- * Transforma un producto crudo de FoxData a la interfaz canónica de producto de Gran Catador.
+ * Transforma un producto crudo de FoxData a la interfaz canónica de producto de Gran Catador,
+ * fusionando las reglas comerciales configuradas en el CMS (Unidad/Caja, Sin Stock, Ocultar, Descripción, Ofertas).
  */
 export function adaptFoxDataProduct(
   raw: RawFoxDataProductDto,
-  imagesMap?: Map<string, string>
+  imagesMap?: Map<string, string>,
+  cmsConfigMap?: Map<string, ProductCmsConfig>,
+  globalAllowBackorder = false
 ): Product {
+  const id = String(raw.codArticulo ?? raw.id ?? raw.codigo ?? raw.sku ?? Math.random().toString(36).substring(7));
+  const sku = raw.sku ?? raw.codigo ?? `GC-${id.padStart(6, '0')}`;
+  const rawCode = (raw.codArticulo ?? raw.sku ?? raw.codigo ?? id).trim();
+
+  const cmsConfig =
+    cmsConfigMap?.get(rawCode) ??
+    cmsConfigMap?.get(rawCode.toLowerCase()) ??
+    cmsConfigMap?.get(id);
+
   // En SmartVentas / Saint, el precio de venta al detal en divisas de Bodegón está en precioVentDiv5
   const candidatePrices = [
     raw.precioVentDiv5,
@@ -116,15 +128,43 @@ export function adaptFoxDataProduct(
     Number(raw.precio_usd ?? 0),
     Number(raw.precio ?? 0),
   ];
-  const resolvedPrice = candidatePrices.find((p) => typeof p === 'number' && p > 0) ?? 0;
-  const priceUsd = Number(resolvedPrice.toFixed(2));
+  const resolvedBasePrice = candidatePrices.find((p) => typeof p === 'number' && p > 0) ?? 0;
+  const basePriceUsd = Number(resolvedBasePrice.toFixed(2));
 
-  const rawOriginalPrice = raw.precio_regular_usd ?? raw.precio_regular;
-  const originalPriceUsd = rawOriginalPrice ? Number(rawOriginalPrice) : undefined;
+  // Si tiene precio de oferta en CMS o porcentaje de descuento en CMS, se aplica
+  let priceUsd = basePriceUsd;
+  let originalPriceUsd = raw.precio_regular_usd ?? raw.precio_regular
+    ? Number(raw.precio_regular_usd ?? raw.precio_regular)
+    : undefined;
 
-  const id = String(raw.codArticulo ?? raw.id ?? raw.codigo ?? raw.sku ?? Math.random().toString(36).substring(7));
-  const sku = raw.sku ?? raw.codigo ?? `GC-${id.padStart(6, '0')}`;
-  const rawCode = (raw.codArticulo ?? raw.sku ?? raw.codigo ?? id).trim();
+  if (cmsConfig?.precio_oferta_usd && Number(cmsConfig.precio_oferta_usd) > 0 && Number(cmsConfig.precio_oferta_usd) < basePriceUsd) {
+    priceUsd = Number(Number(cmsConfig.precio_oferta_usd).toFixed(2));
+    originalPriceUsd = basePriceUsd;
+  } else if (cmsConfig?.porcentaje_descuento_custom && cmsConfig.porcentaje_descuento_custom > 0 && cmsConfig.porcentaje_descuento_custom < 100) {
+    originalPriceUsd = basePriceUsd;
+    priceUsd = Number((basePriceUsd * (1 - cmsConfig.porcentaje_descuento_custom / 100)).toFixed(2));
+  }
+
+  // Configuración de Caja / Bulto
+  const defaultBoxSize = raw.codGrupo === '09' ? 24 : 12;
+  const foxBoxUnits = raw.cantidadGrup && raw.cantidadGrup > 1 ? Math.round(raw.cantidadGrup) : defaultBoxSize;
+  const unitsPerBox =
+    cmsConfig?.unidades_por_caja_custom && cmsConfig.unidades_por_caja_custom > 1
+      ? Math.round(cmsConfig.unidades_por_caja_custom)
+      : foxBoxUnits;
+
+  const foxBoxPrice =
+    raw.precioVentGrupDiv1 && raw.precioVentGrupDiv1 > priceUsd
+      ? Number(raw.precioVentGrupDiv1.toFixed(2))
+      : Number((priceUsd * unitsPerBox).toFixed(2));
+
+  const boxPriceUsd =
+    cmsConfig?.precio_caja_usd_custom && Number(cmsConfig.precio_caja_usd_custom) > 0
+      ? Number(Number(cmsConfig.precio_caja_usd_custom).toFixed(2))
+      : foxBoxPrice;
+
+  const saleMode = cmsConfig?.modalidad_venta ?? 'ambos';
+  const boxUnitLabel = (raw.unidadGrup && raw.unidadGrup.trim() !== '' ? raw.unidadGrup.trim() : 'CAJA');
 
   // Buscar imagen WebP cargada en el CMS por código de barras / SKU
   const cmsImage =
@@ -133,7 +173,6 @@ export function adaptFoxDataProduct(
     (raw.codArticulo ? imagesMap?.get(raw.codArticulo.trim()) : undefined) ??
     (raw.sku ? imagesMap?.get(raw.sku.trim()) : undefined);
 
-  // Sanitización de imágenes con prioridad a la imagen oficial subida en el CMS
   const imageSources = [
     cmsImage,
     raw.imagenUrl,
@@ -141,7 +180,6 @@ export function adaptFoxDataProduct(
   ].filter((img): img is string => typeof img === 'string' && img.trim() !== '');
 
   const images = imageSources.length > 0 ? imageSources : [IMAGE_FALLBACKS.product];
-
   const name = (raw.nombre ?? raw.descripcion ?? raw.name ?? 'Producto Gran Catador').trim();
 
   const slug =
@@ -151,23 +189,38 @@ export function adaptFoxDataProduct(
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-  const stock = Number(raw.existencia ?? raw.stock ?? 0);
-  const isAvailable = raw.suspendido === 0 && stock > 0;
+  const stock = Math.max(0, Math.floor(Number(raw.existencia ?? raw.stock ?? 0)));
+  const allowBackorder =
+    typeof cmsConfig?.permitir_venta_sin_stock === 'boolean'
+      ? cmsConfig.permitir_venta_sin_stock
+      : Boolean(globalAllowBackorder);
+
+  // Si es solo_caja y no permite backorder, requiere al menos unitsPerBox en stock para estar disponible
+  const minRequiredStock = saleMode === 'solo_caja' ? unitsPerBox : 1;
+  const isAvailable = raw.suspendido === 0 && (stock >= minRequiredStock || allowBackorder);
+
   const department = resolveDepartmentByGroup(raw.codGrupo);
   const { categoryLabel, searchKeywords } = resolveCategoryMetadata(raw.codGrupo, raw.codSubgrupo);
 
   const discountPercentage =
+    cmsConfig?.porcentaje_descuento_custom ??
     raw.porcentaje_descuento ??
     (originalPriceUsd && originalPriceUsd > priceUsd
       ? Math.round(((originalPriceUsd - priceUsd) / originalPriceUsd) * 100)
       : undefined);
+
+  const customDesc = cmsConfig?.descripcion_custom?.trim();
+  const description =
+    customDesc && customDesc.length > 0
+      ? customDesc
+      : `${name} • ${categoryLabel} (${searchKeywords}) • Disponible por unidad o caja en Gran Catador Barinas.`;
 
   return {
     id,
     sku,
     name,
     slug,
-    description: `${name} - ${categoryLabel} (${searchKeywords}) - Gran Catador Barinas`,
+    description,
     brand: (raw.marca ?? raw.brand ?? categoryLabel.split('•')[0].trim() ?? 'Gran Catador').trim(),
     category: (raw.categoria ?? raw.grupo ?? categoryLabel).trim(),
     department,
@@ -180,9 +233,16 @@ export function adaptFoxDataProduct(
     reviewsCount: Number(raw.opiniones ?? raw.reviews_count ?? 18),
     images,
     unit: raw.unidadSimple ?? raw.unidad_medida ?? raw.unidad ?? 'Unidad',
-    isDealOfTheDay: Boolean(raw.es_oferta_del_dia),
+    saleMode,
+    unitsPerBox,
+    boxPriceUsd,
+    boxUnitLabel,
+    allowBackorder,
+    hiddenFromStore: Boolean(cmsConfig?.oculto_en_web),
+    trendTab: cmsConfig?.categoria_tendencia ?? 'mas_vendidos',
+    isDealOfTheDay: Boolean(cmsConfig?.es_oferta_destacada ?? raw.es_oferta_del_dia),
     dealEndsAt: raw.fecha_fin_oferta,
-    isWeeklyTrend: Boolean(raw.es_tendencia),
+    isWeeklyTrend: Boolean(cmsConfig?.es_tendencia ?? raw.es_tendencia),
     isStarProduct: Boolean(raw.es_estrella),
     codGrupo: raw.codGrupo,
     codSubgrupo: raw.codSubgrupo,
@@ -190,12 +250,15 @@ export function adaptFoxDataProduct(
 }
 
 /**
- * Transforma una lista de artículos de FoxData vinculándolos opcionalmente con existencias y fotos CMS
+ * Transforma una lista de artículos de FoxData vinculándolos con existencias, fotos y reglas CMS
  */
 export function adaptFoxDataProducts(
   rawList: RawFoxDataProductDto[],
   existenciasMap?: Map<string, number>,
-  imagesMap?: Map<string, string>
+  imagesMap?: Map<string, string>,
+  cmsConfigMap?: Map<string, ProductCmsConfig>,
+  globalAllowBackorder = false,
+  includeHidden = false
 ): Product[] {
   if (!Array.isArray(rawList)) return [];
 
@@ -204,8 +267,14 @@ export function adaptFoxDataProducts(
     .map((item) => {
       const artId = item.codArticulo ?? String(item.id);
       const stock = existenciasMap?.has(artId) ? existenciasMap.get(artId) : item.existencia;
-      return adaptFoxDataProduct({ ...item, existencia: stock }, imagesMap);
+      return adaptFoxDataProduct(
+        { ...item, existencia: stock },
+        imagesMap,
+        cmsConfigMap,
+        globalAllowBackorder
+      );
     })
+    .filter((p) => (includeHidden ? true : !p.hiddenFromStore))
     .sort((a, b) => {
       if (a.inStock && !b.inStock) return -1;
       if (!a.inStock && b.inStock) return 1;

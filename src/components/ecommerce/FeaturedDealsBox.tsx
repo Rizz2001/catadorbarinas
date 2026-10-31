@@ -9,9 +9,10 @@ import { useCountdown } from '@/hooks/useCountdown';
 interface FeaturedDealsBoxProps {
   products: Product[];
   targetEndTime?: string;
+  customTitle?: string | null;
 }
 
-export function FeaturedDealsBox({ products, targetEndTime }: FeaturedDealsBoxProps) {
+export function FeaturedDealsBox({ products, targetEndTime, customTitle }: FeaturedDealsBoxProps) {
   const isMounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -34,7 +35,7 @@ export function FeaturedDealsBox({ products, targetEndTime }: FeaturedDealsBoxPr
           </div>
           <div>
             <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">
-              Ofertas Destacadas del Día
+              {customTitle || 'Ofertas Destacadas del Día'}
             </h2>
             <p className="text-xs text-slate-600 hidden sm:block">
               Precios especiales por tiempo limitado en Gran Catador

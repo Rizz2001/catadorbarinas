@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingBag, Heart } from 'lucide-react';
 import { useCartTotals } from '@/hooks/useCartTotals';
+import { useWishlistStore } from '@/store/useWishlistStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { formatUsd } from '@/lib/currency';
 import { HeaderSearch } from './HeaderSearch';
@@ -12,6 +13,7 @@ import { UserNavMenu } from '@/components/auth';
 
 export function HeaderMain() {
   const totals = useCartTotals();
+  const favCount = useWishlistStore((state) => state.items.length);
   const storeConfig = useStoreConfigStore((state) => state.config);
   const logoUrl = storeConfig?.logo_url || '/logo-catador.svg';
   const logoAlto = storeConfig?.logo_alto_px || 44;
@@ -73,13 +75,18 @@ export function HeaderMain() {
           {/* Acciones de Usuario & Carrito */}
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Favoritos */}
-            <button
-              type="button"
-              className="hidden sm:flex items-center justify-center min-h-[40px] min-w-[40px] text-slate-700 hover:text-catador-blue transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
-              aria-label="Lista de Deseos"
+            <Link
+              href="/favoritos"
+              className="relative flex items-center justify-center min-h-[40px] min-w-[40px] text-slate-700 hover:text-red-500 transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
+              aria-label="Lista de Favoritos"
             >
               <Heart className="h-5 w-5" />
-            </button>
+              {favCount > 0 && (
+                <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white shadow-xs">
+                  {favCount}
+                </span>
+              )}
+            </Link>
 
             {/* Usuario / Mi Cuenta Dinámico con Control de Roles */}
             <UserNavMenu />

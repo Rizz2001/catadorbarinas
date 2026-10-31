@@ -7,6 +7,7 @@ import {
   FeaturedDealsBox,
   WeeklyTrendsBento,
   LiveCatalogSection,
+  AlliedBrandsSection,
 } from '@/components/ecommerce';
 import {
   deriveFeaturedDeals,
@@ -22,6 +23,7 @@ import {
   getBannersServer,
   getQuickCategoriesServer,
   getStoreConfigServer,
+  getAlliedBrandsServer,
 } from '@/services/cms.server';
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +44,7 @@ export default async function HomePage() {
     banners,
     quickCategories,
     storeConfig,
+    alliedBrands,
   ] = await Promise.all([
     fetchArticulosSmartVentas('01'),
     fetchGruposInv(),
@@ -49,6 +52,7 @@ export default async function HomePage() {
     getBannersServer(),
     getQuickCategoriesServer(),
     getStoreConfigServer(),
+    getAlliedBrandsServer(),
   ]);
 
   const featuredDeals = deriveFeaturedDeals(allProducts);
@@ -168,14 +172,34 @@ export default async function HomePage() {
       </section>
 
       {/* 4. Sección "Ofertas Destacadas del Día" con Contador Regresivo */}
-      <div id="ofertas">
-        <FeaturedDealsBox products={featuredDeals} />
-      </div>
+      {storeConfig?.seccion_ofertas_activa !== false && (
+        <div id="ofertas">
+          <FeaturedDealsBox
+            products={featuredDeals}
+            customTitle={storeConfig?.seccion_ofertas_titulo}
+          />
+        </div>
+      )}
 
       {/* 5. Sección "Tendencias de la Semana" (Bento Grid Asimétrico 5 Columnas) */}
-      <WeeklyTrendsBento products={weeklyTrends} starProduct={starProduct} />
+      {storeConfig?.seccion_tendencias_activa !== false && (
+        <WeeklyTrendsBento
+          products={weeklyTrends}
+          starProduct={starProduct}
+          customTitle={storeConfig?.seccion_tendencias_titulo}
+          customSubtitle={storeConfig?.seccion_tendencias_subtitulo}
+        />
+      )}
 
-      {/* 6. Catálogo en Vivo con Paginación Liviana (Control de Saturación de DOM) */}
+      {/* 6. Sección de Logotipos de Empresas y Marcas Aliadas Comerciales */}
+      {storeConfig?.seccion_aliados_activa !== false && (
+        <AlliedBrandsSection
+          brands={alliedBrands}
+          title={storeConfig?.seccion_aliados_titulo}
+        />
+      )}
+
+      {/* 7. Catálogo en Vivo con Paginación Liviana (Control de Saturación de DOM) */}
       <LiveCatalogSection
         groups={groups}
         initialSubgroups={initialSubgroups}

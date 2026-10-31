@@ -3,16 +3,33 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Truck, Users, Settings, ArrowLeft, LogOut, Shield, Image as ImageIcon, Camera, Menu, X } from 'lucide-react';
+import {
+  Truck,
+  Users,
+  Settings,
+  ArrowLeft,
+  LogOut,
+  Shield,
+  Image as ImageIcon,
+  Camera,
+  Menu,
+  X,
+  Sliders,
+  Award,
+  Search,
+} from 'lucide-react';
 import { signOutUser } from '@/services/auth.service';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/admin/pedidos', label: 'Despacho & Pedidos', icon: Truck, exact: false },
-  { href: '/admin/banners', label: 'Banners & Promos', icon: ImageIcon, exact: true },
+  { href: '/admin/catalogo-config', label: 'Artículos, Cajas & Secciones', icon: Sliders, exact: true },
+  { href: '/admin/banners', label: 'Banners & Promociones', icon: ImageIcon, exact: true },
+  { href: '/admin/aliados', label: 'Empresas Aliadas & FAQ', icon: Award, exact: true },
+  { href: '/admin/busquedas', label: 'Búsquedas de Usuarios', icon: Search, exact: true },
   { href: '/admin/productos', label: 'Fotos de Productos WebP', icon: Camera, exact: true },
   { href: '/admin/usuarios', label: 'Usuarios & Roles', icon: Users, exact: true },
-  { href: '/admin/configuracion', label: 'Configuración del Negocio', icon: Settings, exact: true },
+  { href: '/admin/configuracion', label: 'Configuración & Delivery GPS', icon: Settings, exact: true },
 ];
 
 export function AdminSidebar() {

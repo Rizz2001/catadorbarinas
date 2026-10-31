@@ -10,11 +10,17 @@ import { cn } from '@/lib/utils';
 interface WeeklyTrendsBentoProps {
   products: Product[];
   starProduct?: Product;
+  customTitle?: string | null;
+  customSubtitle?: string | null;
 }
 
 type TabType = 'bestseller' | 'deals' | 'new';
 
-export function WeeklyTrendsBento({ products }: WeeklyTrendsBentoProps) {
+export function WeeklyTrendsBento({
+  products,
+  customTitle,
+  customSubtitle,
+}: WeeklyTrendsBentoProps) {
   const [activeTab, setActiveTab] = useState<TabType>('bestseller');
 
   // Filtrado reactivo según la pestaña seleccionada
@@ -43,13 +49,13 @@ export function WeeklyTrendsBento({ products }: WeeklyTrendsBentoProps) {
           </div>
           <div>
             <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              Tendencias de la Semana
+              {customTitle || 'Tendencias de la Semana'}
               <span className="hidden sm:inline-flex text-[10px] font-black uppercase text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300/60">
                 Top Ventas
               </span>
             </h2>
             <p className="text-[11px] text-slate-500">
-              Artículos con mayor demanda en Barinas y disponibilidad inmediata
+              {customSubtitle || 'Artículos con mayor demanda en Barinas y disponibilidad inmediata'}
             </p>
           </div>
         </div>

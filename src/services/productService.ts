@@ -15,12 +15,14 @@ export async function getAllProducts(): Promise<Product[]> {
 }
 
 /**
- * Deriva las Ofertas Destacadas en memoria a partir de una lista ya cargada de productos
+ * Deriva las Ofertas Destacadas en memoria dando prioridad absoluta a los productos fijados en el CMS ("2. Ofertas")
  */
 export function deriveFeaturedDeals(all: Product[]): Product[] {
-  const inStock = all.filter((p) => p.inStock);
-  const candidates = inStock.length >= 6 ? inStock : all;
-  return candidates.slice(0, 6).map((p, idx) => ({
+  const cmsPinned = all.filter((p) => p.isDealOfTheDay);
+  const inStock = all.filter((p) => p.inStock && !p.isDealOfTheDay);
+  const combined = [...cmsPinned, ...(inStock.length >= 6 ? inStock : all.filter((p) => !p.isDealOfTheDay))];
+
+  return combined.slice(0, 6).map((p, idx) => ({
     ...p,
     isDealOfTheDay: true,
     discountPercentage: p.discountPercentage || (idx % 2 === 0 ? 15 : 10),
@@ -29,16 +31,19 @@ export function deriveFeaturedDeals(all: Product[]): Product[] {
 }
 
 /**
- * Deriva las Tendencias de la Semana en memoria
+ * Deriva las Tendencias de la Semana en memoria dando prioridad a los productos fijados en el CMS ("1. Tendencias")
  */
 export function deriveWeeklyTrends(all: Product[]): Product[] {
-  const inStock = all.filter((p) => p.inStock);
-  const pool = inStock.length >= 8 ? inStock : all;
-  return pool.slice(0, 12).map((p, idx) => ({
+  const cmsPinned = all.filter((p) => p.isWeeklyTrend);
+  const inStock = all.filter((p) => p.inStock && !p.isWeeklyTrend);
+  const combined = [...cmsPinned, ...(inStock.length >= 8 ? inStock : all.filter((p) => !p.isWeeklyTrend))];
+
+  return combined.slice(0, 12).map((p, idx) => ({
     ...p,
     isWeeklyTrend: true,
-    discountPercentage: idx % 3 === 0 ? 10 : undefined,
-    originalPriceUsd: idx % 3 === 0 ? Number((p.priceUsd * 1.10).toFixed(2)) : undefined,
+    discountPercentage: p.discountPercentage ?? (idx % 3 === 0 ? 10 : undefined),
+    originalPriceUsd:
+      p.originalPriceUsd ?? (idx % 3 === 0 ? Number((p.priceUsd * 1.1).toFixed(2)) : undefined),
   }));
 }
 

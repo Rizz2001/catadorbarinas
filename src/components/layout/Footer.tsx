@@ -119,12 +119,33 @@ export function Footer() {
 
         {/* Información & Ayuda */}
         <div className="space-y-3">
-          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Servicio al Cliente</h4>
+          <h4 className="text-xs font-bold text-white uppercase tracking-wider">Ayuda, Políticas y Legal</h4>
           <ul className="space-y-2 text-slate-400">
-            <li><span className="text-slate-400">Delivery en toda la ciudad de Barinas</span></li>
-            <li><span className="text-slate-400">Métodos: Pago Móvil, Zelle y Efectivo $</span></li>
-            <li><span className="text-slate-400">Chat y Soporte en Vivo por Pedido</span></li>
-            <li><span className="text-slate-400">100% de la gestión dentro de la Web</span></li>
+            <li>
+              <Link href="/preguntas-frecuentes" className="hover:text-catador-amber font-semibold">
+                Ayuda y Preguntas Frecuentes (FAQ)
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacidad" className="hover:text-catador-amber">
+                Políticas de Privacidad y Cookies
+              </Link>
+            </li>
+            <li>
+              <Link href="/terminos" className="hover:text-catador-amber">
+                Términos y Condiciones (+18)
+              </Link>
+            </li>
+            <li>
+              <Link href="/favoritos" className="hover:text-catador-amber">
+                Mis Productos Favoritos
+              </Link>
+            </li>
+            <li>
+              <Link href="/cuenta" className="hover:text-catador-amber">
+                Mi Cuenta y Seguimiento de Pedidos
+              </Link>
+            </li>
           </ul>
         </div>
 

@@ -69,6 +69,10 @@ export interface Database {
           estado_pedido: EstadoPedido;
           estado_pago: EstadoPago;
           notas: string | null;
+          latitud_entrega?: number | null;
+          longitud_entrega?: number | null;
+          distancia_km?: number | null;
+          tipo_transporte?: 'motorizado' | 'vehiculo_carga' | 'pickup' | null;
           created_at: string;
           updated_at: string;
         };
@@ -94,6 +98,10 @@ export interface Database {
           estado_pedido?: EstadoPedido;
           estado_pago?: EstadoPago;
           notas?: string | null;
+          latitud_entrega?: number | null;
+          longitud_entrega?: number | null;
+          distancia_km?: number | null;
+          tipo_transporte?: 'motorizado' | 'vehiculo_carga' | 'pickup' | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -119,6 +127,10 @@ export interface Database {
           estado_pedido?: EstadoPedido;
           estado_pago?: EstadoPago;
           notas?: string | null;
+          latitud_entrega?: number | null;
+          longitud_entrega?: number | null;
+          distancia_km?: number | null;
+          tipo_transporte?: 'motorizado' | 'vehiculo_carga' | 'pickup' | null;
           updated_at?: string;
         };
       };
@@ -134,6 +146,9 @@ export interface Database {
           subtotal_usd: number;
           subtotal_ves: number;
           imagen_url: string | null;
+          modalidad_compra?: 'unidad' | 'caja' | null;
+          unidades_por_caja?: number | null;
+          unidades_totales_descontadas?: number | null;
           created_at: string;
         };
         Insert: {
@@ -147,6 +162,9 @@ export interface Database {
           subtotal_usd: number;
           subtotal_ves: number;
           imagen_url?: string | null;
+          modalidad_compra?: 'unidad' | 'caja' | null;
+          unidades_por_caja?: number | null;
+          unidades_totales_descontadas?: number | null;
           created_at?: string;
         };
         Update: {
@@ -160,6 +178,9 @@ export interface Database {
           subtotal_usd?: number;
           subtotal_ves?: number;
           imagen_url?: string | null;
+          modalidad_compra?: 'unidad' | 'caja' | null;
+          unidades_por_caja?: number | null;
+          unidades_totales_descontadas?: number | null;
         };
       };
       pagos_pedido: {

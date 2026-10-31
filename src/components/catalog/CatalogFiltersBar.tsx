@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ArrowUpDown, Share2, Check, PackageCheck } from 'lucide-react';
+import { ArrowUpDown, Share2, Check, PackageCheck, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type SortOption = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
+export type PriceRangeFilter = 'all' | 'under_5' | '5_to_15' | '15_to_40' | 'over_40';
 
 interface CatalogFiltersBarProps {
   totalCount: number;
@@ -13,6 +14,8 @@ interface CatalogFiltersBarProps {
   onToggleInStock: (val: boolean) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
+  priceRange?: PriceRangeFilter;
+  onPriceRangeChange?: (range: PriceRangeFilter) => void;
   categoryTitle: string;
 }
 
@@ -23,6 +26,8 @@ export function CatalogFiltersBar({
   onToggleInStock,
   sortBy,
   onSortChange,
+  priceRange = 'all',
+  onPriceRangeChange,
   categoryTitle,
 }: CatalogFiltersBarProps) {
   const [copied, setCopied] = useState(false);
@@ -43,14 +48,12 @@ export function CatalogFiltersBar({
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 sm:px-4 rounded-xl border border-slate-200/80 shadow-2xs">
-      {/* Contador de Productos */}
       <div className="flex items-center gap-2">
         <span className="text-xs font-bold text-slate-700">
           Mostrando {displayedCount} de {totalCount} productos
         </span>
       </div>
 
-      {/* Controles de Filtros y Acciones */}
       <div className="flex flex-wrap items-center gap-2">
         {/* Toggle Solo en Stock */}
         <button
@@ -67,7 +70,26 @@ export function CatalogFiltersBar({
           <span>Solo en Stock</span>
         </button>
 
-        {/* Selector de Orden (text-base md:text-xs evita auto-zoom en iOS) */}
+        {/* Filtro por Rango de Precio USD */}
+        {onPriceRangeChange && (
+          <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2.5 py-1 min-h-[38px] rounded-lg">
+            <DollarSign className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+            <select
+              value={priceRange}
+              onChange={(e) => onPriceRangeChange(e.target.value as PriceRangeFilter)}
+              aria-label="Filtrar por rango de precios"
+              className="bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+            >
+              <option value="all">Todos los precios</option>
+              <option value="under_5">Menos de $5.00</option>
+              <option value="5_to_15">$5.00 a $15.00</option>
+              <option value="15_to_40">$15.00 a $40.00</option>
+              <option value="over_40">Más de $40.00</option>
+            </select>
+          </div>
+        )}
+
+        {/* Selector de Orden */}
         <div className="flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2.5 py-1 min-h-[38px] rounded-lg">
           <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
           <select
@@ -83,7 +105,7 @@ export function CatalogFiltersBar({
           </select>
         </div>
 
-        {/* Compartir Categoría por WhatsApp */}
+        {/* Compartir Categoría */}
         <button
           type="button"
           onClick={handleShareCategory}

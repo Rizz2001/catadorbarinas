@@ -4,7 +4,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import { Product } from '@/types';
 import { ProductCard } from '@/components/ecommerce/ProductCard';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CatalogFiltersBar, SortOption } from './CatalogFiltersBar';
+import { CatalogFiltersBar, PriceRangeFilter, SortOption } from './CatalogFiltersBar';
 import { cn } from '@/lib/utils';
 import { SmartVentasGroup, SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
 
@@ -32,6 +32,7 @@ export function CatalogBrowser({
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [onlyInStock, setOnlyInStock] = useState<boolean>(false);
+  const [priceRange, setPriceRange] = useState<PriceRangeFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
 
@@ -151,6 +152,16 @@ export function CatalogBrowser({
       result = result.filter((p) => p.inStock);
     }
 
+    if (priceRange === 'under_5') {
+      result = result.filter((p) => p.priceUsd < 5);
+    } else if (priceRange === '5_to_15') {
+      result = result.filter((p) => p.priceUsd >= 5 && p.priceUsd <= 15);
+    } else if (priceRange === '15_to_40') {
+      result = result.filter((p) => p.priceUsd > 15 && p.priceUsd <= 40);
+    } else if (priceRange === 'over_40') {
+      result = result.filter((p) => p.priceUsd > 40);
+    }
+
     if (sortBy === 'price_asc') {
       result.sort((a, b) => a.priceUsd - b.priceUsd);
     } else if (sortBy === 'price_desc') {
@@ -160,7 +171,7 @@ export function CatalogBrowser({
     }
 
     return result;
-  }, [products, onlyInStock, sortBy]);
+  }, [products, onlyInStock, priceRange, sortBy]);
 
   const displayedProducts = useMemo(() => {
     return processedProducts.slice(0, visibleCount);
@@ -244,6 +255,8 @@ export function CatalogBrowser({
         onToggleInStock={setOnlyInStock}
         sortBy={sortBy}
         onSortChange={setSortBy}
+        priceRange={priceRange}
+        onPriceRangeChange={setPriceRange}
         categoryTitle={categoryTitle}
       />
 

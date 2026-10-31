@@ -10,6 +10,7 @@ import {
   EstadoPago,
 } from '@/types';
 import { fetchExistenciasBodegonMap } from './foxdata.service';
+import { getProductCmsConfigsMap, getStoreConfig } from './cms.service';
 
 // Memoria volátil de respaldo para desarrollo si Supabase no está sincronizado
 const memoryOrders = new Map<string, PedidoConDetalles>();
@@ -24,6 +25,10 @@ export interface CreateOrderPayload {
   direccionEntrega?: string;
   zonaBarinas?: string;
   notas?: string;
+  latitudEntrega?: number | null;
+  longitudEntrega?: number | null;
+  distanciaKm?: number | null;
+  tipoTransporte?: 'motorizado' | 'vehiculo_carga' | 'pickup';
   subtotalUsd: number;
   subtotalVes: number;
   deliveryUsd: number;
@@ -35,6 +40,9 @@ export interface CreateOrderPayload {
     codArticuloFoxdata: string;
     nombreArticulo: string;
     cantidad: number;
+    modalidadCompra?: 'unidad' | 'caja';
+    unidadesPorCaja?: number;
+    unidadesTotalesDescontadas?: number;
     precioUnitarioUsd: number;
     precioUnitarioVes: number;
     subtotalUsd: number;
@@ -55,22 +63,57 @@ export interface CreateOrderPayload {
 }
 
 /**
- * Valida stock en Bodegón (Depósito 01) y crea el pedido en Supabase
+ * Valida matemáticamente el stock real en unidades base en Bodegón (Depósito 01) y crea el pedido en Supabase
  */
 export async function createOrder(payload: CreateOrderPayload): Promise<PedidoConDetalles> {
-  // 1. Validar existencias contra FoxData Depósito 01
-  try {
-    const existencias = await fetchExistenciasBodegonMap();
-    if (existencias.size > 0) {
-      for (const item of payload.items) {
-        const stockActual = existencias.get(item.codArticuloFoxdata) ?? 0;
-        if (stockActual < item.cantidad) {
-          console.warn(`Stock bajo para ${item.nombreArticulo}. Solicitado: ${item.cantidad}, Disponible: ${stockActual}`);
+  // 1. Validar existencias reales en unidades base contra FoxData Depósito 01
+  const [existencias, cmsConfigsMap, storeConfig] = await Promise.all([
+    fetchExistenciasBodegonMap(),
+    getProductCmsConfigsMap(),
+    getStoreConfig(),
+  ]);
+
+  const globalAllowBackorder = Boolean(storeConfig?.permitir_venta_sin_stock_global);
+
+  if (existencias.size > 0) {
+    // Sumar todas las unidades base requeridas por código de artículo (por si lleva cajas + unidades del mismo producto)
+    const requiredByCode = new Map<string, { totalUnits: number; name: string; detail: string }>();
+
+    for (const item of payload.items) {
+      const code = item.codArticuloFoxdata.trim();
+      const mode = item.modalidadCompra || 'unidad';
+      const unitsPerBox = mode === 'caja' ? Math.max(2, item.unidadesPorCaja || 12) : 1;
+      const unitsRequired = item.unidadesTotalesDescontadas || item.cantidad * unitsPerBox;
+
+      const prev = requiredByCode.get(code);
+      const detailPart =
+        mode === 'caja'
+          ? `${item.cantidad} ${item.cantidad === 1 ? 'caja' : 'cajas'} (${unitsRequired} und)`
+          : `${item.cantidad} ${item.cantidad === 1 ? 'unidad' : 'unidades'}`;
+
+      requiredByCode.set(code, {
+        totalUnits: (prev?.totalUnits || 0) + unitsRequired,
+        name: item.nombreArticulo,
+        detail: prev ? `${prev.detail} + ${detailPart}` : detailPart,
+      });
+    }
+
+    for (const [code, reqInfo] of requiredByCode.entries()) {
+      const cmsCfg = cmsConfigsMap.get(code) ?? cmsConfigsMap.get(code.toLowerCase());
+      const allowBackorder =
+        typeof cmsCfg?.permitir_venta_sin_stock === 'boolean'
+          ? cmsCfg.permitir_venta_sin_stock
+          : globalAllowBackorder;
+
+      if (!allowBackorder && existencias.has(code)) {
+        const stockActual = Math.max(0, Math.floor(existencias.get(code) ?? 0));
+        if (reqInfo.totalUnits > stockActual) {
+          throw new Error(
+            `Stock insuficiente para "${reqInfo.name}". Solicitaste ${reqInfo.detail} (${reqInfo.totalUnits} unidades en total), pero en inventario solo quedan ${stockActual} unidades disponibles.`
+          );
         }
       }
     }
-  } catch (err) {
-    console.warn('Advertencia verificando stock con FoxData:', err);
   }
 
   const supabaseAdmin = getSupabaseAdmin();
@@ -98,21 +141,37 @@ export async function createOrder(payload: CreateOrderPayload): Promise<PedidoCo
     estado_pedido: 'recibido',
     estado_pago: 'pendiente',
     notas: payload.notas || null,
+    latitud_entrega: payload.latitudEntrega ?? null,
+    longitud_entrega: payload.longitudEntrega ?? null,
+    distancia_km: payload.distanciaKm ?? null,
+    tipo_transporte: payload.tipoTransporte || (payload.tipoEntrega === 'pickup' ? 'pickup' : 'motorizado'),
   };
 
-  const itemsData = payload.items.map((it) => ({
-    id: crypto.randomUUID(),
-    pedido_id: orderId,
-    cod_articulo_foxdata: it.codArticuloFoxdata,
-    nombre_articulo: it.nombreArticulo,
-    cantidad: it.cantidad,
-    precio_unitario_usd: it.precioUnitarioUsd,
-    precio_unitario_ves: it.precioUnitarioVes,
-    subtotal_usd: it.subtotalUsd,
-    subtotal_ves: it.subtotalVes,
-    imagen_url: it.imagenUrl || null,
-    created_at: new Date().toISOString(),
-  }));
+  const itemsData = payload.items.map((it) => {
+    const mode = it.modalidadCompra || 'unidad';
+    const unitsPerBox = mode === 'caja' ? Math.max(2, it.unidadesPorCaja || 12) : 1;
+    const totalDiscounted = it.unidadesTotalesDescontadas || it.cantidad * unitsPerBox;
+    const labelSuffix = mode === 'caja' ? ` [CAJA x${unitsPerBox}]` : '';
+
+    return {
+      id: crypto.randomUUID(),
+      pedido_id: orderId,
+      cod_articulo_foxdata: it.codArticuloFoxdata,
+      nombre_articulo: it.nombreArticulo.includes('[CAJA')
+        ? it.nombreArticulo
+        : `${it.nombreArticulo}${labelSuffix}`,
+      cantidad: it.cantidad,
+      modalidad_compra: mode,
+      unidades_por_caja: unitsPerBox,
+      unidades_totales_descontadas: totalDiscounted,
+      precio_unitario_usd: it.precioUnitarioUsd,
+      precio_unitario_ves: it.precioUnitarioVes,
+      subtotal_usd: it.subtotalUsd,
+      subtotal_ves: it.subtotalVes,
+      imagen_url: it.imagenUrl || null,
+      created_at: new Date().toISOString(),
+    };
+  });
 
   const pagoData = {
     id: crypto.randomUUID(),

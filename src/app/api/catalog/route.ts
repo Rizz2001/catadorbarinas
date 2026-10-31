@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const codGrupo = searchParams.get('codGrupo') || '01';
   const codSubgrupo = searchParams.get('codSubgrupo') || undefined;
   const fetchSubgroupsOnly = searchParams.get('subgroups') === 'true';
+  const includeHidden = searchParams.get('includeHidden') === 'true';
 
   try {
     if (fetchSubgroupsOnly) {
@@ -15,7 +16,8 @@ export async function GET(request: NextRequest) {
 
     const products = await fetchArticulosSmartVentas(
       codGrupo,
-      codSubgrupo === 'todos' ? undefined : codSubgrupo
+      codSubgrupo === 'todos' ? undefined : codSubgrupo,
+      includeHidden
     );
 
     return NextResponse.json({

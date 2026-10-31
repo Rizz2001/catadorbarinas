@@ -1,5 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/supabase/server';
-import { Banner, StoreConfig, QuickCategory } from '@/types';
+import { Banner, StoreConfig, QuickCategory, AlliedBrand } from '@/types';
 
 interface ServerCacheItem<T> {
   data: T;
@@ -9,11 +9,13 @@ interface ServerCacheItem<T> {
 let cachedBanners: ServerCacheItem<Banner[]> | null = null;
 let cachedQuickCats: ServerCacheItem<QuickCategory[]> | null = null;
 let cachedConfig: ServerCacheItem<StoreConfig | null> | null = null;
+let cachedAlliedBrands: ServerCacheItem<AlliedBrand[]> | null = null;
 
 export function invalidateServerCmsCache() {
   cachedBanners = null;
   cachedQuickCats = null;
   cachedConfig = null;
+  cachedAlliedBrands = null;
 }
 
 /**
@@ -105,3 +107,30 @@ export async function getStoreConfigServer(): Promise<StoreConfig | null> {
     return null;
   }
 }
+
+/**
+ * Obtiene las empresas y marcas aliadas activas directamente en el Servidor (Cache 60s)
+ */
+export async function getAlliedBrandsServer(): Promise<AlliedBrand[]> {
+  const now = Date.now();
+  if (cachedAlliedBrands && cachedAlliedBrands.expiresAt > now) {
+    return cachedAlliedBrands.data;
+  }
+
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from('marcas_aliadas')
+      .select('*')
+      .eq('activo', true)
+      .order('orden', { ascending: true });
+
+    if (error) return [];
+    const brands = (data || []) as AlliedBrand[];
+    cachedAlliedBrands = { data: brands, expiresAt: now + 60000 };
+    return brands;
+  } catch {
+    return [];
+  }
+}
+
