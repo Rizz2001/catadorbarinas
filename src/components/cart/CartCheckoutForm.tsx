@@ -1,12 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, ShieldCheck, MapPin, CreditCard, Lock } from 'lucide-react';
+import {
+  ArrowRight,
+  ShieldCheck,
+  MapPin,
+  CreditCard,
+  Lock,
+  UserPlus,
+  LogIn,
+} from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
+import { supabase } from '@/lib/supabase';
 
 export function CartCheckoutForm() {
   const { items } = useCartStore();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+    let active = true;
+    async function checkAuth() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (active) setIsAuthenticated(Boolean(user));
+    }
+    checkAuth();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   if (items.length === 0) return null;
 
@@ -31,13 +53,38 @@ export function CartCheckoutForm() {
         </div>
       </div>
 
-      <Link
-        href="/checkout"
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light p-3.5 text-sm font-extrabold text-white shadow-md transition-all active:scale-[0.99]"
-      >
-        <span>Proceder al Pago en Línea</span>
-        <ArrowRight className="h-4 w-4" />
-      </Link>
+      {isAuthenticated ? (
+        <Link
+          href="/checkout"
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light p-3.5 text-sm font-extrabold text-white shadow-md transition-all active:scale-[0.99]"
+        >
+          <span>Proceder al Pago en Línea</span>
+          <ArrowRight className="h-4 w-4" />
+        </Link>
+      ) : (
+        <div className="space-y-2.5 pt-1">
+          <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
+            <p className="font-extrabold">🔒 Registro obligatorio para comprar</p>
+            <p className="text-[11px] text-amber-800 mt-0.5">
+              Para procesar tu pedido y darte seguimiento en tiempo real debes crear tu cuenta o iniciar sesión. Tu carrito se mantendrá guardado.
+            </p>
+          </div>
+          <Link
+            href="/registro?redirect=/checkout"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light p-3 text-xs font-extrabold text-white shadow-md transition-all"
+          >
+            <UserPlus className="h-4 w-4" />
+            <span>Crear mi Cuenta y Comprar</span>
+          </Link>
+          <Link
+            href="/login?redirect=/checkout"
+            className="w-full flex items-center justify-center gap-2 rounded-xl border border-catador-blue bg-white hover:bg-blue-50 p-2.5 text-xs font-extrabold text-catador-blue transition-all"
+          >
+            <LogIn className="h-4 w-4" />
+            <span>Ya tengo cuenta • Iniciar Sesión</span>
+          </Link>
+        </div>
+      )}
 
       <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
         <Lock className="h-3 w-3" />

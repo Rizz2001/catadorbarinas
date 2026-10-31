@@ -31,6 +31,11 @@ interface CartState {
     quantity: number,
     purchaseMode?: PurchaseMode
   ) => void;
+  switchPurchaseMode: (
+    productId: string,
+    currentMode: PurchaseMode,
+    nextMode: PurchaseMode
+  ) => void;
   clearCart: () => void;
   setNotes: (notes: string) => void;
   getTotals: (bcvRate?: number) => CartTotals;
@@ -163,6 +168,80 @@ export const useCartStore = create<CartState>()(
           });
 
           return { items: updatedItems, lastStockWarning: warning };
+        });
+      },
+
+      switchPurchaseMode: (
+        productId: string,
+        currentMode: PurchaseMode,
+        nextMode: PurchaseMode
+      ) => {
+        if (currentMode === nextMode) return;
+
+        set((state) => {
+          const sourceItem = state.items.find(
+            (i) =>
+              i.product.id === productId &&
+              (i.purchaseMode || 'unidad') === currentMode
+          );
+          if (!sourceItem) return state;
+
+          const otherItems = state.items.filter(
+            (i) =>
+              !(
+                i.product.id === productId &&
+                (i.purchaseMode || 'unidad') === currentMode
+              )
+          );
+
+          const maxAllowed = getMaxAllowedQuantity(
+            sourceItem.product,
+            nextMode,
+            otherItems
+          );
+
+          if (maxAllowed <= 0 && !sourceItem.product.allowBackorder) {
+            const unitsPerBox = getUnitsPerPurchaseMode(
+              sourceItem.product,
+              'caja'
+            );
+            return {
+              ...state,
+              lastStockWarning: `No hay suficientes botellas (${sourceItem.product.stockQuantity} disponibles) para armar una caja de ${unitsPerBox} unidades.`,
+            };
+          }
+
+          const existingTargetIdx = otherItems.findIndex(
+            (i) =>
+              i.product.id === productId &&
+              (i.purchaseMode || 'unidad') === nextMode
+          );
+
+          if (existingTargetIdx > -1) {
+            const merged = [...otherItems];
+            const currentTargetQty = merged[existingTargetIdx].quantity;
+            const newTotalQty = Math.min(
+              currentTargetQty + 1,
+              Math.max(1, maxAllowed)
+            );
+            merged[existingTargetIdx] = {
+              ...merged[existingTargetIdx],
+              quantity: newTotalQty,
+            };
+            return { items: merged, lastStockWarning: null };
+          }
+
+          return {
+            items: [
+              ...otherItems,
+              {
+                product: sourceItem.product,
+                quantity: 1,
+                purchaseMode: nextMode,
+              },
+            ],
+            lastStockWarning: null,
+          };
         });
       },
 

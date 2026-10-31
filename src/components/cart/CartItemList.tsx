@@ -3,17 +3,29 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, AlertTriangle } from 'lucide-react';
+import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag, AlertTriangle, Package } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { formatPrices } from '@/lib/currency';
-import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
+import {
+  canBuyBox,
+  canBuyUnit,
+  getEffectivePriceUsd,
+  getUnitsPerPurchaseMode,
+} from '@/lib/inventory';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 export function CartItemList() {
-  const { items, updateQuantity, removeItem, clearCart, lastStockWarning } = useCartStore();
+  const {
+    items,
+    updateQuantity,
+    removeItem,
+    switchPurchaseMode,
+    clearCart,
+    lastStockWarning,
+  } = useCartStore();
   const bcvRate = useBcvStore((state) => state.rateInfo.rate);
   const storeConfig = useStoreConfigStore((state) => state.config);
   const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
@@ -29,7 +41,7 @@ export function CartItemList() {
           No tienes productos en tu carrito. Explora nuestro catálogo de licores, víveres y bodegón para agregar tus favoritos.
         </p>
         <Link
-          href="/#catalogo-en-vivo"
+          href="/catalogo"
           className="mt-6 inline-flex items-center gap-2 rounded-xl bg-catador-blue px-5 py-2.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors shadow-xs"
         >
           <ArrowLeft className="h-4 w-4" /> Ir al Catálogo de Productos
@@ -45,6 +57,7 @@ export function CartItemList() {
           Artículos en tu Carrito ({items.reduce((acc, i) => acc + i.quantity, 0)})
         </h2>
         <button
+          type="button"
           onClick={clearCart}
           className="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors cursor-pointer"
         >
@@ -65,8 +78,10 @@ export function CartItemList() {
           const unitPriceUsd = getEffectivePriceUsd(product, mode);
           const itemPrices = formatPrices(unitPriceUsd * quantity, bcvRate);
           const unitPrices = formatPrices(unitPriceUsd, bcvRate);
+          const unitsPerBox = getUnitsPerPurchaseMode(product, 'caja');
           const unitsPerItem = getUnitsPerPurchaseMode(product, mode);
           const totalBaseUnits = quantity * unitsPerItem;
+          const supportsBothModes = canBuyUnit(product) && canBuyBox(product);
 
           const rawImg = product.images?.[0];
           const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
@@ -77,7 +92,7 @@ export function CartItemList() {
               key={`${product.id}-${mode}`}
               className="pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
-              <div className="flex items-center gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
+              <div className="flex items-start gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
                 <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 overflow-hidden">
                   <Image
                     src={itemImg}
@@ -88,30 +103,60 @@ export function CartItemList() {
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider truncate">
                       {product.brand}
                     </span>
-                    <span
-                      className={cn(
-                        'text-[10px] font-black uppercase px-2 py-0.5 rounded-full',
-                        mode === 'caja'
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-slate-100 text-slate-700'
-                      )}
-                    >
-                      {mode === 'caja' ? `Por Caja (${unitsPerItem} und)` : 'Por Unidad'}
-                    </span>
+                    {supportsBothModes ? (
+                      <div className="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() => switchPurchaseMode(product.id, mode, 'unidad')}
+                          className={cn(
+                            'px-2 py-0.5 rounded-md text-[10px] font-extrabold transition-all cursor-pointer',
+                            mode === 'unidad'
+                              ? 'bg-white text-catador-blue shadow-2xs'
+                              : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          Por Unidad
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => switchPurchaseMode(product.id, mode, 'caja')}
+                          className={cn(
+                            'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all cursor-pointer',
+                            mode === 'caja'
+                              ? 'bg-amber-500 text-white shadow-2xs'
+                              : 'text-slate-500 hover:text-slate-800'
+                          )}
+                        >
+                          <Package className="h-2.5 w-2.5" />
+                          Caja x{unitsPerBox}
+                        </button>
+                      </div>
+                    ) : (
+                      <span
+                        className={cn(
+                          'text-[10px] font-black uppercase px-2 py-0.5 rounded-full',
+                          mode === 'caja'
+                            ? 'bg-amber-100 text-amber-800'
+                            : 'bg-slate-100 text-slate-700'
+                        )}
+                      >
+                        {mode === 'caja' ? `Por Caja (${unitsPerItem} und)` : 'Por Unidad'}
+                      </span>
+                    )}
                   </div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 sm:truncate mt-0.5">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-800 line-clamp-2 sm:truncate mt-1">
                     {product.name}
                   </h3>
                   <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
-                    Precio {mode === 'caja' ? 'Caja' : 'Unidad'}:{' '}
+                    {mode === 'caja' ? 'Caja' : 'Unidad'}:{' '}
                     <span className="font-bold text-slate-700">{unitPrices.usdFormatted}</span> (
                     {unitPrices.vesFormatted}) •{' '}
                     <span className="text-emerald-700 font-semibold">
-                      Total: {totalBaseUnits} botellas/und
+                      Total: {totalBaseUnits} und
                     </span>
                   </p>
                 </div>
@@ -120,16 +165,18 @@ export function CartItemList() {
               <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
                 <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs">
                   <button
+                    type="button"
                     onClick={() => updateQuantity(product.id, quantity - 1, mode)}
-                    className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-l-xl cursor-pointer"
+                    className="h-9 w-9 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors rounded-l-xl cursor-pointer"
                     aria-label="Disminuir cantidad"
                   >
                     <Minus className="h-3.5 w-3.5" />
                   </button>
-                  <span className="w-8 text-center text-xs font-bold text-slate-800">{quantity}</span>
+                  <span className="w-8 text-center text-xs font-black text-slate-900">{quantity}</span>
                   <button
+                    type="button"
                     onClick={() => updateQuantity(product.id, quantity + 1, mode)}
-                    className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-r-xl cursor-pointer"
+                    className="h-9 w-9 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors rounded-r-xl cursor-pointer"
                     aria-label="Aumentar cantidad"
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -144,6 +191,7 @@ export function CartItemList() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => removeItem(product.id, mode)}
                   className="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                   aria-label={`Eliminar ${product.name}`}
@@ -158,7 +206,7 @@ export function CartItemList() {
 
       <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
         <Link
-          href="/#catalogo-en-vivo"
+          href="/catalogo"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors"
         >
           <ArrowLeft className="h-3.5 w-3.5" /> Seguir Comprando

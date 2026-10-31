@@ -3,12 +3,12 @@
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, ArrowLeft, AlertCircle } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, AlertCircle, Lock, UserPlus, LogIn, ShieldCheck } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
-import { convertUsdToVes } from '@/lib/currency';
+import { convertUsdToVes, formatUsd, formatVes } from '@/lib/currency';
 import { calculateSmartDeliveryQuote } from '@/lib/delivery';
 import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
 import {
@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const storeConfig = useStoreConfigStore((state) => state.config);
   const baseTotals = useCartTotals();
   const [userId, setUserId] = useState<string | null>(null);
+  const [authChecking, setAuthChecking] = useState<boolean>(true);
 
   const [deliveryData, setDeliveryData] = useState<DeliveryDataState>({
     nombre: '',
@@ -42,8 +43,10 @@ export default function CheckoutPage() {
   });
 
   React.useEffect(() => {
+    let active = true;
     async function loadAuthUser() {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!active) return;
       if (user) {
         setUserId(user.id);
         const { data: perfil } = await supabase
@@ -52,6 +55,7 @@ export default function CheckoutPage() {
           .eq('id', user.id)
           .single();
 
+        if (!active) return;
         setDeliveryData((prev) => ({
           ...prev,
           nombre: perfil?.nombre || prev.nombre,
@@ -61,8 +65,12 @@ export default function CheckoutPage() {
           email: user.email || prev.email,
         }));
       }
+      setAuthChecking(false);
     }
     loadAuthUser();
+    return () => {
+      active = false;
+    };
   }, []);
 
   // Cotización dinámica de delivery según GPS / Zona + Volumen de Cajas/Unidades
@@ -123,8 +131,78 @@ export default function CheckoutPage() {
     );
   }
 
+  if (!authChecking && !userId) {
+    return (
+      <main className="container mx-auto px-4 py-10 md:py-16 max-w-lg">
+        <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 shadow-xl space-y-6 text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-catador-blue/10 text-catador-blue">
+            <Lock className="h-8 w-8" />
+          </div>
+
+          <div className="space-y-2">
+            <span className="inline-block rounded-full bg-amber-100 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-amber-800">
+              Requisito Obligatorio de Compra
+            </span>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900">
+              Regístrate o Inicia Sesión para Comprar
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Por seguridad y para brindarte seguimiento en vivo de tu despacho y soporte directo con administración, todas las compras requieren una cuenta registrada.
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-4 text-left space-y-2">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+              <span>Tu carrito está guardado ({baseTotals.itemCount} artículos):</span>
+              <span className="text-catador-blue font-black">
+                {formatUsd(baseTotals.subtotalUsd)}
+              </span>
+            </div>
+            <p className="text-[11px] font-mono font-semibold text-slate-500">
+              Equivalente BCV: {formatVes(baseTotals.subtotalVes)}
+            </p>
+            <div className="pt-2 border-t border-slate-200/80 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+              <ShieldCheck className="h-4 w-4 shrink-0" />
+              <span>Al iniciar sesión volverás automáticamente a finalizar tu compra.</span>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <Link
+              href="/registro?redirect=/checkout"
+              className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light py-3.5 px-5 text-sm font-extrabold text-white shadow-md transition-all"
+            >
+              <UserPlus className="h-4 w-4" />
+              <span>Crear mi Cuenta Rápida</span>
+            </Link>
+
+            <Link
+              href="/login?redirect=/checkout"
+              className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-xl border-2 border-catador-blue bg-white hover:bg-blue-50 py-3 px-5 text-sm font-extrabold text-catador-blue transition-all"
+            >
+              <LogIn className="h-4 w-4" />
+              <span>Ya tengo cuenta • Iniciar Sesión</span>
+            </Link>
+          </div>
+
+          <Link
+            href="/carrito"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-800"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" /> Volver a mi Carrito
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   const handleProcessOrder = async () => {
     setErrorMessage(null);
+
+    if (!userId) {
+      setErrorMessage('Debes registrarte o iniciar sesión para poder procesar tu compra.');
+      return;
+    }
 
     if (!deliveryData.nombre.trim() || !deliveryData.cedula.trim() || !deliveryData.telefono.trim()) {
       setErrorMessage('Por favor completa todos tus datos personales obligatorios (Nombre, Cédula, Teléfono).');

@@ -8,6 +8,14 @@ export function getDefaultPurchaseMode(product: Product): PurchaseMode {
   return 'unidad';
 }
 
+export function canBuyUnit(product: Product): boolean {
+  return (product.saleMode || 'ambos') !== 'solo_caja';
+}
+
+export function canBuyBox(product: Product): boolean {
+  return (product.saleMode || 'ambos') !== 'solo_unidad';
+}
+
 /**
  * Devuelve cuántas unidades base de inventario consume 1 ítem en la modalidad elegida.
  */

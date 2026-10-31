@@ -66,6 +66,12 @@ export interface CreateOrderPayload {
  * Valida matemáticamente el stock real en unidades base en Bodegón (Depósito 01) y crea el pedido en Supabase
  */
 export async function createOrder(payload: CreateOrderPayload): Promise<PedidoConDetalles> {
+  if (!payload.usuarioId || !payload.usuarioId.trim()) {
+    throw new Error(
+      'Debes registrarte e iniciar sesión en Gran Catador para poder realizar una compra.'
+    );
+  }
+
   // 1. Validar existencias reales en unidades base contra FoxData Depósito 01
   const [existencias, cmsConfigsMap, storeConfig] = await Promise.all([
     fetchExistenciasBodegonMap(),
