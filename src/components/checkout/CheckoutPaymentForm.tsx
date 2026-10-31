@@ -57,7 +57,7 @@ export function CheckoutPaymentForm({
   return (
     <div className="space-y-5">
       {/* Selector de Método de Pago */}
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="grid grid-cols-1 xs:grid-cols-3 gap-2 sm:gap-2.5">
         {[
           { id: 'pago_movil' as const, label: 'Pago Móvil', sub: 'Bolívares (Bs)', icon: Smartphone },
           { id: 'zelle' as const, label: 'Zelle', sub: 'Dólares ($ USD)', icon: CreditCard },
@@ -68,56 +68,58 @@ export function CheckoutPaymentForm({
             type="button"
             onClick={() => onChange({ metodoPago: id })}
             className={cn(
-              'flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer',
+              'flex xs:flex-col items-center justify-start xs:justify-center gap-3 xs:gap-0 p-3 min-h-[48px] rounded-xl border text-left xs:text-center transition-all cursor-pointer',
               paymentData.metodoPago === id
                 ? 'border-catador-amber bg-amber-50/60 text-catador-amber ring-2 ring-catador-amber/20 shadow-xs'
                 : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
             )}
           >
-            <Icon className="h-5 w-5 mb-1" />
-            <span className="text-xs font-bold text-slate-900">{label}</span>
-            <span className="text-[10px] text-slate-500">{sub}</span>
+            <Icon className="h-5 w-5 xs:mb-1 shrink-0" />
+            <div>
+              <span className="text-xs font-bold text-slate-900 block">{label}</span>
+              <span className="text-[10px] text-slate-500 block">{sub}</span>
+            </div>
           </button>
         ))}
       </div>
 
       {/* PESTAÑA: PAGO MÓVIL */}
       {paymentData.metodoPago === 'pago_movil' && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4 space-y-4">
           <div className="rounded-lg bg-white p-3 border border-slate-200/80 space-y-2 text-xs">
             <span className="font-bold text-catador-blue uppercase tracking-wider text-[10px]">
               Datos Oficiales para Pago Móvil
             </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-700">
               <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border">
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-600">Banco</div>
-                  <div className="font-bold text-slate-900">{storeConfig?.pago_movil_banco || 'Banesco (0134)'}</div>
+                  <div className="font-bold text-slate-900 truncate">{storeConfig?.pago_movil_banco || 'Banesco (0134)'}</div>
                 </div>
-                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_banco || '0134', 'banco')} className="text-slate-600 hover:text-catador-blue">
+                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_banco || '0134', 'banco')} className="p-1.5 text-slate-600 hover:text-catador-blue cursor-pointer shrink-0">
                   {copiedField === 'banco' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                 </button>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border">
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-600">RIF / Cédula</div>
-                  <div className="font-bold text-slate-900">{storeConfig?.pago_movil_cedula || 'J-50123456-7'}</div>
+                  <div className="font-bold text-slate-900 truncate">{storeConfig?.pago_movil_cedula || 'J-50123456-7'}</div>
                 </div>
-                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_cedula || 'J-50123456-7', 'rif')} className="text-slate-600 hover:text-catador-blue">
+                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_cedula || 'J-50123456-7', 'rif')} className="p-1.5 text-slate-600 hover:text-catador-blue cursor-pointer shrink-0">
                   {copiedField === 'rif' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                 </button>
               </div>
               <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border">
-                <div>
+                <div className="min-w-0">
                   <div className="text-[10px] text-slate-600">Teléfono</div>
-                  <div className="font-bold text-slate-900">{storeConfig?.pago_movil_telefono || '0414-5738890'}</div>
+                  <div className="font-bold text-slate-900 truncate">{storeConfig?.pago_movil_telefono || '0414-5738890'}</div>
                 </div>
-                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_telefono || '04145738890', 'tel')} className="text-slate-600 hover:text-catador-blue">
+                <button type="button" onClick={() => copyToClipboard(storeConfig?.pago_movil_telefono || '04145738890', 'tel')} className="p-1.5 text-slate-600 hover:text-catador-blue cursor-pointer shrink-0">
                   {copiedField === 'tel' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
                 </button>
               </div>
             </div>
-            <div className="text-right text-[11px] font-extrabold text-catador-blue">
+            <div className="text-right text-[11px] font-extrabold text-catador-blue font-mono">
               Monto exacto a transferir: {formatVes(totalVes)}
             </div>
           </div>
@@ -131,7 +133,7 @@ export function CheckoutPaymentForm({
                 placeholder="Ej: Banesco, Mercantil, Venezuela"
                 value={paymentData.bancoOrigen}
                 onChange={(e) => onChange({ bancoOrigen: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+                className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
               />
             </div>
             <div>
@@ -143,7 +145,7 @@ export function CheckoutPaymentForm({
                 placeholder="Ej: 549120"
                 value={paymentData.referencia}
                 onChange={(e) => onChange({ referencia: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+                className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
               />
             </div>
           </div>
@@ -154,7 +156,7 @@ export function CheckoutPaymentForm({
             <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-3 text-center bg-white hover:bg-slate-50 transition-colors cursor-pointer">
               <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
               <UploadCloud className="h-6 w-6 text-slate-400 mx-auto mb-1" />
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="text-xs font-semibold text-slate-700 truncate">
                 {paymentData.comprobanteFile ? paymentData.comprobanteFile.name : 'Haz clic o arrastra tu comprobante aquí'}
               </p>
               <p className="text-[10px] text-slate-400">PNG, JPG o JPEG (Máximo 5MB)</p>
@@ -165,20 +167,20 @@ export function CheckoutPaymentForm({
 
       {/* PESTAÑA: ZELLE */}
       {paymentData.metodoPago === 'zelle' && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4 space-y-4">
           <div className="rounded-lg bg-white p-3 border border-slate-200/80 space-y-2 text-xs">
             <span className="font-bold text-catador-blue uppercase tracking-wider text-[10px]">Datos Oficiales Zelle</span>
-            <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border">
-              <div>
+            <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border gap-2">
+              <div className="min-w-0">
                 <div className="text-[10px] text-slate-600">Correo Zelle</div>
-                <div className="font-bold text-slate-900">{storeConfig?.zelle_email || 'pagos@grancatadorbarinas.com'}</div>
-                <div className="text-[10px] text-slate-600">Titular: {storeConfig?.zelle_titular || 'Gran Catador LLC'}</div>
+                <div className="font-bold text-slate-900 truncate">{storeConfig?.zelle_email || 'pagos@grancatadorbarinas.com'}</div>
+                <div className="text-[10px] text-slate-600 truncate">Titular: {storeConfig?.zelle_titular || 'Gran Catador LLC'}</div>
               </div>
-              <button type="button" onClick={() => copyToClipboard(storeConfig?.zelle_email || 'pagos@grancatadorbarinas.com', 'zelle')} className="text-slate-600 hover:text-catador-blue">
+              <button type="button" onClick={() => copyToClipboard(storeConfig?.zelle_email || 'pagos@grancatadorbarinas.com', 'zelle')} className="p-1.5 text-slate-600 hover:text-catador-blue cursor-pointer shrink-0">
                 {copiedField === 'zelle' ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
             </div>
-            <div className="text-right text-[11px] font-extrabold text-catador-blue">
+            <div className="text-right text-[11px] font-extrabold text-catador-blue font-mono">
               Monto exacto a transferir: {formatUsd(totalUsd)}
             </div>
           </div>
@@ -192,7 +194,7 @@ export function CheckoutPaymentForm({
                 placeholder="Nombre completo en cuenta Zelle"
                 value={paymentData.bancoOrigen}
                 onChange={(e) => onChange({ bancoOrigen: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+                className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
               />
             </div>
             <div>
@@ -203,7 +205,7 @@ export function CheckoutPaymentForm({
                 placeholder="Ej: ZL-894120"
                 value={paymentData.referencia}
                 onChange={(e) => onChange({ referencia: e.target.value })}
-                className="w-full rounded-xl border border-slate-200 p-2.5 text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+                className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
               />
             </div>
           </div>
@@ -213,7 +215,7 @@ export function CheckoutPaymentForm({
             <div className="relative border-2 border-dashed border-slate-200 rounded-xl p-3 text-center bg-white hover:bg-slate-50 transition-colors cursor-pointer">
               <input type="file" accept="image/*" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" />
               <UploadCloud className="h-6 w-6 text-slate-400 mx-auto mb-1" />
-              <p className="text-xs font-semibold text-slate-700">
+              <p className="text-xs font-semibold text-slate-700 truncate">
                 {paymentData.comprobanteFile ? paymentData.comprobanteFile.name : 'Haz clic o arrastra tu comprobante aquí'}
               </p>
             </div>
@@ -223,19 +225,19 @@ export function CheckoutPaymentForm({
 
       {/* PESTAÑA: EFECTIVO USD CONTRA ENTREGA */}
       {paymentData.metodoPago === 'efectivo_usd' && (
-        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-4">
+        <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 sm:p-4 space-y-4">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-2">
               ¿Con qué billete en divisas ($ USD) pagarás al recibir?
             </label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 xs:grid-cols-4 gap-2">
               {[20, 50, 100].map((bill) => (
                 <button
                   key={bill}
                   type="button"
                   onClick={() => handleBillSelect(bill)}
                   className={cn(
-                    'p-2.5 rounded-xl border text-center font-black text-xs transition-all cursor-pointer',
+                    'p-2.5 min-h-[44px] rounded-xl border text-center font-black text-xs transition-all cursor-pointer',
                     paymentData.billetePagoUsd === bill
                       ? 'border-catador-blue bg-catador-blue text-white'
                       : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -248,7 +250,7 @@ export function CheckoutPaymentForm({
                 type="button"
                 onClick={() => handleBillSelect(Math.ceil(totalUsd))}
                 className={cn(
-                  'p-2.5 rounded-xl border text-center font-bold text-[11px] transition-all cursor-pointer',
+                  'p-2.5 min-h-[44px] rounded-xl border text-center font-bold text-[11px] transition-all cursor-pointer',
                   paymentData.billetePagoUsd === Math.ceil(totalUsd)
                     ? 'border-catador-blue bg-catador-blue text-white'
                     : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -259,14 +261,14 @@ export function CheckoutPaymentForm({
             </div>
           </div>
 
-          <div className="rounded-xl bg-white border border-slate-200 p-3 flex items-center justify-between text-xs">
+          <div className="rounded-xl bg-white border border-slate-200 p-3 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-xs">
             <div>
               <span className="text-slate-600 block text-[11px]">Total a pagar:</span>
               <span className="font-extrabold text-slate-900">{formatUsd(totalUsd)}</span>
             </div>
-            <div className="text-right">
+            <div className="xs:text-right">
               <span className="text-slate-600 block text-[11px]">Vuelto que llevará el repartidor:</span>
-              <span className="font-black text-emerald-600 text-sm">
+              <span className="font-black text-emerald-600 text-sm font-mono">
                 {formatUsd(paymentData.vueltoCalculadoUsd)} ({formatVes(paymentData.vueltoCalculadoUsd * bcvRate)})
               </span>
             </div>

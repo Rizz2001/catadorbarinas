@@ -12,31 +12,60 @@ interface TokenCache {
 }
 
 let cachedToken: TokenCache | null = null;
-let lastAuthFailureTime = 0;
-const AUTH_COOLDOWN_MS = 30000;
+let inflightTokenPromise: Promise<string> | null = null;
 
-const FOXDATA_HEADERS = {
+const FOXDATA_HEADERS: Record<string, string> = {
   Accept: 'application/json',
+  Connection: 'close',
   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GranCatador/1.0',
 };
 
 /**
- * Obtiene o reutiliza el Bearer Token de autenticación OAuth2 de FoxData con circuit breaker
+ * Helper resiliente con reintentos automáticos ante cierres de socket (UND_ERR_SOCKET)
+ */
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit & { next?: { revalidate?: number } },
+  retries = 2,
+  timeoutMs = 7000
+): Promise<Response> {
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      return res;
+    } catch (err) {
+      lastError = err;
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 180 * (attempt + 1)));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/**
+ * Obtiene o reutiliza el Bearer Token OAuth2 de FoxData con deduplicación de promesas en vuelo
  */
 async function getFoxDataToken(): Promise<string> {
   const now = Date.now();
-  if (now - lastAuthFailureTime < AUTH_COOLDOWN_MS) {
-    throw new Error('FoxData en periodo de enfriamiento');
-  }
-
   if (cachedToken && cachedToken.expiresAt > now + 60000) {
     return cachedToken.token;
+  }
+
+  if (inflightTokenPromise) {
+    return inflightTokenPromise;
   }
 
   const authUrl = process.env.FOXDATA_AUTH_URL || 'https://auth.foxdata.app/connect/token';
   const clientId = process.env.FOXDATA_CLIENT_ID || 'smvt-apiweb-C0006';
   const clientSecret = process.env.FOXDATA_CLIENT_SECRET || 'i84so7BEzsUo';
-  const scope = process.env.FOXDATA_SCOPE || 'smartventas-api smartventas.service.read smartventas.service.write smartventas.common.read';
+  const scope =
+    process.env.FOXDATA_SCOPE ||
+    'smartventas-api smartventas.service.read smartventas.service.write smartventas.common.read';
 
   const params = new URLSearchParams();
   params.append('grant_type', 'client_credentials');
@@ -44,35 +73,41 @@ async function getFoxDataToken(): Promise<string> {
   params.append('client_secret', clientSecret);
   params.append('scope', scope);
 
-  try {
-    const res = await fetch(authUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        ...FOXDATA_HEADERS,
-      },
-      body: params.toString(),
-      signal: AbortSignal.timeout(4000),
-      next: { revalidate: 3000 },
-    });
+  inflightTokenPromise = (async () => {
+    try {
+      const res = await fetchWithRetry(
+        authUrl,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            ...FOXDATA_HEADERS,
+          },
+          body: params.toString(),
+          next: { revalidate: 3000 },
+        },
+        2,
+        6000
+      );
 
-    if (!res.ok) {
-      lastAuthFailureTime = Date.now();
-      throw new Error(`Error en autenticación FoxData: ${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Error en autenticación FoxData: ${res.status} ${res.statusText}`);
+      }
+
+      const data = await res.json();
+      const expiresInMs = (data.expires_in || 3600) * 1000;
+      cachedToken = {
+        token: data.access_token,
+        expiresAt: Date.now() + expiresInMs,
+      };
+
+      return data.access_token as string;
+    } finally {
+      inflightTokenPromise = null;
     }
+  })();
 
-    const data = await res.json();
-    const expiresInMs = (data.expires_in || 3600) * 1000;
-    cachedToken = {
-      token: data.access_token,
-      expiresAt: now + expiresInMs,
-    };
-
-    return data.access_token;
-  } catch (err) {
-    lastAuthFailureTime = Date.now();
-    throw err;
-  }
+  return inflightTokenPromise;
 }
 
 const API_BASE = process.env.FOXDATA_API_BASE_URL || 'https://n1.apismartventas.foxdata.app';
@@ -83,10 +118,15 @@ interface CacheItem<T> {
   expiresAt: number;
 }
 
-const memoryProductsCache = new Map<string, CacheItem<Product[]>>();
+const memoryGroupProductsCache = new Map<string, CacheItem<Product[]>>();
+const inflightGroupPromises = new Map<string, Promise<Product[]>>();
 let memoryExistenciasCache: CacheItem<Map<string, number>> | null = null;
-let memoryGroupsCache: CacheItem<unknown[]> | null = null;
-const memorySubgroupsCache = new Map<string, CacheItem<unknown[]>>();
+let inflightExistenciasPromise: Promise<Map<string, number>> | null = null;
+let memoryGroupsCache: CacheItem<{ CodGrupo: string; Nombre: string; SmartVentas?: number }[]> | null = null;
+const memorySubgroupsCache = new Map<
+  string,
+  CacheItem<{ CodGrupo: string; CodSubgrupo: string; Nombre: string }[]>
+>();
 
 /**
  * Obtiene los grupos de inventario reales de SmartVentas (Cache 5 min)
@@ -99,18 +139,25 @@ export async function fetchGruposInv() {
 
   try {
     const token = await getFoxDataToken();
-    const res = await fetch(`${API_BASE}/api/v1/syn/gruposinv`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...FOXDATA_HEADERS,
+    const res = await fetchWithRetry(
+      `${API_BASE}/api/v1/syn/gruposinv`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...FOXDATA_HEADERS,
+        },
+        next: { revalidate: 300 },
       },
-      signal: AbortSignal.timeout(4000),
-      next: { revalidate: 300 },
-    });
+      2,
+      5000
+    );
     if (!res.ok) return DEFAULT_GROUPS;
     const json = await res.json();
     const list = json.data || json || [];
-    const result = Array.isArray(list) && list.length > 0 ? list : DEFAULT_GROUPS;
+    const activeList = Array.isArray(list)
+      ? list.filter((g: { SmartVentas?: number }) => g.SmartVentas === 1 || g.SmartVentas === undefined)
+      : [];
+    const result = activeList.length > 0 ? activeList : DEFAULT_GROUPS;
     memoryGroupsCache = { data: result, expiresAt: now + 300000 };
     return result;
   } catch {
@@ -130,14 +177,18 @@ export async function fetchSubgruposInv(codGrupo: string) {
 
   try {
     const token = await getFoxDataToken();
-    const res = await fetch(`${API_BASE}/api/v1/syn/gruposinvsub/grupo/${codGrupo}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...FOXDATA_HEADERS,
+    const res = await fetchWithRetry(
+      `${API_BASE}/api/v1/syn/gruposinvsub/grupo/${codGrupo}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...FOXDATA_HEADERS,
+        },
+        next: { revalidate: 300 },
       },
-      signal: AbortSignal.timeout(4000),
-      next: { revalidate: 300 },
-    });
+      2,
+      5000
+    );
     if (!res.ok) return DEFAULT_SUBGROUPS[codGrupo] || [];
     const json = await res.json();
     const list = json.data || json || [];
@@ -150,7 +201,7 @@ export async function fetchSubgruposInv(codGrupo: string) {
 }
 
 /**
- * Obtiene el mapa de existencias del depósito Bodegón (01) (Cache 60 seg)
+ * Obtiene el mapa de existencias del depósito Bodegón (01) (Cache 2 min con deduplicación)
  */
 export async function fetchExistenciasBodegonMap(): Promise<Map<string, number>> {
   const now = Date.now();
@@ -158,110 +209,139 @@ export async function fetchExistenciasBodegonMap(): Promise<Map<string, number>>
     return memoryExistenciasCache.data;
   }
 
-  const map = new Map<string, number>();
-  try {
-    const token = await getFoxDataToken();
-    const res = await fetch(`${API_BASE}/api/v1/syn/existencias/deposito/${DEPOSITO_BODEGON}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        ...FOXDATA_HEADERS,
-      },
-      signal: AbortSignal.timeout(5000),
-      next: { revalidate: 60 },
-    });
-    if (!res.ok) return map;
-    const json = await res.json();
-    const list = json.data || json || [];
-    list.forEach((item: { codArticulo?: string; existencia?: number }) => {
-      if (item.codArticulo) {
-        map.set(item.codArticulo, Number(item.existencia ?? 0));
-      }
-    });
-    memoryExistenciasCache = { data: map, expiresAt: now + 60000 };
-  } catch {
-    // Si la conexión no responde, continúa con existencias del producto
+  if (inflightExistenciasPromise) {
+    return inflightExistenciasPromise;
   }
-  return map;
+
+  inflightExistenciasPromise = (async () => {
+    const map = new Map<string, number>();
+    try {
+      const token = await getFoxDataToken();
+      const res = await fetchWithRetry(
+        `${API_BASE}/api/v1/syn/existencias/deposito/${DEPOSITO_BODEGON}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            ...FOXDATA_HEADERS,
+          },
+          next: { revalidate: 120 },
+        },
+        2,
+        7000
+      );
+      if (!res.ok) return map;
+      const json = await res.json();
+      const list = json.data || json || [];
+      list.forEach((item: { codArticulo?: string; existencia?: number }) => {
+        if (item.codArticulo) {
+          map.set(item.codArticulo, Number(item.existencia ?? 0));
+        }
+      });
+      if (map.size > 0) {
+        memoryExistenciasCache = { data: map, expiresAt: Date.now() + 120000 };
+      }
+    } catch {
+      // Si la conexión no responde, continúa con existencias del producto
+    } finally {
+      inflightExistenciasPromise = null;
+    }
+    return map;
+  })();
+
+  return inflightExistenciasPromise;
 }
 
-const DEFAULT_SUBGROUP_BY_GROUP: Record<string, string> = {
-  '01': '01',   // WHISKY IMP.
-  '02': '1000', // REFRESCO
-  '03': '01',   // HIELOS
-  '05': '1000', // CONFITERIA
-  '07': '1000', // CARBON
-  '08': '01',   // AGUA MINERAL
-  '09': '1000', // CVZA NAC
-  '10': '01',   // VARIOS
-  '11': '01',   // DELICATECES
-  '12': '01',   // SERVICIO
-  '14': '150',  // JUGOS
-};
+/**
+ * Obtiene y cachea TODOS los artículos de un grupo completo en FoxData (Cache 3 min).
+ * Nunca cachea arreglos vacíos si ocurre un error de red.
+ */
+async function fetchFullGroupArticulos(codGrupo: string): Promise<Product[]> {
+  const now = Date.now();
+  const cached = memoryGroupProductsCache.get(codGrupo);
+  if (cached && cached.expiresAt > now) {
+    return cached.data;
+  }
+
+  const inflight = inflightGroupPromises.get(codGrupo);
+  if (inflight) {
+    return inflight;
+  }
+
+  const promise = (async () => {
+    try {
+      const token = await getFoxDataToken();
+      const url = `${API_BASE}/api/v1/syn/articulos/grupo/${codGrupo}`;
+
+      const [articulosRes, existenciasMap, imagesMap] = await Promise.all([
+        fetchWithRetry(
+          url,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              ...FOXDATA_HEADERS,
+            },
+            next: { revalidate: 120 },
+          },
+          2,
+          8000
+        ),
+        fetchExistenciasBodegonMap(),
+        getProductImagesMap(),
+      ]);
+
+      if (!articulosRes.ok) {
+        return [];
+      }
+
+      const json = await articulosRes.json();
+      const rawList: RawFoxDataProductDto[] = json.data || json || [];
+      const adapted = adaptFoxDataProducts(rawList, existenciasMap, imagesMap);
+
+      if (adapted.length > 0) {
+        memoryGroupProductsCache.set(codGrupo, {
+          data: adapted,
+          expiresAt: Date.now() + 180000,
+        });
+      }
+      return adapted;
+    } catch {
+      return [];
+    } finally {
+      inflightGroupPromises.delete(codGrupo);
+    }
+  })();
+
+  inflightGroupPromises.set(codGrupo, promise);
+  return promise;
+}
 
 /**
- * Obtiene y adapta los artículos reales de FoxData por grupo y subgrupo opcional (Cache 60 seg).
- * 100% basado en la API real de FoxData / SmartVentas.
+ * Obtiene y adapta los artículos reales de FoxData por grupo y subgrupo opcional.
+ * Al cachear el grupo completo, el filtrado por subgrupo es instantáneo (0ms) y devuelve el 100% del inventario.
  */
 export async function fetchArticulosSmartVentas(
   codGrupo: string = '01',
   codSubgrupo?: string
 ): Promise<Product[]> {
-  const now = Date.now();
-  const cacheKey = `${codGrupo}-${codSubgrupo || 'todos'}`;
-  const cached = memoryProductsCache.get(cacheKey);
-  if (cached && cached.expiresAt > now) {
-    return cached.data;
+  const allGroupProducts = await fetchFullGroupArticulos(codGrupo);
+
+  if (!codSubgrupo || codSubgrupo === 'todos') {
+    return allGroupProducts;
   }
 
-  try {
-    const token = await getFoxDataToken();
+  const targetSub = String(codSubgrupo).trim();
+  const filtered = allGroupProducts.filter(
+    (p) => String(p.codSubgrupo || '').trim() === targetSub
+  );
 
-    let targetSub: string | undefined = codSubgrupo && codSubgrupo !== 'todos' ? codSubgrupo : DEFAULT_SUBGROUP_BY_GROUP[codGrupo];
-    if (!targetSub) {
-      const subs = await fetchSubgruposInv(codGrupo);
-      if (subs && subs.length > 0) {
-        targetSub = (subs[0] as { CodSubgrupo?: string }).CodSubgrupo;
-      }
-    }
-
-    let url = `${API_BASE}/api/v1/syn/articulos/grupo/${codGrupo}`;
-    if (targetSub) {
-      url += `?codSubgrupo=${targetSub}`;
-    }
-
-    const [articulosRes, existenciasMap, imagesMap] = await Promise.all([
-      fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...FOXDATA_HEADERS,
-        },
-        signal: AbortSignal.timeout(4000),
-        next: { revalidate: 60 },
-      }),
-      fetchExistenciasBodegonMap(),
-      getProductImagesMap(),
-    ]);
-
-    if (!articulosRes.ok) {
-      memoryProductsCache.set(cacheKey, { data: [], expiresAt: now + 30000 });
-      return [];
-    }
-
-    const json = await articulosRes.json();
-    const rawList: RawFoxDataProductDto[] = json.data || json || [];
-    const adapted = adaptFoxDataProducts(rawList, existenciasMap, imagesMap);
-    memoryProductsCache.set(cacheKey, { data: adapted, expiresAt: now + 60000 });
-    return adapted;
-  } catch {
-    memoryProductsCache.set(cacheKey, { data: [], expiresAt: now + 30000 });
-    return [];
-  }
+  return filtered;
 }
 
+const ALL_ACTIVE_GROUPS = ['01', '02', '09', '11', '05', '14', '08', '03', '06', '10', '07', '04'];
 const memoryProductByIdCache = new Map<string, CacheItem<Product | null>>();
 
 /**
- * Busca un producto individual por ID (codArticulo o SKU) en SmartVentas (Cache 60s)
+ * Busca un producto individual por ID (codArticulo o SKU) en SmartVentas
  */
 export async function fetchProductById(
   id: string,
@@ -276,58 +356,69 @@ export async function fetchProductById(
 
   try {
     if (groupHint) {
-      const products = await fetchArticulosSmartVentas(groupHint);
+      const products = await fetchFullGroupArticulos(groupHint);
       const match = products.find((p) => p.id === id || p.sku === id);
       if (match) {
-        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 60000 });
+        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 120000 });
         return match;
       }
     }
 
-    const priorityGroups = ['01', '02', '09', '11', '05', '14', '08', '03'];
-    for (const grupo of priorityGroups) {
+    for (const grupo of ALL_ACTIVE_GROUPS) {
       if (grupo === groupHint) continue;
-      const products = await fetchArticulosSmartVentas(grupo);
+      const products = await fetchFullGroupArticulos(grupo);
       const match = products.find((p) => p.id === id || p.sku === id);
       if (match) {
-        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 60000 });
+        memoryProductByIdCache.set(cacheKey, { data: match, expiresAt: now + 120000 });
         return match;
       }
     }
 
-    memoryProductByIdCache.set(cacheKey, { data: null, expiresAt: now + 30000 });
     return null;
   } catch {
     return null;
   }
 }
 
+function normalizeSearchText(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
 /**
- * Busca artículos en SmartVentas coincidentes por nombre, marca o SKU
+ * Busca artículos en SmartVentas por nombre, marca, SKU, categoría o subcategoría exacta
  */
 export async function searchProducts(
   query: string,
   codGrupo?: string
 ): Promise<Product[]> {
-  const term = query.toLowerCase().trim();
-  if (!term) return [];
+  const normalizedQuery = normalizeSearchText(query);
+  if (!normalizedQuery) return [];
+
+  const tokens = normalizedQuery.split(/\s+/).filter(Boolean);
 
   try {
-    const targetGroups = codGrupo && codGrupo !== 'all'
-      ? [codGrupo]
-      : ['01', '02', '09', '11', '05', '14', '08', '03'];
+    const targetGroups =
+      codGrupo && codGrupo !== 'all' ? [codGrupo] : ALL_ACTIVE_GROUPS;
 
-    const groupPromises = targetGroups.map((g) => fetchArticulosSmartVentas(g));
-    const results = await Promise.all(groupPromises);
-    const allProducts = results.flat();
+    const allProducts: Product[] = [];
+
+    // Cargar en lotes seguros de 4 grupos para máxima velocidad sin saturar sockets de FoxData
+    const batchSize = 4;
+    for (let i = 0; i < targetGroups.length; i += batchSize) {
+      const batch = targetGroups.slice(i, i + batchSize);
+      const batchResults = await Promise.all(batch.map((g) => fetchFullGroupArticulos(g)));
+      allProducts.push(...batchResults.flat());
+    }
 
     const matches = allProducts.filter((p) => {
-      return (
-        p.name.toLowerCase().includes(term) ||
-        p.brand.toLowerCase().includes(term) ||
-        p.sku.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term)
+      const searchable = normalizeSearchText(
+        `${p.name} ${p.brand} ${p.category} ${p.sku} ${p.description}`
       );
+      return tokens.every((tk) => searchable.includes(tk));
     });
 
     matches.sort((a, b) => {

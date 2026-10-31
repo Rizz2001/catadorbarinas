@@ -73,24 +73,24 @@ export function HeaderNav() {
           )}
         </div>
 
-        {/* Enlaces Rápidos de Navegación */}
-        <div className="hidden lg:flex items-center gap-6 text-xs font-semibold">
-          <Link href="/catalogo/01" className="hover:text-catador-amber transition-colors">
+        {/* Enlaces Rápidos de Navegación (Deslizables en Tablet/Móvil + Fijos en Desktop) */}
+        <div className="hidden sm:flex items-center gap-4 lg:gap-6 text-xs font-semibold overflow-x-auto scrollbar-none whitespace-nowrap px-2">
+          <Link href="/catalogo/01" className="hover:text-catador-amber transition-colors py-1">
             Licores
           </Link>
-          <Link href="/catalogo/09" className="hover:text-catador-amber transition-colors">
+          <Link href="/catalogo/09" className="hover:text-catador-amber transition-colors py-1">
             Cervezas
           </Link>
-          <Link href="/catalogo/11" className="hover:text-catador-amber transition-colors">
+          <Link href="/catalogo/11" className="hover:text-catador-amber transition-colors py-1">
             Alimentos
           </Link>
-          <Link href="/catalogo/02" className="hover:text-catador-amber transition-colors">
+          <Link href="/catalogo/02" className="hover:text-catador-amber transition-colors py-1">
             Refrescos
           </Link>
-          <Link href="/catalogo/05" className="hover:text-catador-amber transition-colors">
+          <Link href="/catalogo/05" className="hover:text-catador-amber transition-colors py-1 hidden md:inline">
             Confitería
           </Link>
-          <Link href="/catalogo" className="hover:text-catador-amber transition-colors font-bold text-catador-amber">
+          <Link href="/catalogo" className="hover:text-catador-amber transition-colors font-bold text-catador-amber py-1">
             Ver Todo el Catálogo
           </Link>
         </div>
@@ -98,10 +98,10 @@ export function HeaderNav() {
         {/* Botón Ofertas del Día Destacado */}
         <Link
           href="#ofertas"
-          className="flex items-center gap-1.5 bg-catador-blue-light/70 hover:bg-catador-blue-light text-white text-xs font-extrabold px-3 py-2 min-h-[44px] rounded-lg border border-catador-amber/40 transition-colors"
+          className="flex items-center gap-1.5 bg-catador-blue-light/70 hover:bg-catador-blue-light text-white text-xs font-extrabold px-3 py-2 min-h-[44px] rounded-lg border border-catador-amber/40 transition-colors shrink-0"
         >
-          <Flame className="h-4 w-4 text-catador-amber fill-catador-amber" />
-          <span>Ofertas del Día</span>
+          <Flame className="h-4 w-4 text-catador-amber fill-catador-amber shrink-0" />
+          <span className="whitespace-nowrap">Ofertas del Día</span>
         </Link>
       </div>
     </nav>

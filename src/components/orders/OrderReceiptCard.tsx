@@ -86,6 +86,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
                     src={item.imagen_url || IMAGE_FALLBACKS.product}
                     alt={item.nombre_articulo}
                     fill
+                    sizes="36px"
                     className="object-contain p-0.5"
                   />
                 </div>

@@ -1,5 +1,6 @@
 import { Product, DepartmentSlug } from '@/types';
 import { IMAGE_FALLBACKS } from '@/constants/config';
+import { resolveCategoryMetadata } from '@/constants/fallback-products';
 
 /**
  * Contrato de datos crudos (Raw DTO) recibido desde la API de FoxData / SmartVentas.
@@ -153,6 +154,7 @@ export function adaptFoxDataProduct(
   const stock = Number(raw.existencia ?? raw.stock ?? 0);
   const isAvailable = raw.suspendido === 0 && stock > 0;
   const department = resolveDepartmentByGroup(raw.codGrupo);
+  const { categoryLabel, searchKeywords } = resolveCategoryMetadata(raw.codGrupo, raw.codSubgrupo);
 
   const discountPercentage =
     raw.porcentaje_descuento ??
@@ -165,9 +167,9 @@ export function adaptFoxDataProduct(
     sku,
     name,
     slug,
-    description: `${name} - Gran Catador Barinas`,
-    brand: (raw.marca ?? raw.brand ?? 'Gran Catador').trim(),
-    category: (raw.categoria ?? raw.grupo ?? 'Bodegón').trim(),
+    description: `${name} - ${categoryLabel} (${searchKeywords}) - Gran Catador Barinas`,
+    brand: (raw.marca ?? raw.brand ?? categoryLabel.split('•')[0].trim() ?? 'Gran Catador').trim(),
+    category: (raw.categoria ?? raw.grupo ?? categoryLabel).trim(),
     department,
     priceUsd: Math.max(0, priceUsd),
     originalPriceUsd: originalPriceUsd && originalPriceUsd > priceUsd ? originalPriceUsd : undefined,

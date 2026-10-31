@@ -36,7 +36,7 @@ export default async function BuscarPage({ searchParams }: SearchPageProps) {
   const [products, groups, subgroups] = await Promise.all([
     term ? searchProducts(term, grupo) : Promise.resolve([]),
     fetchGruposInv(),
-    fetchSubgruposInv(grupo || '01'),
+    grupo ? fetchSubgruposInv(grupo) : Promise.resolve([]),
   ]);
 
   return (
@@ -108,10 +108,11 @@ export default async function BuscarPage({ searchParams }: SearchPageProps) {
       ) : (
         /* Navegador de Resultados con Filtros y Carga Progresiva */
         <CatalogBrowser
+          key={`${term}-${grupo || 'all'}`}
           groups={groups}
           subgroups={subgroups}
           products={products}
-          currentGroup={grupo || '01'}
+          currentGroup={grupo || 'all'}
           currentSubgroup="todos"
         />
       )}

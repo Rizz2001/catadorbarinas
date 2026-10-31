@@ -24,36 +24,41 @@ export function HeaderTopBar() {
 
   return (
     <div className="bg-slate-900 text-slate-300 text-xs py-1.5 border-b border-slate-800">
-      <div className="container mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="container mx-auto px-3 sm:px-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         {/* Ubicación y Contacto */}
-        <div className="flex items-center gap-4 text-[11px]">
-          <span className="flex items-center gap-1">
-            <MapPin className="h-3 w-3 text-catador-amber" />
-            {storeConfig?.direccion_fisica || `${APP_CONFIG.city}, ${APP_CONFIG.country}`}
+        <div className="flex items-center gap-3 sm:gap-4 text-[11px] min-w-0">
+          <span className="flex items-center gap-1 truncate max-w-[55vw] sm:max-w-none">
+            <MapPin className="h-3 w-3 text-catador-amber shrink-0" />
+            <span className="truncate">
+              {storeConfig?.direccion_fisica || `${APP_CONFIG.city}, ${APP_CONFIG.country}`}
+            </span>
           </span>
-          <span className="hidden md:flex items-center gap-1">
-            <Phone className="h-3 w-3 text-catador-amber" />
+          <span className="hidden md:flex items-center gap-1 shrink-0">
+            <Phone className="h-3 w-3 text-catador-amber shrink-0" />
             Atención: {storeConfig?.telefono_atencion || APP_CONFIG.phone}
           </span>
         </div>
 
         {/* Badge Destacado de Tasa BCV Oficial sincronizada con DolarApi */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto shrink-0">
           <button
             type="button"
             onClick={() => fetchRate(true)}
             disabled={isLoading}
             title="Tasa oficial BCV sincronizada en vivo vía DolarApi. Clic para refrescar."
-            className="flex items-center gap-1.5 bg-catador-blue/60 hover:bg-catador-blue border border-catador-amber/40 rounded-full px-2.5 py-0.5 text-white transition-colors cursor-pointer group"
+            className="flex items-center gap-1.5 bg-catador-blue/60 hover:bg-catador-blue border border-catador-amber/40 rounded-full px-2.5 py-0.5 min-h-[26px] text-white transition-colors cursor-pointer group"
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] font-semibold text-slate-200">Tasa Oficial BCV:</span>
-            <span className="text-[11px] font-extrabold text-catador-amber">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span className="text-[10px] sm:text-[11px] font-semibold text-slate-200 hidden xs:inline">
+              Tasa Oficial BCV:
+            </span>
+            <span className="text-[10px] font-semibold text-slate-200 xs:hidden">BCV:</span>
+            <span className="text-[11px] font-extrabold text-catador-amber font-mono">
               Bs. {formattedRate} / $
             </span>
             <RefreshCw
               className={cn(
-                'h-2.5 w-2.5 text-slate-300 ml-0.5 transition-transform',
+                'h-2.5 w-2.5 text-slate-300 ml-0.5 transition-transform shrink-0',
                 isLoading && 'animate-spin text-catador-amber'
               )}
             />

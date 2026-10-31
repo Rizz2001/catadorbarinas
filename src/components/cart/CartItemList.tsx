@@ -66,35 +66,36 @@ export function CartItemList() {
               className="pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
             >
               {/* Información y Miniatura */}
-              <div className="flex items-center gap-3.5 flex-1 min-w-0">
+              <div className="flex items-center gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
                 <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-slate-50 border border-slate-200/80 p-1.5 overflow-hidden">
                   <Image
                     src={itemImg}
                     alt={product.name}
                     fill
+                    sizes="80px"
                     className={cn('object-contain', isNoImg ? 'p-2 opacity-80' : '')}
                   />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider">
+                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block truncate">
                     {product.brand}
                   </span>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 truncate" title={product.name}>
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 sm:truncate" title={product.name}>
                     {product.name}
                   </h3>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
+                  <p className="text-[11px] text-slate-500 mt-0.5 font-mono">
                     Unitario: <span className="font-bold text-slate-700">{unitPrices.usdFormatted}</span> ({unitPrices.vesFormatted})
                   </p>
                 </div>
               </div>
 
               {/* Controles de Cantidad y Subtotal por ítem */}
-              <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
-                {/* Stepper */}
-                <div className="flex items-center border border-slate-200 rounded-lg bg-white shadow-2xs">
+              <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
+                {/* Stepper con área táctil >= 38px */}
+                <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs">
                   <button
                     onClick={() => updateQuantity(product.id, quantity - 1)}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-l-lg"
+                    className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-l-xl cursor-pointer"
                     aria-label="Disminuir cantidad"
                   >
                     <Minus className="h-3.5 w-3.5" />
@@ -104,7 +105,7 @@ export function CartItemList() {
                   </span>
                   <button
                     onClick={() => updateQuantity(product.id, quantity + 1)}
-                    className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-r-lg"
+                    className="h-9 w-9 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors rounded-r-xl cursor-pointer"
                     aria-label="Aumentar cantidad"
                   >
                     <Plus className="h-3.5 w-3.5" />
@@ -112,11 +113,11 @@ export function CartItemList() {
                 </div>
 
                 {/* Subtotal del Item */}
-                <div className="text-right min-w-[90px]">
+                <div className="text-right min-w-[85px]">
                   <p className="text-sm font-extrabold text-catador-blue">
                     {itemPrices.usdFormatted}
                   </p>
-                  <p className="text-[10px] font-semibold text-slate-500">
+                  <p className="text-[10px] font-semibold text-slate-500 font-mono">
                     {itemPrices.vesFormatted}
                   </p>
                 </div>
@@ -124,7 +125,7 @@ export function CartItemList() {
                 {/* Eliminar Ítem */}
                 <button
                   onClick={() => removeItem(product.id)}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                  className="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
                   aria-label={`Eliminar ${product.name}`}
                 >
                   <Trash2 className="h-4 w-4" />

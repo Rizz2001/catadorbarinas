@@ -23,7 +23,7 @@ export function AdminOrderDetail({ order, onUpdateStatus, onDeleteOrder, isUpdat
 
   if (!order) {
     return (
-      <div className="flex h-[700px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400">
+      <div className="flex h-[calc(100vh-14rem)] min-h-[520px] max-h-[720px] items-center justify-center rounded-2xl border border-slate-200 bg-white p-8 text-center text-slate-400">
         Selecciona un pedido de la columna izquierda para gestionar su despacho y verificación.
       </div>
     );
@@ -49,7 +49,7 @@ export function AdminOrderDetail({ order, onUpdateStatus, onDeleteOrder, isUpdat
   const waUrl = cleanPhone.length >= 10 ? `https://wa.me/58${cleanPhone.slice(-10)}` : null;
 
   return (
-    <div className="flex flex-col h-[700px] rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-14rem)] min-h-[520px] max-h-[720px] rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
       {/* Cabecera y Botones de Acción */}
       <div className="p-3.5 border-b border-slate-200 bg-slate-50 space-y-2.5">
         <div className="flex items-center justify-between">
@@ -170,7 +170,7 @@ export function AdminOrderDetail({ order, onUpdateStatus, onDeleteOrder, isUpdat
 
             {order.pago.comprobante_url && (
               <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white border">
-                <Image src={order.pago.comprobante_url} alt="Comprobante de pago" fill className="object-contain cursor-pointer" onClick={() => setShowProofModal(true)} />
+                <Image src={order.pago.comprobante_url} alt="Comprobante de pago" fill sizes="(max-width: 768px) 90vw, 480px" className="object-contain cursor-pointer" onClick={() => setShowProofModal(true)} />
                 <button type="button" onClick={() => setShowProofModal(true)} className="absolute bottom-2 right-2 bg-slate-900/80 text-white px-2 py-0.5 rounded text-[10px] flex items-center gap-1">
                   <ExternalLink className="h-3 w-3" /> Zoom
                 </button>
@@ -189,7 +189,7 @@ export function AdminOrderDetail({ order, onUpdateStatus, onDeleteOrder, isUpdat
               <div key={it.id} className="p-2 flex items-center justify-between bg-white">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="relative h-8 w-8 rounded bg-slate-50 border shrink-0 overflow-hidden">
-                    <Image src={it.imagen_url || IMAGE_FALLBACKS.product} alt="" fill className="object-contain p-0.5" />
+                    <Image src={it.imagen_url || IMAGE_FALLBACKS.product} alt="" fill sizes="32px" className="object-contain p-0.5" />
                   </div>
                   <div className="truncate">
                     <p className="font-bold text-slate-900 truncate text-[11px]">{it.nombre_articulo}</p>

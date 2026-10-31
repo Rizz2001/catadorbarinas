@@ -48,6 +48,7 @@ export function CheckoutOrderSummary({
                   src={product.images[0] || IMAGE_FALLBACKS.product}
                   alt={product.name}
                   fill
+                  sizes="40px"
                   className="object-contain"
                 />
               </div>

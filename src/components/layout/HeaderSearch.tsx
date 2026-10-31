@@ -123,13 +123,13 @@ export function HeaderSearch() {
 
       {/* Dropdown de Autocompletado Flotante */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl bg-white border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
-          <div className="p-3 border-b border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 bg-slate-50">
-            <span>Resultados para &quot;{term}&quot;</span>
-            <span className="text-[11px] text-slate-500 font-semibold">{totalMatches} encontrados</span>
+        <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl bg-white border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-[70vh] flex flex-col">
+          <div className="p-3 border-b border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 bg-slate-50 shrink-0">
+            <span className="truncate pr-2">Resultados para &quot;{term}&quot;</span>
+            <span className="text-[11px] text-slate-500 font-semibold shrink-0">{totalMatches} encontrados</span>
           </div>
 
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+          <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 flex-1">
             {results.length === 0 ? (
               <div className="p-6 text-center text-xs text-slate-500">
                 No se encontraron productos coincidentes.
@@ -147,13 +147,14 @@ export function HeaderSearch() {
                     key={product.id}
                     href={`/producto/${product.id}${product.codGrupo ? `?grupo=${product.codGrupo}` : ''}`}
                     onClick={() => setIsOpen(false)}
-                    className="p-3 flex items-center gap-3 hover:bg-slate-50 transition-colors group"
+                    className="p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 hover:bg-slate-50 transition-colors group"
                   >
                     <div className="relative h-12 w-12 shrink-0 rounded-xl bg-slate-50 border border-slate-100 p-1 overflow-hidden flex items-center justify-center">
                       <Image
                         src={imgSrc}
                         alt={product.name}
                         fill
+                        sizes="48px"
                         className={cn(
                           'object-contain transition-transform duration-200',
                           hasNoImg ? 'p-2 opacity-80' : 'group-hover:scale-105'
@@ -166,11 +167,11 @@ export function HeaderSearch() {
                           {product.brand}
                         </span>
                         {product.inStock ? (
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-full">
+                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-full shrink-0">
                             En Stock
                           </span>
                         ) : (
-                          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-full">
+                          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-full shrink-0">
                             Agotado
                           </span>
                         )}
@@ -178,7 +179,7 @@ export function HeaderSearch() {
                       <h4 className="text-xs font-bold text-slate-900 truncate group-hover:text-catador-blue transition-colors">
                         {product.name}
                       </h4>
-                      <div className="flex items-center gap-1.5 mt-0.5">
+                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
                         <span className="text-xs font-black text-slate-900">{prices.usdFormatted}</span>
                         <span className="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200/60">
                           {prices.vesFormatted}
@@ -199,7 +200,7 @@ export function HeaderSearch() {
                       }}
                       aria-label={`Agregar ${product.name} al carrito`}
                       className={cn(
-                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all cursor-pointer shadow-2xs',
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all cursor-pointer shadow-2xs',
                         !product.inStock
                           ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
                           : isItemAdded
@@ -220,11 +221,11 @@ export function HeaderSearch() {
           </div>
 
           {results.length > 0 && (
-            <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+            <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center shrink-0">
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors"
+                className="w-full min-h-[40px] flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors cursor-pointer"
               >
                 Ver todos los {totalMatches} resultados <ArrowRight className="h-3.5 w-3.5" />
               </button>

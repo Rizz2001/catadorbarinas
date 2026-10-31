@@ -79,55 +79,59 @@ export function CartDrawer() {
                           src={itemImg}
                           alt={product.name}
                           fill
+                          sizes="64px"
                           className={cn('object-contain', isNoImg ? 'p-2 opacity-80' : '')}
                         />
                       </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-semibold text-slate-800 truncate">
-                        {product.name}
-                      </h4>
-                      <p className="text-[11px] font-bold text-catador-blue mt-0.5">
-                        {itemPrices.usdFormatted}
-                        <span className="text-slate-600 font-medium ml-1.5">
-                          ({itemPrices.vesFormatted})
-                        </span>
-                      </p>
-                      {/* Stepper de Cantidad */}
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="flex items-center border border-slate-200 rounded-md bg-white">
-                          <button
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
-                            className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
-                          >
-                            <Minus className="h-3 w-3" />
-                          </button>
-                          <span className="px-2 text-xs font-bold text-slate-800">
-                            {quantity}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xs font-semibold text-slate-800 truncate">
+                          {product.name}
+                        </h4>
+                        <p className="text-[11px] font-bold text-catador-blue mt-0.5">
+                          {itemPrices.usdFormatted}
+                          <span className="text-slate-600 font-medium ml-1.5 font-mono">
+                            ({itemPrices.vesFormatted})
                           </span>
+                        </p>
+                        {/* Stepper de Cantidad con área táctil ergonómica */}
+                        <div className="flex items-center justify-between gap-2 mt-2">
+                          <div className="flex items-center border border-slate-200 rounded-lg bg-white">
+                            <button
+                              onClick={() => updateQuantity(product.id, quantity - 1)}
+                              aria-label="Disminuir cantidad"
+                              className="h-8 w-8 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-l-lg cursor-pointer"
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </button>
+                            <span className="px-2.5 text-xs font-bold text-slate-800">
+                              {quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(product.id, quantity + 1)}
+                              aria-label="Aumentar cantidad"
+                              className="h-8 w-8 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:bg-slate-50 rounded-r-lg cursor-pointer"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
                           <button
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
-                            className="p-1 text-slate-500 hover:text-slate-800 cursor-pointer"
+                            onClick={() => removeItem(product.id)}
+                            aria-label={`Eliminar ${product.name}`}
+                            className="h-8 w-8 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer transition-colors"
                           >
-                            <Plus className="h-3 w-3" />
+                            <Trash2 className="h-4 w-4" />
                           </button>
                         </div>
-                        <button
-                          onClick={() => removeItem(product.id)}
-                          className="text-slate-400 hover:text-red-500 p-1 cursor-pointer"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
           </div>
 
           {/* Footer Bimonetario y Checkout */}
           {items.length > 0 && (
-            <div className="p-4 border-t border-slate-200 bg-slate-50 space-y-3">
+            <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-200 bg-slate-50 space-y-3">
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-slate-600">
                   <span>Subtotal:</span>

@@ -51,29 +51,30 @@ export function CatalogFiltersBar({
       </div>
 
       {/* Controles de Filtros y Acciones */}
-      <div className="flex flex-wrap items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Toggle Solo en Stock */}
         <button
           type="button"
           onClick={() => onToggleInStock(!onlyInStock)}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer',
+            'flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold border transition-all cursor-pointer',
             onlyInStock
               ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200'
               : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
           )}
         >
-          <PackageCheck className="h-3.5 w-3.5" />
+          <PackageCheck className="h-3.5 w-3.5 shrink-0" />
           <span>Solo en Stock</span>
         </button>
 
-        {/* Selector de Orden */}
-        <div className="flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2 py-1 rounded-lg">
-          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+        {/* Selector de Orden (text-base md:text-xs evita auto-zoom en iOS) */}
+        <div className="flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2.5 py-1 min-h-[38px] rounded-lg">
+          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
-            className="bg-transparent text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+            aria-label="Ordenar productos"
+            className="bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
           >
             <option value="default">Por Disponibilidad</option>
             <option value="price_asc">Menor Precio ($)</option>
@@ -87,16 +88,16 @@ export function CatalogFiltersBar({
           type="button"
           onClick={handleShareCategory}
           title="Compartir esta categoría por WhatsApp"
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+          className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
         >
-          <Share2 className="h-3.5 w-3.5" />
-          <span className="hidden md:inline">Compartir</span>
+          <Share2 className="h-3.5 w-3.5 shrink-0" />
+          <span className="hidden xs:inline">Compartir</span>
         </button>
 
         <button
           type="button"
           onClick={handleCopyLink}
-          className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+          className="px-3 py-1.5 min-h-[38px] rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
         >
           {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : 'Copiar URL'}
         </button>

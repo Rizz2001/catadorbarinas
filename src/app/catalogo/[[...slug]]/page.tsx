@@ -115,6 +115,7 @@ export default async function CatalogoPage({ params }: CatalogPageProps) {
 
       {/* Navegador Interactivo del Catálogo */}
       <CatalogBrowser
+        key={`${codGrupo}-${codSubgrupo}`}
         groups={groups}
         subgroups={subgroups}
         products={products}

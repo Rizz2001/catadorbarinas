@@ -127,24 +127,24 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+            <h1 className="text-[clamp(1.5rem,4vw,3rem)] font-black tracking-tight leading-[1.12]">
               {titulo}
             </h1>
 
-            <p className="text-xs sm:text-sm text-blue-100 max-w-lg leading-relaxed">
+            <p className="text-xs sm:text-sm text-blue-100 max-w-lg mx-auto lg:mx-0 leading-relaxed">
               {subtitulo}
             </p>
 
-            <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+            <div className="pt-2 flex flex-col xs:flex-row flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3">
               <Link
                 href={botonUrl}
-                className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-xs sm:text-sm font-black text-catador-blue shadow-lg hover:bg-slate-100 hover:shadow-xl transition-all"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white min-h-[44px] px-5 sm:px-6 py-3 text-xs sm:text-sm font-black text-catador-blue shadow-lg hover:bg-slate-100 hover:shadow-xl transition-all"
               >
                 {botonTexto} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
                 href="/catalogo"
-                className="inline-flex items-center gap-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 px-6 py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-sm transition-all"
+                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 min-h-[44px] px-5 sm:px-6 py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-sm transition-all"
               >
                 Explorar Catálogo
               </Link>
@@ -153,7 +153,7 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
 
           {/* Columna Derecha: Tarjeta de Promo CMS o Showcase Real desde FoxData */}
           {hasPromo ? (
-            <div className="relative shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-6 text-center min-w-[240px] max-w-xs shadow-2xl">
+            <div className="relative shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-6 text-center w-full sm:w-auto min-w-[220px] max-w-xs shadow-2xl">
               <span className="text-xs font-extrabold text-catador-amber uppercase tracking-wider">
                 {promoTitulo}
               </span>
@@ -175,29 +175,30 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
               )}
             </div>
           ) : starProduct ? (
-            <div className="relative shrink-0 w-full max-w-sm rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-5 shadow-2xl flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-extrabold text-amber-300 uppercase tracking-wider">
+            <div className="relative shrink-0 w-full max-w-sm rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-5 shadow-2xl flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-300 uppercase tracking-wider truncate">
                   ★ DESTACADO EN INVENTARIO
                 </span>
-                <span className="text-[10px] font-bold bg-catador-amber text-white px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold bg-catador-amber text-white px-2 py-0.5 rounded-full shrink-0">
                   Stock Disponible
                 </span>
               </div>
 
-              <div className="relative h-44 w-full rounded-xl overflow-hidden bg-slate-900/40 flex items-center justify-center">
+              <div className="relative h-40 sm:h-44 w-full rounded-xl overflow-hidden bg-slate-900/40 flex items-center justify-center">
                 <Image
                   src={starImage}
                   alt={starProduct.name}
                   fill
+                  sizes="(max-width: 640px) 90vw, 360px"
                   className={cn(
                     'object-contain',
                     isStarNoImg ? 'p-8 opacity-80' : 'object-cover'
                   )}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between">
-                  <div className="max-w-[65%]">
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between gap-2">
+                  <div className="max-w-[62%] min-w-0">
                     <p className="text-xs font-black text-white leading-tight line-clamp-1">
                       {starProduct.name}
                     </p>
@@ -205,11 +206,11 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
                       {starProduct.brand || 'Gran Catador'}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <p className="text-base font-black text-white leading-tight">
                       ${starProduct.priceUsd.toFixed(2)}
                     </p>
-                    <p className="text-[10px] font-extrabold text-amber-300">
+                    <p className="text-[10px] font-extrabold text-amber-300 font-mono">
                       {formatVes(convertUsdToVes(starProduct.priceUsd, bcvRate))}
                     </p>
                   </div>
@@ -218,7 +219,7 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
 
               <Link
                 href={`/producto/${starProduct.id}${starProduct.codGrupo ? `?grupo=${starProduct.codGrupo}` : ''}`}
-                className="w-full text-center py-2 text-xs font-extrabold rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+                className="w-full min-h-[40px] flex items-center justify-center py-2 text-xs font-extrabold rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
               >
                 Ver detalle y comprar →
               </Link>

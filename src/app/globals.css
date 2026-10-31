@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant xs (@media (min-width: 480px));
+
 @theme {
   --color-catador-blue: #00227B;
   --color-catador-blue-light: #0A38A8;
@@ -37,12 +39,19 @@
   --background: #F8FAFC;
 }
 
+html,
+body {
+  max-width: 100vw;
+  overflow-x: clip;
+}
+
 body {
   background-color: var(--surface-bg);
   color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /* Scrollbar sutil estilo retail */
@@ -64,6 +73,18 @@ body {
   background: #94A3B8;
 }
 
+/* Ocultar scrollbar en tiras horizontales táctiles */
+.scrollbar-none,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Utilidad para badges con pulso suave */
 @keyframes pulse-subtle {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -72,4 +93,16 @@ body {
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2.5s infinite ease-in-out;
+}
+
+/* Respeto por accesibilidad de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

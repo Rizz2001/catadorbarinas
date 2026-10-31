@@ -86,6 +86,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
             alt={product.name}
             fill
             priority
+            sizes="(max-width: 1024px) 92vw, 42vw"
             className={cn(
               'object-contain transition-transform duration-300',
               activeImage === cmsLogo
@@ -98,7 +99,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
         {/* Miniaturas si hay múltiples */}
         {product.images.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto pb-1">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             {product.images.map((img, idx) => (
               <button
                 key={idx}
@@ -108,13 +109,13 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   setHasError(false);
                 }}
                 className={cn(
-                  'relative h-16 w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden transition-all',
+                  'relative h-16 w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden transition-all cursor-pointer',
                   (selectedImage === img || (!selectedImage && idx === 0))
                     ? 'border-catador-blue ring-2 ring-catador-blue/20'
                     : 'border-slate-200 hover:border-slate-400'
                 )}
               >
-                <Image src={img} alt="" fill className="object-contain" />
+                <Image src={img} alt="" fill sizes="64px" className="object-contain" />
               </button>
             ))}
           </div>
@@ -127,7 +128,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
           <span className="text-xs font-bold uppercase tracking-wider text-catador-amber">
             {product.brand} • {product.category}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight">
+          <h1 className="text-xl sm:text-3xl font-black text-slate-900 mt-1 tracking-tight leading-snug">
             {product.name}
           </h1>
           <p className="text-xs text-slate-500 mt-1">Código / SKU: {product.sku}</p>
@@ -135,19 +136,19 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
 
         {/* Precios Bimonetarios Oficiales */}
         <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-4 space-y-1">
-          <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wide">
+          <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wide block">
             Precio Oficial Bodegón (Depósito 01)
           </span>
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl sm:text-4xl font-black text-catador-blue tracking-tight">
+          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span className="text-2xl sm:text-4xl font-black text-catador-blue tracking-tight">
               {prices.usdFormatted}
             </span>
-            <span className="text-base sm:text-lg font-bold text-slate-700">
+            <span className="text-sm sm:text-lg font-bold text-slate-700 font-mono bg-white px-2.5 py-0.5 rounded-lg border border-slate-200/80">
               {prices.vesFormatted}
             </span>
           </div>
-          <p className="text-[11px] text-slate-500">
-            Tasa BCV del día: <strong>Bs. {bcvRate.toFixed(2)}/$</strong>
+          <p className="text-[11px] text-slate-500 pt-0.5">
+            Tasa BCV del día: <strong className="font-mono">Bs. {bcvRate.toFixed(2)}/$</strong>
           </p>
         </div>
 
@@ -155,34 +156,38 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
         <div className="flex items-center gap-2">
           {product.inStock ? (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-              <CheckCircle2 className="h-3.5 w-3.5" /> En stock en Bodegón ({product.stockQuantity} disponibles)
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+              <span>En stock en Bodegón ({product.stockQuantity} disponibles)</span>
             </div>
           ) : (
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold">
-              <XCircle className="h-3.5 w-3.5 text-slate-400" /> Agotado temporalmente en Bodegón
+              <XCircle className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+              <span>Agotado temporalmente en Bodegón</span>
             </div>
           )}
         </div>
 
         {/* Controles de Compra y Carrito */}
         <div className="space-y-3 pt-2 border-t border-slate-200">
-          <div className="flex items-center gap-3">
-            {/* Stepper */}
-            <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs h-11">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            {/* Stepper con área táctil >= 44px */}
+            <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs h-11 shrink-0">
               <button
                 type="button"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="px-3 text-slate-600 hover:text-slate-900 font-bold"
+                aria-label="Disminuir cantidad"
+                className="min-w-[42px] h-full flex items-center justify-center text-slate-600 hover:text-slate-900 font-bold cursor-pointer"
               >
                 -
               </button>
-              <span className="w-10 text-center text-sm font-bold text-slate-900">
+              <span className="w-9 text-center text-sm font-bold text-slate-900">
                 {quantity}
               </span>
               <button
                 type="button"
                 onClick={() => setQuantity(quantity + 1)}
-                className="px-3 text-slate-600 hover:text-slate-900 font-bold"
+                aria-label="Aumentar cantidad"
+                className="min-w-[42px] h-full flex items-center justify-center text-slate-600 hover:text-slate-900 font-bold cursor-pointer"
               >
                 +
               </button>
@@ -194,7 +199,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
               onClick={handleAddToCart}
               disabled={!product.inStock}
               className={cn(
-                'flex-1 flex items-center justify-center gap-2 h-11 px-5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm cursor-pointer',
+                'flex-1 flex items-center justify-center gap-2 h-11 px-4 sm:px-5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm cursor-pointer',
                 !product.inStock
                   ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                   : isAdded
@@ -202,8 +207,8 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
                   : 'bg-catador-blue text-white hover:bg-catador-blue-light active:scale-[0.99]'
               )}
             >
-              {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-              {isAdded ? '¡Agregado al Carrito!' : 'Agregar al Carrito'}
+              {isAdded ? <Check className="h-4 w-4 shrink-0" /> : <ShoppingCart className="h-4 w-4 shrink-0" />}
+              <span className="truncate">{isAdded ? '¡Agregado!' : 'Agregar al Carrito'}</span>
             </button>
           </div>
 

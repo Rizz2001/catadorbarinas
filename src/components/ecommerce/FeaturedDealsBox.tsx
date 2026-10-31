@@ -43,30 +43,30 @@ export function FeaturedDealsBox({ products, targetEndTime }: FeaturedDealsBoxPr
         </div>
 
         {/* Temporizador Regresivo (Cajitas Ámbar) */}
-        <div className="flex items-center gap-2 self-start sm:self-auto bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
-          <Clock className="h-4 w-4 text-catador-amber" />
-          <span className="text-xs font-semibold text-slate-600">Termina en:</span>
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start sm:self-auto bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 max-w-full">
+          <Clock className="h-4 w-4 text-catador-amber shrink-0" />
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-600">Termina en:</span>
           <div
             className="flex items-center gap-1 font-mono text-xs font-bold text-white"
             suppressHydrationWarning
           >
-            <span className="bg-catador-amber px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
+            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
               {isMounted ? String(timeLeft.hours).padStart(2, '0') : '12'}h
             </span>
             <span className="text-catador-amber font-bold">:</span>
-            <span className="bg-catador-amber px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
+            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
               {isMounted ? String(timeLeft.minutes).padStart(2, '0') : '00'}m
             </span>
             <span className="text-catador-amber font-bold">:</span>
-            <span className="bg-catador-amber px-2 py-0.5 rounded shadow-xs animate-pulse" suppressHydrationWarning>
+            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs animate-pulse" suppressHydrationWarning>
               {isMounted ? String(timeLeft.seconds).padStart(2, '0') : '00'}s
             </span>
           </div>
         </div>
       </div>
 
-      {/* Grid de Productos en Oferta */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+      {/* Grid de Productos en Oferta (Simétrico: 2 en móvil, 3 en tablet, 6 en desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
         {products.slice(0, 6).map((product) => (
           <ProductCard key={product.id} product={product} isCompact />
         ))}

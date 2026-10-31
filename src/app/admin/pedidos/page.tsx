@@ -15,6 +15,7 @@ export default function AdminPedidosCommandCenterPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [mobilePanel, setMobilePanel] = useState<'cola' | 'detalle' | 'chat'>('cola');
 
   // 1. Cargar lista completa de órdenes
   const loadOrders = useCallback(async () => {
@@ -156,11 +157,11 @@ export default function AdminPedidosCommandCenterPage() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white min-h-[38px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             {soundEnabled ? <Volume2 className="h-3.5 w-3.5 text-emerald-600" /> : <VolumeX className="h-3.5 w-3.5 text-slate-400" />}
             <span>{soundEnabled ? 'Sonidos Activos' : 'Silenciado'}</span>
@@ -169,7 +170,7 @@ export default function AdminPedidosCommandCenterPage() {
           <button
             type="button"
             onClick={() => loadOrders()}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white min-h-[38px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>Refrescar</span>
@@ -177,22 +178,65 @@ export default function AdminPedidosCommandCenterPage() {
 
           <Link
             href="/"
-            className="inline-flex items-center gap-1 rounded-xl bg-catador-blue px-3 py-1.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
+            className="inline-flex items-center gap-1 rounded-xl bg-catador-blue min-h-[38px] px-3 py-1.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" /> Ir a la Tienda
           </Link>
         </div>
       </div>
 
-      {/* Consola Split-Screen de 3 Columnas */}
+      {/* Selector de Panel en Móvil / Tablet (< 1024px) para evitar scroll triple */}
+      <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setMobilePanel('cola')}
+          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
+            mobilePanel === 'cola'
+              ? 'bg-catador-blue text-white shadow-xs'
+              : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          1. Cola ({orders.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobilePanel('detalle')}
+          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer truncate ${
+            mobilePanel === 'detalle'
+              ? 'bg-catador-blue text-white shadow-xs'
+              : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          2. {selectedOrder ? `Orden #${selectedOrder.numero_orden}` : 'Detalle'}
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobilePanel('chat')}
+          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
+            mobilePanel === 'chat'
+              ? 'bg-catador-blue text-white shadow-xs'
+              : 'text-slate-600 hover:bg-white/60'
+          }`}
+        >
+          <span>3. Chat</span>
+          {(selectedOrder?.mensajes_no_leidos || 0) > 0 && (
+            <span className="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center">
+              {selectedOrder?.mensajes_no_leidos}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {/* Consola Split-Screen de 3 Columnas en Desktop y Pestañas Inteligentes en Móvil/Tablet */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Columna 1: Cola de Pedidos en Vivo (3 cols) */}
-        <div className="lg:col-span-3">
+        <div className={`lg:col-span-3 ${mobilePanel === 'cola' ? 'block' : 'hidden lg:block'}`}>
           <AdminOrderQueue
             orders={orders}
             selectedOrderId={selectedOrder?.id || null}
             onSelectOrder={(ord) => {
               setSelectedOrder(ord);
+              setMobilePanel('detalle');
               // Limpiar badge de no leídos al abrir
               setOrders((prev) => prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o)));
             }}
@@ -202,7 +246,7 @@ export default function AdminPedidosCommandCenterPage() {
         </div>
 
         {/* Columna 2: Detalle de Orden y Verificación de Pago (5 cols) */}
-        <div className="lg:col-span-5">
+        <div className={`lg:col-span-5 ${mobilePanel === 'detalle' ? 'block' : 'hidden lg:block'}`}>
           <AdminOrderDetail
             order={selectedOrder}
             onUpdateStatus={handleUpdateStatus}
@@ -212,7 +256,7 @@ export default function AdminPedidosCommandCenterPage() {
         </div>
 
         {/* Columna 3: Chat Directo con el Cliente (4 cols) */}
-        <div className="lg:col-span-4">
+        <div className={`lg:col-span-4 ${mobilePanel === 'chat' ? 'block' : 'hidden lg:block'}`}>
           {selectedOrder ? (
             <OrderLiveChat
               pedidoId={selectedOrder.id}

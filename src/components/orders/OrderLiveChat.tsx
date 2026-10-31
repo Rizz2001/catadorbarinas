@@ -67,7 +67,7 @@ export function OrderLiveChat({
   };
 
   return (
-    <div className="flex flex-col h-[580px] rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+    <div className="flex flex-col h-[520px] sm:h-[580px] rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
       {/* Cabecera del Chat */}
       <div className="bg-catador-blue text-white p-3.5 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -138,8 +138,8 @@ export function OrderLiveChat({
                   )}
                 >
                   {m.adjunto_url && (
-                    <div className="relative aspect-video w-48 rounded-lg overflow-hidden bg-slate-100 border">
-                      <Image src={m.adjunto_url} alt="Adjunto" fill className="object-cover" />
+                    <div className="relative aspect-video w-48 max-w-full rounded-lg overflow-hidden bg-slate-100 border">
+                      <Image src={m.adjunto_url} alt="Adjunto" fill sizes="192px" className="object-cover" />
                     </div>
                   )}
                   {m.mensaje && <p className="leading-relaxed break-words">{m.mensaje}</p>}
@@ -193,7 +193,8 @@ export function OrderLiveChat({
           onClick={() => fileInputRef.current?.click()}
           disabled={enviando}
           title="Adjuntar imagen o comprobante"
-          className="p-2 rounded-xl text-slate-400 hover:text-catador-blue hover:bg-slate-100 transition-colors cursor-pointer"
+          aria-label="Adjuntar imagen o comprobante"
+          className="h-10 w-10 flex items-center justify-center rounded-xl text-slate-400 hover:text-catador-blue hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
         >
           <ImagePlus className="h-5 w-5" />
         </button>
@@ -203,13 +204,14 @@ export function OrderLiveChat({
           value={inputTexto}
           onChange={handleInputChange}
           placeholder="Escribe tu mensaje aquí..."
-          className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+          className="flex-1 min-h-[40px] rounded-xl border border-slate-200 px-3 py-2 text-base md:text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
         />
 
         <button
           type="submit"
           disabled={!inputTexto.trim() || enviando}
-          className="flex items-center justify-center h-8 w-8 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-200 text-white transition-colors cursor-pointer"
+          aria-label="Enviar mensaje"
+          className="flex items-center justify-center h-10 w-10 shrink-0 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-200 text-white transition-colors cursor-pointer"
         >
           {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
         </button>

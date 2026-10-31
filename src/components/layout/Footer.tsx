@@ -68,7 +68,7 @@ export function Footer() {
       </div>
 
       {/* Secciones del Footer */}
-      <div className="container mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-xs">
+      <div className="container mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-xs">
         {/* Info Bodegón */}
         <div className="space-y-3">
           <div
@@ -82,6 +82,7 @@ export function Footer() {
               src={storeConfig?.logo_url || '/logo-catador.svg'}
               alt={storeConfig?.nombre_tienda || APP_CONFIG.name}
               fill
+              sizes="200px"
               className="object-contain object-left brightness-0 invert opacity-95"
             />
           </div>

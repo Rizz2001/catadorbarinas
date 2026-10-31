@@ -1,6 +1,14 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Header, CartDrawer, BottomNav, Footer } from '@/components/layout';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: '#00227B',
+};
 
 export const metadata: Metadata = {
   title: 'Gran Catador | Distribuidora & Bodegón del Catador Barinas',
@@ -14,10 +22,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-hidden">
+    <html lang="es" className="h-full antialiased scroll-smooth">
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-clip">
         <Header />
-        <div className="flex-1 pb-16 md:pb-0">{children}</div>
+        <div className="flex-1 pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">{children}</div>
         <CartDrawer />
         <BottomNav />
         <Footer />

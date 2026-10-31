@@ -89,7 +89,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
           required
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+          className="w-full min-h-[42px] rounded-xl border border-slate-200 px-3 py-2 text-base md:text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
           placeholder="Ej. Juan Pérez"
         />
       </div>
@@ -101,7 +101,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
             type="text"
             value={cedula}
             onChange={(e) => setCedula(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-800 font-mono focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+            className="w-full min-h-[42px] rounded-xl border border-slate-200 px-3 py-2 text-base md:text-xs text-slate-800 font-mono focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
             placeholder="V-12345678"
           />
         </div>
@@ -111,7 +111,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
             type="text"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
-            className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+            className="w-full min-h-[42px] rounded-xl border border-slate-200 px-3 py-2 text-base md:text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
             placeholder="0414-1234567"
           />
         </div>
@@ -123,7 +123,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
           rows={2}
           value={direccion}
           onChange={(e) => setDireccion(e.target.value)}
-          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20 resize-none"
+          className="w-full rounded-xl border border-slate-200 px-3 py-2 text-base md:text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-catador-blue/20 resize-none"
           placeholder="Av. Principal, Edificio / Casa..."
         />
       </div>
@@ -136,7 +136,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
         <select
           value={rol}
           onChange={(e) => setRol(e.target.value as PerfilRow['rol'])}
-          className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-catador-blue/20 cursor-pointer"
+          className="w-full min-h-[42px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-base md:text-xs text-slate-800 font-bold focus:outline-none focus:ring-2 focus:ring-catador-blue/20 cursor-pointer"
         >
           <option value="cliente">Cliente (Comprador de la Tienda)</option>
           <option value="repartidor">Repartidor (Acceso a Despachos / Entregas)</option>

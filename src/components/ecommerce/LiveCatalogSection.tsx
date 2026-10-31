@@ -67,7 +67,7 @@ export function LiveCatalogSection({
     const cacheKey = `${codGrupo}-todos`;
     const cached = clientCacheRef.current.get(cacheKey);
 
-    if (cached) {
+    if (cached && cached.products.length > 0) {
       setProducts(cached.products);
       if (cached.subgroups) setSubgroups(cached.subgroups);
       return;
@@ -81,11 +81,13 @@ export function LiveCatalogSection({
       ]);
 
       const [artData, subData] = await Promise.all([artRes.json(), subRes.json()]);
-      const newProds = artData.products || [];
-      const newSubs = subData.subgrupos || [];
+      const newProds: Product[] = artData.products || [];
+      const newSubs: SmartVentasSubgroup[] = subData.subgrupos || [];
       setProducts(newProds);
       setSubgroups(newSubs);
-      clientCacheRef.current.set(cacheKey, { products: newProds, subgroups: newSubs });
+      if (newProds.length > 0) {
+        clientCacheRef.current.set(cacheKey, { products: newProds, subgroups: newSubs });
+      }
     } catch {
       // Manejo de fallo silencioso
     } finally {
@@ -93,16 +95,34 @@ export function LiveCatalogSection({
     }
   };
 
-  // Maneja el filtrado por Subgrupo con respuesta inmediata si ya fue consultado
+  // Maneja el filtrado por Subgrupo instantáneamente en memoria desde el grupo completo o vía API
   const handleSelectSubgroup = async (codSubgrupo: string) => {
     if (codSubgrupo === selectedSubgroup) return;
     setSelectedSubgroup(codSubgrupo);
     setVisibleCount(INITIAL_VISIBLE_COUNT);
 
+    const groupCacheKey = `${selectedGroup}-todos`;
+    const cachedFullGroup = clientCacheRef.current.get(groupCacheKey);
+
+    if (cachedFullGroup && cachedFullGroup.products.length > 0) {
+      if (codSubgrupo === 'todos') {
+        setProducts(cachedFullGroup.products);
+        return;
+      }
+      const targetSub = String(codSubgrupo).trim();
+      const filteredLocal = cachedFullGroup.products.filter(
+        (p) => String(p.codSubgrupo || '').trim() === targetSub
+      );
+      if (filteredLocal.length > 0) {
+        setProducts(filteredLocal);
+        return;
+      }
+    }
+
     const cacheKey = `${selectedGroup}-${codSubgrupo}`;
     const cached = clientCacheRef.current.get(cacheKey);
 
-    if (cached) {
+    if (cached && cached.products.length > 0) {
       setProducts(cached.products);
       return;
     }
@@ -116,9 +136,11 @@ export function LiveCatalogSection({
 
       const res = await fetch(url);
       const data = await res.json();
-      const newProds = data.products || [];
+      const newProds: Product[] = data.products || [];
       setProducts(newProds);
-      clientCacheRef.current.set(cacheKey, { products: newProds });
+      if (newProds.length > 0) {
+        clientCacheRef.current.set(cacheKey, { products: newProds });
+      }
     } catch {
       // Manejo de fallo silencioso
     } finally {
