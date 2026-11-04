@@ -54,6 +54,98 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* 0. Banda de Métricas / Garantías de Confianza */}
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 md:col-span-2 space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-200/80 pb-2">
+            <div>
+              <span className="font-black text-slate-900 text-xs block">
+                Banda de Garantías y Métricas de Confianza (4 Bloques)
+              </span>
+              <span className="text-[11px] text-slate-500">
+                Modifica el texto, cifras y subtítulos de cada tarjeta de la barra superior
+              </span>
+            </div>
+            <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={form.seccion_confianza_activa !== false}
+                onChange={(e) => onChange({ seccion_confianza_activa: e.target.checked })}
+              />
+              <span className="text-[11px] font-bold">Visible</span>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+            {([0, 1, 2, 3] as const).map((idx) => {
+              const currentMetric = (form.metricas_confianza && form.metricas_confianza[idx]) || {
+                figura: idx === 0 ? '< 45 min' : idx === 1 ? 'Tasa BCV' : idx === 2 ? 'Stock Garantizado' : 'Bs. / $ USD',
+                titulo: idx === 0 ? 'Despacho Express' : idx === 1 ? 'Cotización Bimonetaria' : idx === 2 ? 'Inventario Real' : 'Métodos de Pago',
+                subtitulo: '',
+              };
+
+              const updateMetric = (field: 'figura' | 'titulo' | 'subtitulo', val: string) => {
+                const list = [...(form.metricas_confianza || [
+                  { figura: '< 45 min', titulo: 'Despacho Express en Barinas', subtitulo: 'Alto Barinas, Centro, Palma Sola y Varyná en motorizado o carga' },
+                  { figura: 'Tasa BCV', titulo: 'Cotización Bimonetaria Exacta', subtitulo: 'Precios sincronizados al día en Dólares ($ USD) y Bolívares' },
+                  { figura: 'Stock Garantizado', titulo: 'Inventario Real por Unidad o Caja', subtitulo: 'Licores con precinto oficial y víveres directo de nuestro almacén' },
+                  { figura: 'Bs. / $ USD', titulo: 'Pago Móvil, Zelle y Efectivo', subtitulo: 'Verificación inmediata y atención directa en nuestro Chat en Vivo' },
+                ])];
+                while (list.length < 4) {
+                  list.push({ figura: '', titulo: '', subtitulo: '' });
+                }
+                list[idx] = { ...list[idx], [field]: val };
+                onChange({ metricas_confianza: list });
+              };
+
+              return (
+                <div key={idx} className="bg-white p-3 rounded-xl border border-slate-200/90 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase text-catador-blue">
+                      Bloque #{idx + 1}
+                    </span>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 block mb-0.5">
+                      Cifra o Destacado:
+                    </label>
+                    <input
+                      type="text"
+                      value={currentMetric.figura}
+                      onChange={(e) => updateMetric('figura', e.target.value)}
+                      placeholder="Ej: < 45 min"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 p-1.5 text-xs font-black text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 block mb-0.5">
+                      Título:
+                    </label>
+                    <input
+                      type="text"
+                      value={currentMetric.titulo}
+                      onChange={(e) => updateMetric('titulo', e.target.value)}
+                      placeholder="Título de la garantía"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 p-1.5 text-xs font-bold text-slate-900"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-slate-500 block mb-0.5">
+                      Descripción:
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={currentMetric.subtitulo}
+                      onChange={(e) => updateMetric('subtitulo', e.target.value)}
+                      placeholder="Breve descripción"
+                      className="w-full rounded-lg border border-slate-200 bg-slate-50 p-1.5 text-[11px] text-slate-700"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* 1. Tendencias */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
           <div className="flex items-center justify-between">
@@ -137,7 +229,7 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
             type="text"
             value={form.catalogo_titulo || ''}
             onChange={(e) => onChange({ catalogo_titulo: e.target.value })}
-            placeholder="Catálogo Bodegón & Supermercado (Depósito 01)"
+            placeholder="Catálogo General Bodegón"
             className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
           />
           <input
@@ -147,6 +239,116 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
             placeholder="Inventario en tiempo real sincronizado con precios oficiales"
             className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
           />
+        </div>
+
+        {/* 5. Personalización del Footer / Pie de Página */}
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 md:col-span-2 space-y-3">
+          <div className="border-b border-slate-200/80 pb-2">
+            <span className="font-black text-slate-900 text-xs block">
+              5. Personalización del Pie de Página (Footer)
+            </span>
+            <span className="text-[11px] text-slate-500">
+              Modifica la descripción comercial de la empresa, texto de transparencia bimonetaria y dirección del pie de página
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-600 block mb-1">
+                Descripción Comercial de la Empresa (Bajo el Logo en el Footer):
+              </label>
+              <textarea
+                rows={3}
+                value={form.footer_descripcion || ''}
+                onChange={(e) => onChange({ footer_descripcion: e.target.value })}
+                placeholder="Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada con despacho express."
+                className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-bold text-slate-600 block mb-1">
+                Texto de Transparencia Bimonetaria y Legal:
+              </label>
+              <textarea
+                rows={3}
+                value={form.footer_transparencia_texto || ''}
+                onChange={(e) => onChange({ footer_transparencia_texto: e.target.value })}
+                placeholder="Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES) calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV)."
+                className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-[10px] font-bold text-slate-600 block mb-1">
+              Dirección Resumida (Fila inferior de Copyright):
+            </label>
+            <input
+              type="text"
+              value={form.footer_subdireccion || ''}
+              onChange={(e) => onChange({ footer_subdireccion: e.target.value })}
+              placeholder="Av. 23 de Enero • Barinas, Estado Barinas, Venezuela"
+              className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
+            />
+          </div>
+
+          {/* Bloques de Garantías Superiores del Footer */}
+          <div className="pt-2 border-t border-slate-200/80">
+            <span className="font-bold text-slate-800 text-[11px] block mb-2">
+              Banda Superior de Garantías del Footer (4 Columnas):
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              {([0, 1, 2, 3] as const).map((idx) => {
+                const current = (form.footer_garantias && form.footer_garantias[idx]) || {
+                  figura: idx === 0 ? 'Gratis desde $30' : idx === 1 ? '100% Original' : idx === 2 ? 'Bs. BCV / $ USD' : 'Sala en Vivo',
+                  titulo: idx === 0 ? 'Delivery en Barinas' : idx === 1 ? 'Precinto Oficial' : idx === 2 ? 'Pagos Bimonetarios' : 'Atención Directa',
+                  subtitulo: '',
+                };
+
+                const updateFooterGarantia = (field: 'figura' | 'titulo' | 'subtitulo', val: string) => {
+                  const list = [...(form.footer_garantias || [
+                    { figura: 'Gratis desde $30', titulo: 'Delivery en Barinas', subtitulo: 'Cotización automática por GPS y volumen' },
+                    { figura: '100% Original', titulo: 'Precinto Oficial', subtitulo: 'Licores importados y despensa garantizada' },
+                    { figura: 'Bs. BCV / $ USD', titulo: 'Pagos Bimonetarios', subtitulo: 'Pago Móvil, Zelle y Efectivo Divisas' },
+                    { figura: 'Sala en Vivo', titulo: 'Atención Directa', subtitulo: 'Chat en tiempo real en cada pedido' },
+                  ])];
+                  while (list.length < 4) list.push({ figura: '', titulo: '', subtitulo: '' });
+                  list[idx] = { ...list[idx], [field]: val };
+                  onChange({ footer_garantias: list });
+                };
+
+                return (
+                  <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200 space-y-1.5">
+                    <span className="text-[10px] font-black text-catador-amber uppercase block">
+                      Columna #{idx + 1}
+                    </span>
+                    <input
+                      type="text"
+                      value={current.figura}
+                      onChange={(e) => updateFooterGarantia('figura', e.target.value)}
+                      placeholder="Cifra / Destacado"
+                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[11px] font-bold"
+                    />
+                    <input
+                      type="text"
+                      value={current.titulo}
+                      onChange={(e) => updateFooterGarantia('titulo', e.target.value)}
+                      placeholder="Título"
+                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[11px] font-bold"
+                    />
+                    <input
+                      type="text"
+                      value={current.subtitulo}
+                      onChange={(e) => updateFooterGarantia('subtitulo', e.target.value)}
+                      placeholder="Subtítulo"
+                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[10px]"
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </section>

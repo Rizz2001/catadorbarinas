@@ -130,6 +130,12 @@ export interface QuickCategory {
   updated_at?: string;
 }
 
+export interface TrustMetricItem {
+  figura: string;
+  titulo: string;
+  subtitulo: string;
+}
+
 export interface StoreConfig {
   id: string;
   nombre_tienda: string;
@@ -159,6 +165,8 @@ export interface StoreConfig {
   delivery_max_cajas_motorizado?: number;
   delivery_max_unidades_motorizado?: number;
   delivery_recargo_vehiculo_usd?: number;
+  seccion_confianza_activa?: boolean;
+  metricas_confianza?: TrustMetricItem[];
   seccion_tendencias_activa?: boolean;
   seccion_tendencias_titulo?: string | null;
   seccion_tendencias_subtitulo?: string | null;
@@ -166,6 +174,10 @@ export interface StoreConfig {
   seccion_ofertas_titulo?: string | null;
   seccion_aliados_activa?: boolean;
   seccion_aliados_titulo?: string | null;
+  footer_descripcion?: string | null;
+  footer_transparencia_texto?: string | null;
+  footer_subdireccion?: string | null;
+  footer_garantias?: TrustMetricItem[];
   updated_at?: string;
 }
 

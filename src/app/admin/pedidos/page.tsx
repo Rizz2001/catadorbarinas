@@ -169,7 +169,7 @@ export default function AdminPedidosCommandCenterPage() {
             Centro de Comando y Despacho
           </h1>
           <p className="text-xs text-slate-500 mt-1">
-            Depósito 01 • Facturación en caja, verificación de pagos y chat en tiempo real
+            Bodegón Central • Facturación en caja, verificación de pagos y chat en tiempo real
           </p>
         </div>
 

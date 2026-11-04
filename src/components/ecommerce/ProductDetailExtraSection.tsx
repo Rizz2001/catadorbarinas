@@ -128,7 +128,7 @@ export function ProductDetailExtraSection({
                 </strong>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/70">
-                <span className="text-slate-500 block">Existencia Real (Depósito 01)</span>
+                <span className="text-slate-500 block">Existencia Real en Bodegón</span>
                 <strong className="text-sm text-emerald-700">
                   {product.stockQuantity} unidades ({Math.floor(product.stockQuantity / unitsPerBox)} cajas)
                 </strong>

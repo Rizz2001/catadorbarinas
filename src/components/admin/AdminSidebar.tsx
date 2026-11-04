@@ -80,7 +80,7 @@ export function AdminSidebar() {
                 Gran Catador CMS
               </h2>
               <p className="text-[11px] text-slate-400 font-medium mt-1">
-                Depósito 01 • Barinas
+                Bodegón • Barinas
               </p>
             </div>
           </div>

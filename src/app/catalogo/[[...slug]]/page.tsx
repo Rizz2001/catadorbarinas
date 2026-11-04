@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: CatalogPageProps): Promise<Me
     ? `${subName} (${groupName}) | Catálogo Gran Catador Barinas`
     : `${groupName} | Catálogo Gran Catador Barinas`;
 
-  const description = `Consulta precios bimonetarios oficiales ($ y Bs.) e inventario en tiempo real de ${subName || groupName} en Bodegón del Catador Barinas (Depósito 01).`;
+  const description = `Consulta precios bimonetarios oficiales ($ y Bs.) e inventario en tiempo real de ${subName || groupName} en Bodegón del Catador Barinas.`;
 
   return {
     title,
@@ -107,7 +107,7 @@ export default async function CatalogoPage({ params }: CatalogPageProps) {
               {activeSub ? `${activeGroup?.Nombre} • ${activeSub.Nombre}` : (activeGroup?.Nombre || 'Catálogo General')}
             </h1>
             <p className="text-[11px] sm:text-xs text-slate-500 truncate">
-              Inventario en tiempo real sincronizado directamente con el Bodegón (Depósito 01)
+              Inventario en tiempo real sincronizado directamente con el Bodegón
             </p>
           </div>
         </div>

@@ -67,7 +67,7 @@ export default async function BuscarPage({ searchParams }: SearchPageProps) {
               {term ? `Resultados para: "${term}"` : 'Buscador de Productos'}
             </h1>
             <p className="text-xs text-slate-500">
-              {products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'} en tiempo real en Bodegón (Depósito 01)
+              {products.length} {products.length === 1 ? 'producto encontrado' : 'productos encontrados'} en tiempo real en Bodegón del Catador Barinas
             </p>
           </div>
         </div>

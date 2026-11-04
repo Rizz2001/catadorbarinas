@@ -50,7 +50,7 @@ export default function PrivacidadPage() {
               <strong>Datos de Pago Bimonetario:</strong> Referencias bancarias de Pago Móvil, Zelle o modalidad en efectivo para conciliación administrativa interna.
             </li>
             <li>
-              <strong>Búsquedas en el Catálogo:</strong> Registramos los términos consultados en el buscador para mejorar nuestro inventario en el Depósito 01 y ofrecerte disponibilidad continua de las marcas que prefieres.
+              <strong>Búsquedas en el Catálogo:</strong> Registramos los términos consultados en el buscador para mejorar nuestro inventario en el Bodegón y ofrecerte disponibilidad continua de las marcas que prefieres.
             </li>
           </ul>
         </section>

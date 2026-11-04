@@ -21,36 +21,48 @@ export function Footer() {
   const freeShipping =
     storeConfig?.delivery_gratis_minimo_usd ?? APP_CONFIG.freeShippingThresholdUsd;
 
+  const defaultGarantias = [
+    {
+      figura: `Gratis desde $${freeShipping}`,
+      titulo: 'Delivery en Barinas',
+      subtitulo: 'Cotización automática por GPS y volumen',
+    },
+    {
+      figura: '100% Original',
+      titulo: 'Precinto Oficial',
+      subtitulo: 'Licores importados y despensa garantizada',
+    },
+    {
+      figura: 'Bs. BCV / $ USD',
+      titulo: 'Pagos Bimonetarios',
+      subtitulo: 'Pago Móvil, Zelle y Efectivo Divisas',
+    },
+    {
+      figura: 'Sala en Vivo',
+      titulo: 'Atención Directa',
+      subtitulo: 'Chat en tiempo real en cada pedido',
+    },
+  ];
+
+  const garantias =
+    storeConfig?.footer_garantias && storeConfig.footer_garantias.length > 0
+      ? storeConfig.footer_garantias
+      : defaultGarantias;
+
   return (
     <footer className="bg-slate-950 text-slate-300 mt-16 border-t-4 border-catador-blue">
       {/* Banda Arquitectónica Superior */}
       <div className="border-b border-slate-800/80">
         <div className="container mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-800/80">
-          <div className="py-5 sm:px-5 first:pl-0">
-            <span className="text-sm font-black text-catador-amber tabular-nums block">
-              Gratis desde ${freeShipping}
-            </span>
-            <h4 className="text-xs font-extrabold text-white mt-0.5">Delivery en Barinas</h4>
-            <p className="text-[11px] text-slate-400">Cotización automática por GPS y volumen</p>
-          </div>
-
-          <div className="py-5 sm:px-5">
-            <span className="text-sm font-black text-catador-amber block">100% Original</span>
-            <h4 className="text-xs font-extrabold text-white mt-0.5">Precinto Oficial</h4>
-            <p className="text-[11px] text-slate-400">Licores importados y despensa garantizada</p>
-          </div>
-
-          <div className="py-5 sm:px-5">
-            <span className="text-sm font-black text-catador-amber block">Bs. BCV / $ USD</span>
-            <h4 className="text-xs font-extrabold text-white mt-0.5">Pagos Bimonetarios</h4>
-            <p className="text-[11px] text-slate-400">Pago Móvil, Zelle y Efectivo Divisas</p>
-          </div>
-
-          <div className="py-5 sm:px-5 last:pr-0">
-            <span className="text-sm font-black text-catador-amber block">Sala en Vivo</span>
-            <h4 className="text-xs font-extrabold text-white mt-0.5">Atención Directa</h4>
-            <p className="text-[11px] text-slate-400">Chat en tiempo real en cada pedido</p>
-          </div>
+          {garantias.map((g, idx) => (
+            <div key={idx} className="py-5 sm:px-5 first:pl-0 last:pr-0">
+              <span className="text-sm font-black text-catador-amber tabular-nums block">
+                {g.figura}
+              </span>
+              <h4 className="text-xs font-extrabold text-white mt-0.5">{g.titulo}</h4>
+              <p className="text-[11px] text-slate-400">{g.subtitulo}</p>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -77,8 +89,9 @@ export function Footer() {
           </h3>
           <p className="text-slate-400 leading-relaxed text-[11px]">
             {storeConfig?.razon_social || APP_CONFIG.legalName} (RIF:{' '}
-            {storeConfig?.rif || 'J-50123456-7'}). Distribuidora y bodegón en Barinas con venta al
-            detal por unidad y al mayor por caja cerrada.
+            {storeConfig?.rif || 'J-50123456-7'}).{' '}
+            {storeConfig?.footer_descripcion ||
+              'Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada.'}
           </p>
           <div className="space-y-1.5 text-[11px] text-slate-400 pt-1">
             <p className="flex items-center gap-1.5">
@@ -138,8 +151,8 @@ export function Footer() {
         <div className="space-y-3">
           <h4 className="text-xs font-extrabold text-white">Transparencia Bimonetaria</h4>
           <p className="text-[11px] text-slate-400 leading-relaxed">
-            Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES)
-            calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV).
+            {storeConfig?.footer_transparencia_texto ||
+              'Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES) calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV).'}
           </p>
           <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 text-[11px]">
             <span className="text-slate-400 font-semibold block">Horario de Despacho:</span>
@@ -157,7 +170,7 @@ export function Footer() {
             los derechos reservados.
           </p>
           <p className="font-semibold text-slate-400">
-            Av. 23 de Enero • Barinas, Estado Barinas, Venezuela
+            {storeConfig?.footer_subdireccion || 'Av. 23 de Enero • Barinas, Estado Barinas, Venezuela'}
           </p>
         </div>
       </div>

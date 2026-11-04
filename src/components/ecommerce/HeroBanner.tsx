@@ -58,7 +58,7 @@ export function HeroBanner({
     banner?.titulo || 'Licores Importados y Víveres al Precio Oficial en Barinas';
   const subtitulo =
     banner?.subtitulo ||
-    'Inventario real sincronizado con Depósito 01 (Av. 23 de Enero). Compra por unidad o por caja cerrada en Dólares ($ USD) y Bolívares (Bs. BCV).';
+    'Inventario real garantizado en nuestra sede (Av. 23 de Enero). Compra por unidad o por caja cerrada en Dólares ($ USD) y Bolívares (Bs. BCV).';
   const botonTexto = banner?.boton_texto || 'Ver Ofertas del Día';
   const botonUrl = banner?.boton_url || '/catalogo';
 
@@ -92,7 +92,7 @@ export function HeroBanner({
           <div className="lg:col-span-7 space-y-3 sm:space-y-5 text-left min-w-0">
             <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-lg bg-blue-950/75 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-bold text-blue-100 border border-blue-800/80 max-w-full">
               <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
-              <span className="truncate">Depósito 01 • Barinas</span>
+              <span className="truncate">Sede Barinas • Av. 23 de Enero</span>
               <span className="text-amber-300 font-black tabular-nums">
                 BCV Bs. {bcvRate.toFixed(2)}
               </span>

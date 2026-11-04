@@ -99,30 +99,33 @@ export function UserNavMenu() {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-10 sm:min-h-[42px] text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors"
+        className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-9 sm:min-h-[42px] text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors"
       >
         <User className="h-3.5 w-3.5 shrink-0" />
         <span className="hidden sm:inline">Iniciar Sesión</span>
-        <span className="sm:hidden text-[11px]">Entrar</span>
+        <span className="sm:hidden text-[10px] xs:text-[11px]">Entrar</span>
       </Link>
     );
   }
 
   const isAdmin = perfil?.rol === 'admin';
-  const displayName = perfil?.nombre || user.email?.split('@')[0] || 'Mi Cuenta';
+  const rawDisplayName = perfil?.nombre || user.email?.split('@')[0] || 'Mi Cuenta';
+  // En móviles tomamos el primer nombre para máxima limpieza y evitar desbordes
+  const firstName = rawDisplayName.trim().split(' ')[0] || rawDisplayName;
 
   return (
     <div className="relative" ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-10 sm:min-h-[42px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer"
+        className="flex items-center gap-1 sm:gap-2 rounded-xl border border-slate-200 bg-white px-1.5 xs:px-2 sm:px-3 h-9 sm:min-h-[42px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer"
       >
-        <div className="h-6 w-6 shrink-0 rounded-full bg-catador-blue text-white flex items-center justify-center text-[10px] font-black uppercase">
-          {displayName.charAt(0)}
+        <div className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 rounded-full bg-catador-blue text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black uppercase">
+          {rawDisplayName.charAt(0)}
         </div>
-        <span className="max-w-[64px] xs:max-w-[85px] sm:max-w-[110px] truncate text-[11px] sm:text-xs">
-          {displayName}
+        <span className="max-w-[42px] xs:max-w-[65px] sm:max-w-[110px] truncate text-[10px] xs:text-[11px] sm:text-xs">
+          <span className="sm:hidden">{firstName}</span>
+          <span className="hidden sm:inline">{rawDisplayName}</span>
         </span>
         {isAdmin && (
           <span className="hidden md:inline-block bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">
@@ -139,7 +142,7 @@ export function UserNavMenu() {
           />
           <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl z-50 animate-in fade-in slide-in-from-top-1 text-xs space-y-1">
             <div className="p-2 border-b border-slate-100">
-              <p className="font-extrabold text-slate-900 truncate">{displayName}</p>
+              <p className="font-extrabold text-slate-900 truncate">{rawDisplayName}</p>
               <p className="text-[10px] text-slate-500 truncate">{user.email}</p>
             </div>
 

@@ -40,7 +40,7 @@ export default function TerminosPage() {
             1. Ventas por Unidad, por Caja y Disponibilidad de Stock
           </h2>
           <p>
-            Todos los productos publicados en nuestra tienda están sincronizados con nuestro inventario físico del <strong>Depósito 01 (Bodegón)</strong>. Cuando eliges comprar <strong>Por Caja</strong>, el sistema multiplica automáticamente el número de cajas por las unidades que componen el empaque (ej. 12 o 24 unidades) y verifica en tiempo real que existan las unidades suficientes antes de procesar la orden.
+            Todos los productos publicados en nuestra tienda están sincronizados con nuestro inventario físico del <strong>Bodegón Oficial</strong>. Cuando eliges comprar <strong>Por Caja</strong>, el sistema multiplica automáticamente el número de cajas por las unidades que componen el empaque (ej. 12 o 24 unidades) y verifica en tiempo real que existan las unidades suficientes antes de procesar la orden.
           </p>
         </section>
 

@@ -175,7 +175,7 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
               <div className="inline-flex items-start sm:items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] sm:text-xs font-extrabold">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
                 <span>
-                  Disponible en Depósito 01: {product.stockQuantity} {product.unit.toLowerCase()}s
+                  Disponible en Bodegón: {product.stockQuantity} {product.unit.toLowerCase()}s
                   {product.stockQuantity >= unitsPerBox
                     ? ` (Equivale a ${Math.floor(product.stockQuantity / unitsPerBox)} cajas de ${unitsPerBox} und)`
                     : ' (Stock solo para unidades sueltas)'}

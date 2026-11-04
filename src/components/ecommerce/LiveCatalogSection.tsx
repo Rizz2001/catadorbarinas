@@ -43,7 +43,7 @@ export function LiveCatalogSection({
 }: LiveCatalogSectionProps) {
   const storeConfig = useStoreConfigStore((state) => state.config);
   const catalogTitle =
-    customTitle || storeConfig?.catalogo_titulo || 'Catálogo General • Depósito 01';
+    customTitle || storeConfig?.catalogo_titulo || 'Catálogo General Bodegón';
   const catalogSubtitle =
     customSubtitle ||
     storeConfig?.catalogo_subtitulo ||

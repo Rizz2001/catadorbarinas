@@ -26,10 +26,10 @@ export function HeaderMain() {
           {/* Logotipo Oficial Adaptativo */}
           <Link href="/" className="shrink-0 flex items-center min-w-0">
             <div
-              className="relative transition-all duration-150 flex items-center h-9 w-[132px] xs:w-[155px] sm:h-11 sm:w-[200px]"
+              className="relative transition-all duration-150 flex items-center h-8 xs:h-9 w-[110px] xs:w-[135px] sm:h-11 sm:w-[200px]"
               style={{
-                maxHeight: `${Math.min(52, Math.max(36, logoAlto))}px`,
-                maxWidth: `${Math.min(240, Math.max(132, logoAncho))}px`,
+                maxHeight: `${Math.min(52, Math.max(32, logoAlto))}px`,
+                maxWidth: `${Math.min(240, Math.max(110, logoAncho))}px`,
               }}
             >
               <Image
@@ -37,7 +37,7 @@ export function HeaderMain() {
                 alt={storeConfig?.nombre_tienda || 'Gran Catador / Distribuidora Bodegón del Catador'}
                 fill
                 priority
-                sizes="(max-width: 480px) 135px, (max-width: 768px) 180px, 240px"
+                sizes="(max-width: 480px) 115px, (max-width: 768px) 180px, 240px"
                 className="object-contain object-left"
               />
             </div>
@@ -75,10 +75,10 @@ export function HeaderMain() {
             {/* Favoritos */}
             <Link
               href="/favoritos"
-              className="relative flex items-center justify-center h-10 w-10 text-slate-700 hover:text-red-500 transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
+              className="relative flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 text-slate-700 hover:text-red-500 transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
               aria-label="Lista de Favoritos"
             >
-              <Heart className="h-5 w-5" />
+              <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
               {favCount > 0 && (
                 <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white tabular-nums">
                   {favCount}
@@ -92,7 +92,7 @@ export function HeaderMain() {
             {/* Disparador de Carrito con Total en USD y Badge */}
             <Link
               href="/carrito"
-              className="flex items-center gap-1.5 sm:gap-2 rounded-xl bg-slate-50 hover:bg-slate-100 h-10 sm:min-h-[42px] px-2 sm:px-3 py-1.5 border border-slate-200 transition-colors shrink-0"
+              className="flex items-center gap-1 sm:gap-2 rounded-xl bg-slate-50 hover:bg-slate-100 h-9 sm:min-h-[42px] px-1.5 sm:px-3 py-1 sm:py-1.5 border border-slate-200 transition-colors shrink-0"
               aria-label="Ver Carrito de Compras"
             >
               <div className="relative flex items-center justify-center text-catador-blue">
@@ -105,7 +105,7 @@ export function HeaderMain() {
               </div>
               <div className="flex flex-col text-left tabular-nums">
                 <span className="text-[10px] text-slate-600 leading-tight hidden sm:block">Mi Carrito</span>
-                <span className="text-[11px] sm:text-xs font-extrabold text-catador-blue font-mono">
+                <span className="text-[10px] xs:text-[11px] sm:text-xs font-extrabold text-catador-blue font-mono">
                   {formatUsd(totals.totalUsd)}
                 </span>
               </div>

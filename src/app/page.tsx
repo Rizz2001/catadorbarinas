@@ -63,7 +63,10 @@ export default async function HomePage() {
       />
 
       {/* 2. Banda Arquitectónica de Garantías y Métricas */}
-      <TrustValueBar />
+      <TrustValueBar
+        initialMetrics={storeConfig?.metricas_confianza}
+        active={storeConfig?.seccion_confianza_activa}
+      />
 
       {/* 3. Colecciones Destacadas del Bodegón (Editables en CMS) */}
       <PromoBannersGrid banners={banners} />
@@ -96,7 +99,7 @@ export default async function HomePage() {
         />
       )}
 
-      {/* 7. Catálogo en Vivo (Depósito 01) */}
+      {/* 7. Catálogo en Vivo */}
       <LiveCatalogSection
         groups={groups}
         initialSubgroups={initialSubgroups}

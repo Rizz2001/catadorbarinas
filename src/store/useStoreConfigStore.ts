@@ -25,8 +25,58 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   logo_url: '/logo-catador.svg',
   logo_alto_px: 44,
   logo_ancho_px: 200,
-  catalogo_titulo: 'Catálogo Bodegón & Supermercado (Depósito 01)',
+  catalogo_titulo: 'Catálogo General Bodegón',
   catalogo_subtitulo: 'Inventario en tiempo real sincronizado con precios oficiales en $ USD y Bs. BCV',
+  seccion_confianza_activa: true,
+  metricas_confianza: [
+    {
+      figura: '< 45 min',
+      titulo: 'Despacho Express en Barinas',
+      subtitulo: 'Alto Barinas, Centro, Palma Sola y Varyná en motorizado o carga',
+    },
+    {
+      figura: 'Tasa BCV',
+      titulo: 'Cotización Bimonetaria Exacta',
+      subtitulo: 'Precios sincronizados al día en Dólares ($ USD) y Bolívares',
+    },
+    {
+      figura: 'Stock Garantizado',
+      titulo: 'Inventario Real por Unidad o Caja',
+      subtitulo: 'Licores con precinto oficial y víveres directo de nuestro almacén',
+    },
+    {
+      figura: 'Bs. / $ USD',
+      titulo: 'Pago Móvil, Zelle y Efectivo',
+      subtitulo: 'Verificación inmediata y atención directa en nuestro Chat en Vivo',
+    },
+  ],
+  footer_descripcion:
+    'Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada con despacho express.',
+  footer_transparencia_texto:
+    'Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES) calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV).',
+  footer_subdireccion: 'Av. 23 de Enero • Barinas, Estado Barinas, Venezuela',
+  footer_garantias: [
+    {
+      figura: 'Gratis desde $30',
+      titulo: 'Delivery en Barinas',
+      subtitulo: 'Cotización automática por GPS y volumen',
+    },
+    {
+      figura: '100% Original',
+      titulo: 'Precinto Oficial',
+      subtitulo: 'Licores importados y despensa garantizada',
+    },
+    {
+      figura: 'Bs. BCV / $ USD',
+      titulo: 'Pagos Bimonetarios',
+      subtitulo: 'Pago Móvil, Zelle y Efectivo Divisas',
+    },
+    {
+      figura: 'Sala en Vivo',
+      titulo: 'Atención Directa',
+      subtitulo: 'Chat en tiempo real en cada pedido',
+    },
+  ],
 };
 
 interface StoreConfigState {
