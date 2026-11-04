@@ -6,7 +6,7 @@ import { AdminSidebar } from '@/components/admin';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Panel CMS Administrador | Gran Catador Barinas',
+  title: 'Consola Operativa CMS | Gran Catador Barinas',
   robots: {
     index: false,
     follow: false,
@@ -38,11 +38,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-100 text-slate-900">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 text-slate-900">
       <AdminSidebar />
-      <div className="flex-1 min-w-0 overflow-y-auto">
-        {children}
-      </div>
+      <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
     </div>
   );
 }

@@ -20,52 +20,52 @@ export function ProductDetailExtraSection({
   const unitsPerBox = getUnitsPerPurchaseMode(product, 'caja');
 
   return (
-    <div className="space-y-8 pt-6">
+    <div className="space-y-6 sm:space-y-8 pt-2 sm:pt-4 min-w-0 max-w-full">
       {/* Pestañas de Información Premium */}
-      <section className="rounded-3xl bg-white border border-slate-200/90 shadow-2xs overflow-hidden">
+      <section className="rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-2xs overflow-hidden">
         <div className="flex border-b border-slate-200 bg-slate-50/70 overflow-x-auto scrollbar-none">
           <button
             type="button"
             onClick={() => setActiveTab('desc')}
             className={cn(
-              'flex items-center gap-2 px-5 py-3.5 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer',
+              'flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-3 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer shrink-0',
               activeTab === 'desc'
                 ? 'border-catador-blue text-catador-blue bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             )}
           >
-            <FileText className="h-4 w-4 shrink-0" />
-            Descripción del Artículo
+            <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            Descripción
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('specs')}
             className={cn(
-              'flex items-center gap-2 px-5 py-3.5 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer',
+              'flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-3 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer shrink-0',
               activeTab === 'specs'
                 ? 'border-catador-blue text-catador-blue bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             )}
           >
-            <PackageCheck className="h-4 w-4 shrink-0" />
-            Ficha Técnica y Empaque
+            <PackageCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            Ficha y Empaque
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('shipping')}
             className={cn(
-              'flex items-center gap-2 px-5 py-3.5 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer',
+              'flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-5 py-3 text-xs sm:text-sm font-extrabold border-b-2 transition-colors whitespace-nowrap cursor-pointer shrink-0',
               activeTab === 'shipping'
                 ? 'border-catador-blue text-catador-blue bg-white'
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             )}
           >
-            <Truck className="h-4 w-4 shrink-0" />
-            Delivery y Condiciones
+            <Truck className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+            Delivery
           </button>
         </div>
 
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6">
           {activeTab === 'desc' && (
             <div className="space-y-3 text-sm text-slate-700 leading-relaxed">
               <p className="font-medium text-slate-800 whitespace-pre-line">
@@ -154,14 +154,14 @@ export function ProductDetailExtraSection({
 
       {/* Productos Relacionados */}
       {relatedProducts.length > 0 && (
-        <section className="space-y-4">
+        <section className="space-y-3.5 sm:space-y-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-catador-amber" />
-            <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-catador-amber shrink-0" />
+            <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight truncate">
               Productos Relacionados en {product.category}
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3.5">
             {relatedProducts.slice(0, 5).map((rel) => (
               <ProductCard key={rel.id} product={rel} />
             ))}

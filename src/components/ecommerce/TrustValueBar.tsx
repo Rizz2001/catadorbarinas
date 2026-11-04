@@ -1,74 +1,62 @@
 'use client';
 
 import React from 'react';
-import { Clock, ShieldCheck, Coins, CreditCard } from 'lucide-react';
 
-interface TrustBenefit {
-  icon: React.ElementType;
+interface TrustMetric {
+  figure: string;
   title: string;
   subtitle: string;
-  highlight: string;
 }
 
-const BENEFITS: TrustBenefit[] = [
+const METRICS: TrustMetric[] = [
   {
-    icon: Clock,
-    title: 'Delivery Express Barinas',
-    subtitle: 'Alto Barinas, Centro y Varyná',
-    highlight: '< 45 min',
+    figure: '< 45 min',
+    title: 'Despacho Express en Barinas',
+    subtitle: 'Alto Barinas, Centro, Palma Sola y Varyná en motorizado o carga',
   },
   {
-    icon: Coins,
-    title: 'Tasa Oficial BCV',
-    subtitle: 'Cotización al día y transparente',
-    highlight: 'Sin recargos',
+    figure: 'Tasa BCV',
+    title: 'Cotización Bimonetaria Exacta',
+    subtitle: 'Precios sincronizados al día en Dólares ($ USD) y Bolívares',
   },
   {
-    icon: ShieldCheck,
-    title: '100% Calidad Garantizada',
-    subtitle: 'Licores y víveres con precinto oficial',
-    highlight: 'Verificado',
+    figure: 'Depósito 01',
+    title: 'Inventario Real por Unidad o Caja',
+    subtitle: 'Licores con precinto oficial y víveres directo de almacén',
   },
   {
-    icon: CreditCard,
-    title: 'Múltiples Formas de Pago',
-    subtitle: 'Pago Móvil, Zelle, Tarjeta y Efectivo',
-    highlight: 'Bs / $ USD',
+    figure: 'Bs. / $ USD',
+    title: 'Pago Móvil, Zelle y Efectivo',
+    subtitle: 'Verificación inmediata y atención directa en nuestro Chat en Vivo',
   },
 ];
 
 export function TrustValueBar() {
   return (
     <section
-      aria-label="Beneficios y Garantías Gran Catador"
-      className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3 py-1"
+      aria-label="Garantías operativas de Gran Catador Barinas"
+      className="rounded-2xl bg-white border border-slate-200/90 overflow-hidden"
     >
-      {BENEFITS.map((item) => {
-        const Icon = item.icon;
-        return (
-          <div
-            key={item.title}
-            className="flex items-center gap-3 p-3 sm:p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs hover:border-catador-blue/40 hover:shadow-xs transition-all duration-200 group"
-          >
-            <div className="flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl bg-catador-blue/10 text-catador-blue group-hover:bg-catador-blue group-hover:text-white transition-colors duration-200">
-              <Icon className="h-5 w-5" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-slate-200/90">
+        {METRICS.map((item) => (
+          <div key={item.title} className="p-3 sm:p-5 flex flex-col justify-between gap-1 min-w-0">
+            <div className="flex items-baseline justify-between gap-1.5">
+              <span className="text-sm sm:text-xl font-black text-catador-blue tracking-tight tabular-nums truncate">
+                {item.figure}
+              </span>
+              <span className="h-1.5 w-1.5 rounded-full bg-catador-amber shrink-0" />
             </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <h4 className="text-xs font-black text-slate-900 tracking-tight leading-tight">
-                  {item.title}
-                </h4>
-                <span className="inline-block text-[10px] font-extrabold text-catador-amber bg-amber-50 px-1.5 py-0.5 rounded-md">
-                  {item.highlight}
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 truncate mt-0.5">
+            <div className="min-w-0">
+              <h3 className="text-[11px] sm:text-sm font-extrabold text-slate-900 leading-snug line-clamp-1">
+                {item.title}
+              </h3>
+              <p className="text-[10px] sm:text-[11px] text-slate-600 leading-snug mt-0.5 line-clamp-2">
                 {item.subtitle}
               </p>
             </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </section>
   );
 }

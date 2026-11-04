@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Settings, Save, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Save, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
 import { StoreConfig } from '@/types';
 import { useStoreConfigStore, DEFAULT_STORE_CONFIG } from '@/store/useStoreConfigStore';
 import {
@@ -58,26 +58,20 @@ export default function AdminConfiguracionPage() {
   };
 
   return (
-    <main className="p-6 space-y-6 max-w-4xl">
-      {/* Encabezado */}
-      <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Settings className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">Configuración del Negocio</h1>
-            <p className="text-xs text-slate-500">
-              Datos comerciales, políticas de despacho, cuentas bancarias y tasa de cambio
-            </p>
-          </div>
-        </div>
+    <main className="p-4 sm:p-6 space-y-5 max-w-4xl">
+      <div className="border-b border-slate-200 pb-3.5">
+        <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-none">
+          Configuración General, BCV y Tarifas de Delivery GPS
+        </h1>
+        <p className="text-xs text-slate-500 mt-1">
+          Identidad comercial, cálculo logístico (Motorizado vs. Carga), cuentas receptoras y tasa oficial
+        </p>
       </div>
 
       {saved && (
         <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 font-bold">
           <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Configuración guardada exitosamente. Los cambios ya se reflejan en toda la plataforma.</span>
+          <span>Configuración guardada exitosamente. Los cambios ya están activos en la tienda.</span>
         </div>
       )}
 
@@ -90,12 +84,16 @@ export default function AdminConfiguracionPage() {
 
       {isLoading && !form.id ? (
         <div className="p-12 flex items-center justify-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-catador-blue" />
-          <span className="text-xs font-bold text-slate-500">Cargando configuración del negocio...</span>
+          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+          <span className="text-xs font-bold text-slate-500">Cargando configuración...</span>
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-6 text-xs">
-          <ConfigIdentidadSection form={form} onChange={handleChange} onQuickSave={handleQuickSaveLogo} />
+        <form onSubmit={handleSubmit} className="space-y-5 text-xs">
+          <ConfigIdentidadSection
+            form={form}
+            onChange={handleChange}
+            onQuickSave={handleQuickSaveLogo}
+          />
           <ConfigDeliverySection form={form} onChange={handleChange} />
           <ConfigCatalogoSection form={form} onChange={handleChange} />
           <ConfigBancariaSection form={form} onChange={handleChange} />
@@ -105,7 +103,7 @@ export default function AdminConfiguracionPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 px-6 py-3 font-extrabold text-white text-xs shadow-md transition-all active:scale-[0.99] cursor-pointer"
+              className="flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 px-6 py-3 font-extrabold text-white text-xs transition-colors cursor-pointer"
             >
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               <span>{saving ? 'Guardando...' : 'Guardar Toda la Configuración'}</span>

@@ -3,12 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Wine, ShoppingBasket, Sandwich, Cookie, CupSoda, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Banner, Product, QuickCategory } from '@/types';
 import { getBanners, getQuickCategories } from '@/services/cms.service';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { convertUsdToVes, formatVes, DEFAULT_BCV_RATE } from '@/lib/currency';
+import { QuickCategoriesStrip } from './QuickCategoriesStrip';
 import { cn } from '@/lib/utils';
 
 interface HeroBannerProps {
@@ -17,27 +18,15 @@ interface HeroBannerProps {
   starProduct?: Product;
 }
 
-const ICON_MAP: Record<string, React.ElementType> = {
-  Wine,
-  CupSoda,
-  ShoppingBasket,
-  Cookie,
-  Sandwich,
-  Sparkles,
-};
-
-const DEFAULT_ACCENTS = [
-  { accentColor: 'group-hover:bg-amber-500 group-hover:text-white', badgeBg: 'bg-amber-100/70 text-amber-800' },
-  { accentColor: 'group-hover:bg-blue-600 group-hover:text-white', badgeBg: 'bg-blue-100/70 text-blue-800' },
-  { accentColor: 'group-hover:bg-emerald-600 group-hover:text-white', badgeBg: 'bg-emerald-100/70 text-emerald-800' },
-  { accentColor: 'group-hover:bg-cyan-600 group-hover:text-white', badgeBg: 'bg-cyan-100/70 text-cyan-800' },
-  { accentColor: 'group-hover:bg-rose-500 group-hover:text-white', badgeBg: 'bg-rose-100/70 text-rose-800' },
-  { accentColor: 'group-hover:bg-purple-600 group-hover:text-white', badgeBg: 'bg-purple-100/70 text-purple-800' },
-];
-
-export function HeroBanner({ initialBanner, initialQuickCategories, starProduct }: HeroBannerProps) {
+export function HeroBanner({
+  initialBanner,
+  initialQuickCategories,
+  starProduct,
+}: HeroBannerProps) {
   const [banner, setBanner] = useState<Banner | null>(initialBanner || null);
-  const [quickCategories, setQuickCategories] = useState<QuickCategory[]>(initialQuickCategories || []);
+  const [quickCategories, setQuickCategories] = useState<QuickCategory[]>(
+    initialQuickCategories || []
+  );
   const bcvRate = useBcvStore((state) => state.rateInfo?.rate ?? DEFAULT_BCV_RATE);
   const storeConfig = useStoreConfigStore((state) => state.config);
   const cmsLogo = storeConfig?.logo_url || '/logo-catador.svg';
@@ -65,201 +54,182 @@ export function HeroBanner({ initialBanner, initialQuickCategories, starProduct 
     };
   }, []);
 
-
-
-  const titulo = banner?.titulo || 'Los Mejores Licores y Víveres Directo a tu Puerta';
+  const titulo =
+    banner?.titulo || 'Licores Importados y Víveres al Precio Oficial en Barinas';
   const subtitulo =
     banner?.subtitulo ||
-    'Catálogo completo con precios duales en Dólares ($ USD) y Bolívares (Bs. BCV). Despachos rápidos en toda la ciudad de Barinas.';
-  const badge = banner?.badge_texto || '★ DISTRIBUIDORA & BODEGÓN OFICIAL';
+    'Inventario real sincronizado con Depósito 01 (Av. 23 de Enero). Compra por unidad o por caja cerrada en Dólares ($ USD) y Bolívares (Bs. BCV).';
   const botonTexto = banner?.boton_texto || 'Ver Ofertas del Día';
   const botonUrl = banner?.boton_url || '/catalogo';
 
-  // Verificación de promo activa según configuración CMS
   const hasPromo = Boolean(
     banner?.promo_titulo &&
       banner.promo_titulo.trim() !== '' &&
       banner.promo_titulo.trim() !== '0'
   );
-  const promoTitulo = banner?.promo_titulo || '';
   const promoPrecio =
     banner?.promo_precio !== undefined && banner?.promo_precio !== null
       ? Number(banner.promo_precio)
       : null;
-  const promoAhorro = banner?.promo_ahorro && banner.promo_ahorro !== '0' ? banner.promo_ahorro : '';
-  const promoBadge = banner?.promo_badge && banner.promo_badge !== '0' ? banner.promo_badge : '';
 
-  // Datos del producto estrella real desde FoxData
   const rawStarImg = starProduct?.images?.[0];
   const isStarNoImg =
-    !rawStarImg ||
-    rawStarImg === '/logo-catador.svg' ||
-    rawStarImg.includes('logo');
+    !rawStarImg || rawStarImg === '/logo-catador.svg' || rawStarImg.includes('logo');
   const starImage = isStarNoImg ? cmsLogo : rawStarImg;
 
   return (
-    <div className="space-y-6">
-      {/* Banner Principal con Degradado Azul Rey y Showcase Visual */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-catador-blue via-[#002e9e] to-catador-blue-dark p-6 sm:p-8 md:p-10 text-white shadow-xl border border-blue-800/40">
-        {/* Imagen de fondo desde CMS si está configurada */}
+    <div className="space-y-3 sm:space-y-4">
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-catador-blue p-4 sm:p-8 lg:p-10 text-white border border-blue-950">
         {banner?.imagen_url && (
           <div
-            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay"
+            className="absolute inset-0 bg-cover bg-center opacity-20"
             style={{ backgroundImage: `url(${banner.imagen_url})` }}
           />
         )}
 
-        {/* Adornos visuales de luz */}
-        <div className="pointer-events-none absolute -right-20 -top-20 h-96 w-96 rounded-full bg-white/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-20 -bottom-20 h-80 w-80 rounded-full bg-catador-amber/20 blur-3xl" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-          {/* Columna Izquierda: Información Principal */}
-          <div className="max-w-xl space-y-4 text-center lg:text-left flex-1">
-            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-catador-amber px-3 py-1 text-xs font-black uppercase tracking-wider text-white shadow-xs">
-                <Sparkles className="h-3.5 w-3.5" />
-                {badge}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 backdrop-blur-md px-3 py-1 text-xs font-semibold text-blue-100 border border-white/15">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                Despachos activos Barinas
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-center">
+          {/* Columna Editorial Izquierda */}
+          <div className="lg:col-span-7 space-y-3 sm:space-y-5 text-left min-w-0">
+            <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-lg bg-blue-950/75 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-bold text-blue-100 border border-blue-800/80 max-w-full">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
+              <span className="truncate">Depósito 01 • Barinas</span>
+              <span className="text-amber-300 font-black tabular-nums">
+                BCV Bs. {bcvRate.toFixed(2)}
               </span>
             </div>
 
-            <h1 className="text-[clamp(1.5rem,4vw,3rem)] font-black tracking-tight leading-[1.12]">
+            <h1 className="text-[clamp(1.35rem,4vw,2.75rem)] font-black tracking-[-0.03em] leading-[1.1] text-white max-w-2xl">
               {titulo}
             </h1>
 
-            <p className="text-xs sm:text-sm text-blue-100 max-w-lg mx-auto lg:mx-0 leading-relaxed">
+            <p className="text-xs sm:text-base text-blue-100/95 max-w-xl leading-relaxed line-clamp-3 sm:line-clamp-none">
               {subtitulo}
             </p>
 
-            <div className="pt-2 flex flex-col xs:flex-row flex-wrap items-center justify-center lg:justify-start gap-2.5 sm:gap-3">
+            <div className="pt-1 grid grid-cols-2 xs:flex xs:flex-wrap items-center gap-2 sm:gap-3">
               <Link
                 href={botonUrl}
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white min-h-[44px] px-5 sm:px-6 py-3 text-xs sm:text-sm font-black text-catador-blue shadow-lg hover:bg-slate-100 hover:shadow-xl transition-all"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-catador-amber hover:bg-catador-amber-dark min-h-[44px] px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-black text-white transition-colors text-center"
               >
-                {botonTexto} <ArrowRight className="h-4 w-4" />
+                <span className="truncate">{botonTexto}</span>
+                <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
               </Link>
               <Link
                 href="/catalogo"
-                className="w-full xs:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 min-h-[44px] px-5 sm:px-6 py-3 text-xs sm:text-sm font-bold text-white backdrop-blur-sm transition-all"
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-slate-100 min-h-[44px] px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-black text-catador-blue transition-colors text-center"
               >
-                Explorar Catálogo
+                <span className="truncate">Catálogo</span>
               </Link>
             </div>
           </div>
 
-          {/* Columna Derecha: Tarjeta de Promo CMS o Showcase Real desde FoxData */}
-          {hasPromo ? (
-            <div className="relative shrink-0 flex flex-col items-center justify-center rounded-2xl bg-white/15 backdrop-blur-md border border-white/25 p-6 text-center w-full sm:w-auto min-w-[220px] max-w-xs shadow-2xl">
-              <span className="text-xs font-extrabold text-catador-amber uppercase tracking-wider">
-                {promoTitulo}
-              </span>
-              {promoPrecio !== null && promoPrecio > 0 && (
-                <div className="mt-2 text-center">
-                  <p className="text-3xl font-black text-white">${promoPrecio.toFixed(2)}</p>
-                  <p className="text-xs font-extrabold text-amber-300">
-                    {formatVes(convertUsdToVes(promoPrecio, bcvRate))}
-                  </p>
-                </div>
-              )}
-              {promoAhorro && (
-                <span className="mt-1 text-xs text-blue-100 font-medium">{promoAhorro}</span>
-              )}
-              {promoBadge && (
-                <span className="mt-3 rounded-lg bg-catador-amber px-3.5 py-1 text-xs font-extrabold text-white shadow-xs">
-                  {promoBadge}
-                </span>
-              )}
-            </div>
-          ) : starProduct ? (
-            <div className="relative shrink-0 w-full max-w-sm rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-4 sm:p-5 shadow-2xl flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] sm:text-[11px] font-extrabold text-amber-300 uppercase tracking-wider truncate">
-                  ★ DESTACADO EN INVENTARIO
-                </span>
-                <span className="text-[10px] font-bold bg-catador-amber text-white px-2 py-0.5 rounded-full shrink-0">
-                  Stock Disponible
-                </span>
-              </div>
-
-              <div className="relative h-40 sm:h-44 w-full rounded-xl overflow-hidden bg-slate-900/40 flex items-center justify-center">
-                <Image
-                  src={starImage}
-                  alt={starProduct.name}
-                  fill
-                  sizes="(max-width: 640px) 90vw, 360px"
-                  className={cn(
-                    'object-contain',
-                    isStarNoImg ? 'p-8 opacity-80' : 'object-cover'
-                  )}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-end justify-between gap-2">
-                  <div className="max-w-[62%] min-w-0">
-                    <p className="text-xs font-black text-white leading-tight line-clamp-1">
-                      {starProduct.name}
-                    </p>
-                    <p className="text-[10px] text-amber-300 font-bold truncate">
-                      {starProduct.brand || 'Gran Catador'}
+          {/* Columna Derecha: Pieza Real del Inventario (Compacta en Móvil, Editorial en Desktop) */}
+          <div className="lg:col-span-5 flex justify-center lg:justify-end min-w-0">
+            {hasPromo ? (
+              <div className="w-full lg:max-w-sm rounded-2xl bg-blue-950/80 border border-blue-800 p-4 sm:p-6 space-y-2">
+                <p className="text-xs font-bold text-amber-300">{banner?.promo_titulo}</p>
+                {promoPrecio !== null && promoPrecio > 0 && (
+                  <div className="tabular-nums">
+                    <p className="text-2xl sm:text-3xl font-black text-white">${promoPrecio.toFixed(2)}</p>
+                    <p className="text-xs font-bold text-blue-200 mt-0.5">
+                      {formatVes(convertUsdToVes(promoPrecio, bcvRate))}
                     </p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-base font-black text-white leading-tight">
-                      ${starProduct.priceUsd.toFixed(2)}
-                    </p>
-                    <p className="text-[10px] font-extrabold text-amber-300 font-mono">
-                      {formatVes(convertUsdToVes(starProduct.priceUsd, bcvRate))}
-                    </p>
-                  </div>
-                </div>
+                )}
+                {banner?.promo_ahorro && banner.promo_ahorro !== '0' && (
+                  <p className="text-xs text-blue-100">{banner.promo_ahorro}</p>
+                )}
               </div>
-
+            ) : starProduct ? (
               <Link
                 href={`/producto/${starProduct.id}${starProduct.codGrupo ? `?grupo=${starProduct.codGrupo}` : ''}`}
-                className="w-full min-h-[40px] flex items-center justify-center py-2 text-xs font-extrabold rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+                className="group w-full lg:max-w-sm rounded-2xl bg-white text-slate-900 p-3 sm:p-5 border border-slate-200 transition-transform duration-200 hover:-translate-y-0.5 min-w-0"
               >
-                Ver detalle y comprar →
+                {/* Vista Compacta Horizontal en Móvil/Tablet (< 1024px) */}
+                <div className="flex items-center gap-3 lg:hidden min-w-0">
+                  <div className="relative h-16 w-16 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden p-1.5">
+                    <Image
+                      src={starImage}
+                      alt={starProduct.name}
+                      fill
+                      sizes="64px"
+                      className={cn(
+                        'object-contain',
+                        isStarNoImg ? 'p-2 opacity-80' : ''
+                      )}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded tabular-nums">
+                        ★ Destacado • {starProduct.stockQuantity} disp.
+                      </span>
+                    </div>
+                    <h2 className="text-xs font-extrabold text-slate-900 truncate mt-0.5">
+                      {starProduct.name}
+                    </h2>
+                    <div className="flex items-baseline gap-2 mt-0.5 tabular-nums">
+                      <span className="text-sm font-black text-catador-blue">
+                        ${starProduct.priceUsd.toFixed(2)}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-500 truncate">
+                        {formatVes(convertUsdToVes(starProduct.priceUsd, bcvRate))}
+                      </span>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-4 w-4 text-catador-blue shrink-0" />
+                </div>
+
+                {/* Vista Editorial Completa en Escritorio (>= 1024px) */}
+                <div className="hidden lg:block">
+                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <span className="text-xs font-extrabold text-slate-900 truncate">
+                      {starProduct.brand || 'Selección Gran Catador'}
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md tabular-nums shrink-0">
+                      {starProduct.stockQuantity} und en stock
+                    </span>
+                  </div>
+
+                  <div className="relative h-40 w-full my-3 rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden p-3">
+                    <Image
+                      src={starImage}
+                      alt={starProduct.name}
+                      fill
+                      sizes="340px"
+                      className={cn(
+                        'object-contain transition-transform duration-200 group-hover:scale-105',
+                        isStarNoImg ? 'p-6 opacity-80' : ''
+                      )}
+                    />
+                  </div>
+
+                  <div className="flex items-end justify-between gap-3 pt-2 border-t border-slate-100">
+                    <div className="min-w-0 flex-1">
+                      <h2 className="text-sm font-extrabold text-slate-900 line-clamp-1 group-hover:text-catador-blue transition-colors">
+                        {starProduct.name}
+                      </h2>
+                      <span className="text-[11px] font-bold text-catador-blue inline-flex items-center gap-1 mt-0.5">
+                        Comprar por unidad o caja <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </div>
+                    <div className="text-right shrink-0 tabular-nums">
+                      <p className="text-lg font-black text-slate-900 leading-none">
+                        ${starProduct.priceUsd.toFixed(2)}
+                      </p>
+                      <p className="text-[11px] font-bold text-slate-500 mt-1">
+                        {formatVes(convertUsdToVes(starProduct.priceUsd, bcvRate))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </Link>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </div>
       </div>
 
-      {/* Tira Circular de Categorías Rápidas Oficiales Editables en CMS */}
-      {quickCategories.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {quickCategories.map((cat, idx) => {
-            const Icon = ICON_MAP[cat.icono] || Wine;
-            const style = DEFAULT_ACCENTS[idx % DEFAULT_ACCENTS.length];
-            return (
-              <Link
-                key={cat.id || cat.nombre}
-                href={cat.url}
-                className="group flex flex-col items-center justify-center gap-2 rounded-2xl bg-white p-3.5 border border-slate-200/90 shadow-2xs hover:border-catador-blue/50 hover:shadow-card hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-catador-blue transition-colors duration-200 ${style.accentColor}`}
-                >
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div className="text-center">
-                  <span className="block text-xs font-extrabold text-slate-800 group-hover:text-catador-blue transition-colors">
-                    {cat.nombre}
-                  </span>
-                  <span
-                    className={`inline-block mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${style.badgeBg}`}
-                  >
-                    {cat.descripcion}
-                  </span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      <QuickCategoriesStrip categories={quickCategories} />
     </div>
   );
 }

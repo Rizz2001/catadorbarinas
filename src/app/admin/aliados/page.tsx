@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Award, Plus, Trash2, Save, HelpCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Save, HelpCircle, Loader2, CheckCircle2 } from 'lucide-react';
 import { AlliedBrand, FaqItem } from '@/types';
 import {
   getAlliedBrands,
@@ -98,29 +98,27 @@ export default function AdminAliadosFaqPage() {
   };
 
   return (
-    <main className="p-4 sm:p-6 space-y-6 max-w-5xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-catador-blue text-white">
-            <Award className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">
-              Empresas Aliadas y Preguntas Frecuentes (FAQ)
-            </h1>
-            <p className="text-xs text-slate-500">
-              Gestiona los logotipos de empresas aliadas en portada y el centro de ayuda al cliente
-            </p>
-          </div>
+    <main className="p-4 sm:p-6 space-y-5 max-w-5xl">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200/90 pb-4">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-400">
+            Confianza Comercial &amp; Soporte
+          </span>
+          <h1 className="text-xl font-black text-slate-900 tracking-[-0.025em] mt-0.5">
+            Empresas Aliadas y Preguntas Frecuentes (FAQ)
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Gestiona las marcas distribuidoras oficiales en portada y el centro de ayuda al cliente
+          </p>
         </div>
 
-        <div className="flex gap-1.5 bg-slate-200/70 p-1 rounded-xl self-start">
+        <div className="flex gap-1 bg-slate-200/70 p-1 rounded-xl self-start">
           <button
             type="button"
             onClick={() => setActiveTab('brands')}
             className={cn(
-              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer',
-              activeTab === 'brands' ? 'bg-white text-catador-blue shadow-xs' : 'text-slate-600'
+              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer tabular-nums',
+              activeTab === 'brands' ? 'bg-white text-slate-900 border border-slate-200/80' : 'text-slate-600 hover:text-slate-900'
             )}
           >
             Empresas Aliadas ({brands.length})
@@ -129,8 +127,8 @@ export default function AdminAliadosFaqPage() {
             type="button"
             onClick={() => setActiveTab('faq')}
             className={cn(
-              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer',
-              activeTab === 'faq' ? 'bg-white text-catador-blue shadow-xs' : 'text-slate-600'
+              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer tabular-nums',
+              activeTab === 'faq' ? 'bg-white text-slate-900 border border-slate-200/80' : 'text-slate-600 hover:text-slate-900'
             )}
           >
             Preguntas Frecuentes ({faqs.length})

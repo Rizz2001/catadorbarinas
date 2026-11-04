@@ -99,11 +99,11 @@ export function UserNavMenu() {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-slate-200 bg-white px-2.5 sm:px-3 py-1.5 min-h-[44px] text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors shadow-2xs"
+        className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-10 sm:min-h-[42px] text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors"
       >
-        <User className="h-3.5 w-3.5" />
+        <User className="h-3.5 w-3.5 shrink-0" />
         <span className="hidden sm:inline">Iniciar Sesión</span>
-        <span className="sm:hidden">Entrar</span>
+        <span className="sm:hidden text-[11px]">Entrar</span>
       </Link>
     );
   }
@@ -116,14 +116,16 @@ export function UserNavMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-1.5 min-h-[44px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer shadow-2xs"
+        className="flex items-center gap-1.5 sm:gap-2 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-10 sm:min-h-[42px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer"
       >
-        <div className="h-6 w-6 rounded-full bg-catador-blue text-white flex items-center justify-center text-[10px] font-black uppercase">
+        <div className="h-6 w-6 shrink-0 rounded-full bg-catador-blue text-white flex items-center justify-center text-[10px] font-black uppercase">
           {displayName.charAt(0)}
         </div>
-        <span className="max-w-[110px] truncate">{displayName}</span>
+        <span className="max-w-[64px] xs:max-w-[85px] sm:max-w-[110px] truncate text-[11px] sm:text-xs">
+          {displayName}
+        </span>
         {isAdmin && (
-          <span className="bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">
+          <span className="hidden md:inline-block bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black px-1.5 py-0.2 rounded-full uppercase">
             Admin
           </span>
         )}

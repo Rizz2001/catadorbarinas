@@ -47,20 +47,47 @@ export function CatalogFiltersBar({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-3 sm:px-4 rounded-xl border border-slate-200/80 shadow-2xs">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-bold text-slate-700">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-2xs min-w-0 max-w-full overflow-hidden">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-bold text-slate-700 tabular-nums truncate">
           Mostrando {displayedCount} de {totalCount} productos
         </span>
+
+        {/* Acciones rápidas en móvil en la fila superior */}
+        <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => onToggleInStock(!onlyInStock)}
+            className={cn(
+              'flex items-center gap-1 px-2.5 py-1.5 min-h-[34px] rounded-lg text-[11px] font-semibold border transition-all cursor-pointer',
+              onlyInStock
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200'
+                : 'bg-slate-50 text-slate-600 border-slate-200'
+            )}
+          >
+            <PackageCheck className="h-3.5 w-3.5 shrink-0" />
+            <span>En Stock</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleShareCategory}
+            title="Compartir esta categoría por WhatsApp"
+            aria-label="Compartir categoría por WhatsApp"
+            className="flex items-center justify-center h-[34px] w-[34px] rounded-lg bg-emerald-600 text-white shadow-2xs cursor-pointer"
+          >
+            <Share2 className="h-3.5 w-3.5 shrink-0" />
+          </button>
+        </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Toggle Solo en Stock */}
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 min-w-0">
+        {/* Toggle Solo en Stock (Desktop) */}
         <button
           type="button"
           onClick={() => onToggleInStock(!onlyInStock)}
           className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold border transition-all cursor-pointer',
+            'hidden lg:flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold border transition-all cursor-pointer',
             onlyInStock
               ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200'
               : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
@@ -72,13 +99,13 @@ export function CatalogFiltersBar({
 
         {/* Filtro por Rango de Precio USD */}
         {onPriceRangeChange && (
-          <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2.5 py-1 min-h-[38px] rounded-lg">
+          <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2 sm:px-2.5 py-1 min-h-[38px] rounded-lg min-w-0">
             <DollarSign className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
             <select
               value={priceRange}
               onChange={(e) => onPriceRangeChange(e.target.value as PriceRangeFilter)}
               aria-label="Filtrar por rango de precios"
-              className="bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+              className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
             >
               <option value="all">Todos los precios</option>
               <option value="under_5">Menos de $5.00</option>
@@ -90,36 +117,36 @@ export function CatalogFiltersBar({
         )}
 
         {/* Selector de Orden */}
-        <div className="flex items-center gap-1.5 border border-slate-200 bg-slate-50 px-2.5 py-1 min-h-[38px] rounded-lg">
+        <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2 sm:px-2.5 py-1 min-h-[38px] rounded-lg min-w-0">
           <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
             aria-label="Ordenar productos"
-            className="bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+            className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
           >
-            <option value="default">Por Disponibilidad</option>
+            <option value="default">Disponibilidad</option>
             <option value="price_asc">Menor Precio ($)</option>
             <option value="price_desc">Mayor Precio ($)</option>
             <option value="name_asc">Nombre (A-Z)</option>
           </select>
         </div>
 
-        {/* Compartir Categoría */}
+        {/* Compartir Categoría (Desktop) */}
         <button
           type="button"
           onClick={handleShareCategory}
           title="Compartir esta categoría por WhatsApp"
-          className="flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+          className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
         >
           <Share2 className="h-3.5 w-3.5 shrink-0" />
-          <span className="hidden xs:inline">Compartir</span>
+          <span>Compartir</span>
         </button>
 
         <button
           type="button"
           onClick={handleCopyLink}
-          className="px-3 py-1.5 min-h-[38px] rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+          className="hidden sm:flex items-center justify-center px-3 py-1.5 min-h-[38px] rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
         >
           {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : 'Copiar URL'}
         </button>

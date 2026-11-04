@@ -25,15 +25,16 @@ const FOXDATA_HEADERS: Record<string, string> = {
  */
 async function fetchWithRetry(
   url: string,
-  options: RequestInit & { next?: { revalidate?: number } },
+  options: RequestInit,
   retries = 2,
-  timeoutMs = 7000
+  timeoutMs = 8000
 ): Promise<Response> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const res = await fetch(url, {
         ...options,
+        cache: 'no-store',
         signal: AbortSignal.timeout(timeoutMs),
       });
       return res;
@@ -50,13 +51,13 @@ async function fetchWithRetry(
 /**
  * Obtiene o reutiliza el Bearer Token OAuth2 de FoxData con deduplicación de promesas en vuelo
  */
-async function getFoxDataToken(): Promise<string> {
+async function getFoxDataToken(forceRefresh = false): Promise<string> {
   const now = Date.now();
-  if (cachedToken && cachedToken.expiresAt > now + 60000) {
+  if (!forceRefresh && cachedToken && cachedToken.expiresAt > now + 60000) {
     return cachedToken.token;
   }
 
-  if (inflightTokenPromise) {
+  if (!forceRefresh && inflightTokenPromise) {
     return inflightTokenPromise;
   }
 
@@ -84,10 +85,9 @@ async function getFoxDataToken(): Promise<string> {
             ...FOXDATA_HEADERS,
           },
           body: params.toString(),
-          next: { revalidate: 3000 },
         },
         2,
-        6000
+        7000
       );
 
       if (!res.ok) {
@@ -129,6 +129,42 @@ const memorySubgroupsCache = new Map<
 >();
 
 /**
+ * Ejecuta una petición GET autenticada contra FoxData, renovando automáticamente el token si recibe 401
+ */
+async function fetchFoxDataAuthenticated(url: string, timeoutMs = 9000): Promise<Response> {
+  let token = await getFoxDataToken(false);
+  let res = await fetchWithRetry(
+    url,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        ...FOXDATA_HEADERS,
+      },
+    },
+    2,
+    timeoutMs
+  );
+
+  if (res.status === 401) {
+    cachedToken = null;
+    token = await getFoxDataToken(true);
+    res = await fetchWithRetry(
+      url,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          ...FOXDATA_HEADERS,
+        },
+      },
+      2,
+      timeoutMs
+    );
+  }
+
+  return res;
+}
+
+/**
  * Obtiene los grupos de inventario reales de SmartVentas (Cache 5 min)
  */
 export async function fetchGruposInv() {
@@ -138,19 +174,7 @@ export async function fetchGruposInv() {
   }
 
   try {
-    const token = await getFoxDataToken();
-    const res = await fetchWithRetry(
-      `${API_BASE}/api/v1/syn/gruposinv`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...FOXDATA_HEADERS,
-        },
-        next: { revalidate: 300 },
-      },
-      2,
-      5000
-    );
+    const res = await fetchFoxDataAuthenticated(`${API_BASE}/api/v1/syn/gruposinv`, 6000);
     if (!res.ok) return DEFAULT_GROUPS;
     const json = await res.json();
     const list = json.data || json || [];
@@ -176,18 +200,9 @@ export async function fetchSubgruposInv(codGrupo: string) {
   }
 
   try {
-    const token = await getFoxDataToken();
-    const res = await fetchWithRetry(
+    const res = await fetchFoxDataAuthenticated(
       `${API_BASE}/api/v1/syn/gruposinvsub/grupo/${codGrupo}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          ...FOXDATA_HEADERS,
-        },
-        next: { revalidate: 300 },
-      },
-      2,
-      5000
+      6000
     );
     if (!res.ok) return DEFAULT_SUBGROUPS[codGrupo] || [];
     const json = await res.json();
@@ -216,18 +231,9 @@ export async function fetchExistenciasBodegonMap(): Promise<Map<string, number>>
   inflightExistenciasPromise = (async () => {
     const map = new Map<string, number>();
     try {
-      const token = await getFoxDataToken();
-      const res = await fetchWithRetry(
+      const res = await fetchFoxDataAuthenticated(
         `${API_BASE}/api/v1/syn/existencias/deposito/${DEPOSITO_BODEGON}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...FOXDATA_HEADERS,
-          },
-          next: { revalidate: 120 },
-        },
-        2,
-        7000
+        9000
       );
       if (!res.ok) return map;
       const json = await res.json();
@@ -268,21 +274,8 @@ async function fetchRawGroupArticulos(codGrupo: string): Promise<RawFoxDataProdu
 
   const promise = (async () => {
     try {
-      const token = await getFoxDataToken();
       const url = `${API_BASE}/api/v1/syn/articulos/grupo/${codGrupo}`;
-
-      const articulosRes = await fetchWithRetry(
-        url,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            ...FOXDATA_HEADERS,
-          },
-          next: { revalidate: 120 },
-        },
-        2,
-        8000
-      );
+      const articulosRes = await fetchFoxDataAuthenticated(url, 10000);
 
       if (!articulosRes.ok) {
         return [];

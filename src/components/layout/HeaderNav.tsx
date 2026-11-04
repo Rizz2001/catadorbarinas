@@ -10,19 +10,19 @@ export function HeaderNav() {
   const [isDeptOpen, setIsDeptOpen] = useState(false);
 
   return (
-    <nav className="bg-catador-blue text-white shadow-md relative z-30">
-      <div className="container mx-auto px-4 flex items-center justify-between">
+    <nav className="bg-catador-blue text-white relative z-30 border-b border-blue-950">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-4 flex items-center justify-between gap-2">
         {/* Botón Comprar por Departamento */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setIsDeptOpen(!isDeptOpen)}
-            className="flex items-center gap-2.5 bg-catador-amber hover:bg-catador-amber-dark text-white px-4 py-3 min-h-[44px] text-xs sm:text-sm font-bold uppercase tracking-wider transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 sm:gap-2 bg-catador-amber hover:bg-catador-amber-dark text-white px-3 sm:px-4 py-2 sm:py-2.5 min-h-[38px] sm:min-h-[42px] text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
           >
-            <Menu className="h-4 w-4" />
+            <Menu className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
             <span>Departamentos</span>
             <ChevronDown
-              className={cn('h-4 w-4 transition-transform duration-200', isDeptOpen && 'rotate-180')}
+              className={cn('h-3.5 w-3.5 transition-transform duration-200 shrink-0', isDeptOpen && 'rotate-180')}
             />
           </button>
 
@@ -73,8 +73,8 @@ export function HeaderNav() {
           )}
         </div>
 
-        {/* Enlaces Rápidos de Navegación (Deslizables en Tablet/Móvil + Fijos en Desktop) */}
-        <div className="hidden sm:flex items-center gap-4 lg:gap-6 text-xs font-semibold overflow-x-auto scrollbar-none whitespace-nowrap px-2">
+        {/* Enlaces Rápidos de Navegación (Deslizables en Móvil y Fijos en Desktop) */}
+        <div className="flex items-center gap-3 sm:gap-5 lg:gap-6 text-[11px] sm:text-xs font-semibold overflow-x-auto scrollbar-none whitespace-nowrap px-1 min-w-0 flex-1">
           <Link href="/catalogo/01" className="hover:text-catador-amber transition-colors py-1">
             Licores
           </Link>
@@ -90,18 +90,18 @@ export function HeaderNav() {
           <Link href="/catalogo/05" className="hover:text-catador-amber transition-colors py-1 hidden md:inline">
             Confitería
           </Link>
-          <Link href="/catalogo" className="hover:text-catador-amber transition-colors font-bold text-catador-amber py-1">
-            Ver Todo el Catálogo
+          <Link href="/catalogo" className="hover:text-catador-amber transition-colors font-bold text-amber-300 py-1">
+            Catálogo
           </Link>
         </div>
 
         {/* Botón Ofertas del Día Destacado */}
         <Link
-          href="#ofertas"
-          className="flex items-center gap-1.5 bg-catador-blue-light/70 hover:bg-catador-blue-light text-white text-xs font-extrabold px-3 py-2 min-h-[44px] rounded-lg border border-catador-amber/40 transition-colors shrink-0"
+          href="/#ofertas"
+          className="hidden xs:flex items-center gap-1.5 bg-catador-blue-light/70 hover:bg-catador-blue-light text-white text-[11px] sm:text-xs font-extrabold px-2.5 sm:px-3 py-1.5 min-h-[34px] sm:min-h-[38px] rounded-lg border border-catador-amber/40 transition-colors shrink-0"
         >
-          <Flame className="h-4 w-4 text-catador-amber fill-catador-amber shrink-0" />
-          <span className="whitespace-nowrap">Ofertas del Día</span>
+          <Flame className="h-3.5 w-3.5 text-catador-amber fill-catador-amber shrink-0" />
+          <span className="whitespace-nowrap">Ofertas</span>
         </Link>
       </div>
     </nav>

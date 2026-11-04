@@ -1,25 +1,30 @@
 ---
 name: catador-ecommerce-ui
 description: >-
-  Sistema de diseño UI/UX de alta densidad, identidad de marca y reglas de negocio bimonetarias
-  para Gran Catador / Distribuidora Bodegón del Catador. Utilizar en el desarrollo de vistas,
-  componentes, banners, tarjetas de producto y carritos.
+  Sistema de diseño UI/UX de alta densidad, dirección de arte Taste Skill (Anti-Slop), identidad
+  de marca y reglas de negocio bimonetarias para Gran Catador / Distribuidora Bodegón del Catador.
+  Utilizar en el desarrollo de vistas, componentes, banners, tarjetas de producto y carritos.
 ---
 
-# Gran Catador / Distribuidora Bodegón del Catador - UI/UX & Sistema de Diseño
+# Gran Catador / Distribuidora Bodegón del Catador - UI/UX & Taste Skill System
 
-Manual maestro de diseño visual y experiencia de usuario e-commerce para **Gran Catador / Distribuidora Bodegón del Catador**.
+Manual maestro de diseño visual, dirección de arte **Taste Skill (`design-taste-frontend`)** y experiencia de usuario e-commerce para **Gran Catador / Distribuidora Bodegón del Catador**.
 
 ---
 
-## 1. Estética e Identidad Visual (Retail High-Density)
-- **Estilo:** Mobile-First, retail/supermercado y bodegón premium de alta densidad visual (inspirado en el layout de referencia Digitaz), con navegación veloz, contrastes nítidos y carga instantánea.
-- **Paleta de Colores Oficial (extraída directamente del logo de Bodegón del Catador):**
-  - **`catador-blue` (Primary):** `#00227B` (Azul Rey profundo para la barra de navegación de departamentos, bordes de secciones destacadas, botones de compra principales y cabeceras).
-  - **`catador-blue-light` (Hover/Gradient):** `#0A38A8` (Azul vibrante para estados activos/hover y degradados radiales de los banners principales).
-  - **`catador-amber` (Accent/Barril):** `#E07A1F` con hover `#C85A08` (Naranja/Ámbar madera extraído del barril de roble del logo; usado para contadores regresivos de ofertas, badges de stock, estrellas de valoración y CTAs secundarios).
-  - **`discount-red` (Alerta/Oferta):** `#EF4444` (Rojo vibrante para etiquetas de porcentaje de descuento como `-20%`, `-35%`).
-  - **`bg-surface`:** `#F8FAFC` (`slate-50`) para el fondo general del sitio, proporcionando máximo contraste contra las tarjetas de producto en blanco puro (`#FFFFFF`) con bordes sutiles `border-slate-200`.
+## 1. Dirección de Arte & Reglas "Anti-Slop" (`design-taste-frontend`)
+1. **Paleta Disciplinada (Un Fondo, Una Tinta, Dos Acentos de Marca):**
+   - **`bg-surface` (Fondo):** `#F8FAFC` (`slate-50`) para el lienzo general y `#FFFFFF` para tarjetas de producto y contenedores.
+   - **`ink` (Tinta Principal):** `#0F172A` (`slate-900`) para títulos y datos clave; `#475569` (`slate-600`) para textos de soporte.
+   - **`catador-blue` (Primary):** `#00227B` y `#0A38A8` (Azul Rey oficial de Gran Catador).
+   - **`catador-amber` (Accent/Barril):** `#E07A1F` y `#C85A08` (Ámbar roble oficial).
+   - **`discount-red` (Oferta):** `#EF4444` exclusivamente para descuentos reales.
+   - **Prohibido el "Confeti de Colores IA":** No usar cajas de iconos con colores aleatorios (morado, rosado, cian, verde neón) que rompan la sobriedad del bodegón.
+2. **Cero Ornamentos Artificiales (House Rules Adaptadas):**
+   - **Sin "Blobs" de Luz Difuminados:** Prohibido colocar círculos difuminados (`blur-3xl`) decorativos en fondos.
+   - **Los Datos y la Tipografía Mandan (KPIs are Type, not Tiles):** Evitar repetir el cliché de un icono encerrado en un cuadrito de color junto a cada título de sección. Usar jerarquía tipográfica firme (`tracking-[-0.025em]`), líneas arquitectónicas limpias y cifras reales.
+   - **Superficies en Reposo Planas y Nítidas:** Las tarjetas en reposo se separan por un paso de tono (`#F8FAFC` vs `#FFFFFF`) y un borde nítido de `1px` (`border-slate-200`), reservando la elevación para estados `hover` o modales flotantes.
+   - **Precisión Numérica Tabular (`tabular-nums`):** Todo precio (`$ USD` y `Bs. BCV`), contador de tiempo, stock o código de orden debe renderizarse con `tabular-nums` para alineación vertical perfecta.
 
 ---
 
@@ -27,34 +32,26 @@ Manual maestro de diseño visual y experiencia de usuario e-commerce para **Gran
 El e-commerce opera bajo la realidad comercial de Venezuela:
 1. **Prohibido terminantemente mostrar precios en una sola moneda.**
 2. **Jerarquía Visual en Fichas de Producto y Carrito:**
-   - **Precio en Dólares ($ USD):** Valor principal en negrita prominente (`text-base` o `text-lg` en `font-bold`). Color rojo `#EF4444` si tiene descuento, o `#0F172A` si es precio regular.
-   - **Precio en Bolívares (Bs. / VES):** Justo debajo en tipografía compacta (`text-xs font-semibold text-slate-600`), calculado en tiempo real con la tasa oficial del BCV.
+   - **Precio en Dólares ($ USD):** Valor principal en negrita prominente (`font-black tabular-nums tracking-tight`). Color rojo `#EF4444` si tiene descuento, o `#0F172A` si es precio regular.
+   - **Precio en Bolívares (Bs. / VES):** Justo debajo en tipografía compacta (`text-xs font-bold tabular-nums text-slate-600`), calculado en tiempo real con la tasa oficial del BCV.
 3. **Formateo Estricto de Números:**
    - **USD:** Formato con punto decimal y coma para miles (ej. `$12.50`, `$1,250.00`).
    - **Bolívares:** Formato venezolano con coma decimal y punto para miles (ej. `Bs. 545,25`, `Bs. 54.521,75`).
-4. **Helper Centralizado:** Todo componente debe utilizar `formatPrices(priceUsd, bcvRate)` o `formatDiscountedPrices(...)` de `src/lib/currency.ts`.
+4. **Helper Centralizado:** Todo componente debe utilizar `formatPrices(priceUsd, bcvRate)` de `src/lib/currency.ts`.
 
 ---
 
-## 3. Anatomía Visual de la Página de Inicio (Layout Digitaz)
+## 3. Anatomía Visual de la Página de Inicio
 1. **Header de 3 Niveles:**
-   - *Top Bar:* Enlaces rápidos, soporte y Badge interactivo con la **Tasa BCV Oficial del día**.
-   - *Main Header:* Logotipo a la izquierda, buscador central amplio redondeado (`rounded-full`) con selector de categorías/departamentos integrado, iconos de usuario, lista de deseos y disparador del Carrito (`CartTrigger`) con badge numérico y monto total en USD.
-   - *Bottom Nav (Azul Rey `#00227B`):* Botón "Comprar por Departamento" con menú desplegable, enlaces directos a categorías y botón con animación *"🔥 Ofertas del Día"*.
-2. **Hero Section & Accesos Rápidos:**
-   - Banner principal con degradado Azul Catador (`#00227B` a `#0A38A8`), copys de impacto, precio destacado en ámbar y CTA blanco.
-   - Fila horizontal de iconos circulares para categorías rápidas (Licores, Víveres, Charcutería, Carnicería, Snacks, Refrescos).
-   - Grid de 3 banners promocionales secundarios.
-3. **Sección "Ofertas Destacadas del Día" (Today's Featured Deals):**
-   - Marco contenedor con borde grueso azul (`border-2 border-[#00227B] rounded-2xl bg-white p-4 shadow-sm`).
-   - Título destacado a la izquierda y **Contador Regresivo (Countdown Timer)** con cajitas ámbar `#E07A1F` para Horas, Minutos y Segundos a la derecha.
-4. **Sección "Tendencias de la Semana" (Bento Grid Asimétrico de 5 Columnas):**
-   - Pestañas de filtro tipo píldora (*Más Vendidos*, *Ofertas*, *Novedades*).
-   - Grilla de 5 columnas en escritorio: 2 columnas laterales de productos apilados, y **columna central gigante (`row-span-2 col-span-1`)** destacando el producto estrella de la semana con imagen en gran formato.
-
----
-
-## 4. Carrito Deslizable (`CartDrawer`) & Checkout
-- Drawer lateral deslizable con persistencia en `localStorage`.
-- Visualización dual constante en Subtotal, Descuentos, Envío y Total en ambas monedas.
-- Botón de confirmación con generación de mensaje estructurado para WhatsApp oficial de Gran Catador Barinas.
+   - *Top Bar:* Enlaces rápidos, ubicación Barinas y Badge interactivo con la **Tasa BCV Oficial del día** (`tabular-nums`).
+   - *Main Header:* Logotipo oficial, buscador central amplio con autocompletado en vivo, accesos a Favoritos, Mi Cuenta y disparador del Carrito (`CartTrigger`).
+   - *Bottom Nav (`#00227B`):* Navegación directa por departamentos de SmartVentas y acceso a Ofertas del Día.
+2. **Hero Section & Departamentos Rápidos:**
+   - Banner principal en Azul Rey `#00227B` limpio (sin blobs difuminados), titular de máximo 2-3 líneas con tracking editorial (`tracking-[-0.03em]`), y ficha real del **Producto Destacado en Inventario** con precios bimonetarios tabulares.
+   - Tira arquitectónica de departamentos rápidos con estética monocromática de marca (`#00227B` / `#E07A1F`).
+3. **Barra de Garantías Comerciales (`TrustValueBar`):**
+   - Banda arquitectónica unificada con divisores limpios donde la cifra clave (`< 45 min`, `BCV Oficial`, `Depósito 01`, `Bs. / $ USD`) protagoniza el bloque sin depender de tarjetas con iconos de colores.
+4. **Sección "Ofertas Destacadas del Día" & "Tendencias de la Semana":**
+   - Cabeceras editoriales limpias con temporizador regresivo tabular (`tabular-nums`) y grillas de alta densidad donde la fotografía de la botella/artículo y su selector `Unidad | Caja x12` son los protagonistas.
+5. **Footer de Cierre Arquitectónico:**
+   - Cierre sobrio en tono oscuro (`#0B1120`) con datos fiscales reales (`RIF`, dirección en Av. 23 de Enero Barinas), enlaces directos y firma de marca a ancho completo.

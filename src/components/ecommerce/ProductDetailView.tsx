@@ -95,13 +95,13 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+    <div className="space-y-6 sm:space-y-8 min-w-0 max-w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-start">
         {/* Galería de Imágenes (5 cols) */}
-        <div className="lg:col-span-5 space-y-3">
-          <div className="relative aspect-square w-full rounded-3xl bg-white border border-slate-200/90 p-6 flex items-center justify-center overflow-hidden shadow-xs">
+        <div className="lg:col-span-5 space-y-2.5 sm:space-y-3 min-w-0">
+          <div className="relative aspect-[4/3] sm:aspect-square w-full rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-6 flex items-center justify-center overflow-hidden shadow-xs">
             {product.discountPercentage && (
-              <span className="absolute top-4 left-4 z-10 rounded-full bg-catador-discount px-3 py-1 text-xs font-black text-white shadow-xs">
+              <span className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 rounded-full bg-catador-discount px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-black text-white shadow-xs">
                 -{product.discountPercentage}% OFERTA
               </span>
             )}
@@ -109,14 +109,14 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
               type="button"
               onClick={() => toggleFavorite(product)}
               className={cn(
-                'absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border transition-all cursor-pointer shadow-xs',
+                'absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border transition-all cursor-pointer shadow-xs',
                 isFav
                   ? 'bg-red-50 border-red-200 text-red-500'
                   : 'bg-white/90 border-slate-200 text-slate-400 hover:text-red-500'
               )}
               aria-label="Favorito"
             >
-              <Heart className={cn('h-5 w-5', isFav && 'fill-current')} />
+              <Heart className={cn('h-4 w-4 sm:h-5 sm:w-5', isFav && 'fill-current')} />
             </button>
             <Image
               src={activeImage}
@@ -126,7 +126,7 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
               sizes="(max-width: 1024px) 92vw, 42vw"
               className={cn(
                 'object-contain transition-transform duration-300',
-                activeImage === cmsLogo ? 'p-12 opacity-80' : 'p-4 hover:scale-105'
+                activeImage === cmsLogo ? 'p-10 sm:p-12 opacity-80' : 'p-3 sm:p-4 hover:scale-105'
               )}
               onError={() => setHasError(true)}
             />
@@ -143,7 +143,7 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                     setHasError(false);
                   }}
                   className={cn(
-                    'relative h-16 w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden cursor-pointer',
+                    'relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden cursor-pointer',
                     selectedImage === img || (!selectedImage && idx === 0)
                       ? 'border-catador-blue ring-2 ring-catador-blue/20'
                       : 'border-slate-200 hover:border-slate-400'
@@ -157,23 +157,23 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
         </div>
 
         {/* Columna Comercial y Selector Unidad / Caja (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-7 shadow-xs space-y-5">
+        <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 p-4 sm:p-7 shadow-xs space-y-4 sm:space-y-5 min-w-0">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/80 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-amber-800">
+            <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/80 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-amber-800 max-w-full truncate">
               {product.brand} • {product.category}
             </span>
-            <span className="text-xs font-mono font-bold text-slate-400">SKU: {product.sku}</span>
+            <span className="text-[11px] sm:text-xs font-mono font-bold text-slate-400">SKU: {product.sku}</span>
           </div>
 
-          <h1 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+          <h1 className="text-lg sm:text-3xl font-black text-slate-900 tracking-tight leading-snug break-words">
             {product.name}
           </h1>
 
           {/* Indicador Transparente de Stock en Unidades y Cajas */}
           <div className="flex flex-wrap items-center gap-2">
             {product.inStock ? (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+              <div className="inline-flex items-start sm:items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] sm:text-xs font-extrabold">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
                 <span>
                   Disponible en Depósito 01: {product.stockQuantity} {product.unit.toLowerCase()}s
                   {product.stockQuantity >= unitsPerBox
@@ -191,30 +191,30 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
 
           {/* Tarjetas Gemelas: Elegir Por Unidad vs Por Caja */}
           <div className="space-y-2">
-            <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
+            <label className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
               1. Elige la Presentación de Compra:
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
               {product.saleMode !== 'solo_caja' && (
                 <button
                   type="button"
                   onClick={() => handleModeSwitch('unidad')}
                   className={cn(
-                    'flex flex-col items-start p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer',
+                    'flex flex-col items-start p-3 sm:p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer min-w-0',
                     mode === 'unidad'
                       ? 'border-catador-blue bg-blue-50/40 ring-2 ring-catador-blue/15'
                       : 'border-slate-200 hover:border-slate-300 bg-white'
                   )}
                 >
-                  <div className="flex items-center justify-between w-full mb-1">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase">
-                      <Box className="h-4 w-4 text-catador-blue" /> Por Unidad (1 {product.unit})
+                  <div className="flex items-center justify-between gap-2 w-full mb-1">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-900 uppercase truncate">
+                      <Box className="h-4 w-4 text-catador-blue shrink-0" /> Por Unidad (1 {product.unit})
                     </span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
                       Máx: {maxUnitsAllowed}
                     </span>
                   </div>
-                  <span className="text-xl font-black text-catador-blue">{unitPrices.usdFormatted}</span>
+                  <span className="text-lg sm:text-xl font-black text-catador-blue">{unitPrices.usdFormatted}</span>
                   <span className="text-xs font-mono font-bold text-slate-600">{unitPrices.vesFormatted}</span>
                 </button>
               )}
@@ -225,7 +225,7 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                   disabled={maxBoxesAllowed <= 0 && !product.allowBackorder}
                   onClick={() => handleModeSwitch('caja')}
                   className={cn(
-                    'flex flex-col items-start p-3.5 rounded-2xl border-2 text-left transition-all',
+                    'flex flex-col items-start p-3 sm:p-3.5 rounded-2xl border-2 text-left transition-all min-w-0',
                     mode === 'caja'
                       ? 'border-catador-blue bg-blue-50/40 ring-2 ring-catador-blue/15 cursor-pointer'
                       : maxBoxesAllowed <= 0 && !product.allowBackorder
@@ -233,15 +233,15 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                       : 'border-slate-200 hover:border-slate-300 bg-white cursor-pointer'
                   )}
                 >
-                  <div className="flex items-center justify-between w-full mb-1">
-                    <span className="inline-flex items-center gap-1.5 text-xs font-black text-slate-900 uppercase">
-                      <Package className="h-4 w-4 text-catador-amber" /> Por {product.boxUnitLabel || 'Caja'} ({unitsPerBox} und)
+                  <div className="flex items-center justify-between gap-2 w-full mb-1">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-900 uppercase truncate">
+                      <Package className="h-4 w-4 text-catador-amber shrink-0" /> Por {product.boxUnitLabel || 'Caja'} ({unitsPerBox} und)
                     </span>
-                    <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full">
-                      {maxBoxesAllowed > 0 || product.allowBackorder ? `Máx: ${maxBoxesAllowed} cajas` : 'Sin stock p/caja'}
+                    <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full shrink-0">
+                      {maxBoxesAllowed > 0 || product.allowBackorder ? `Máx: ${maxBoxesAllowed}` : 'Sin stock'}
                     </span>
                   </div>
-                  <span className="text-xl font-black text-catador-blue">{boxPrices.usdFormatted}</span>
+                  <span className="text-lg sm:text-xl font-black text-catador-blue">{boxPrices.usdFormatted}</span>
                   <span className="text-xs font-mono font-bold text-slate-600">{boxPrices.vesFormatted}</span>
                 </button>
               )}
@@ -249,18 +249,18 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
           </div>
 
           {/* Control de Cantidad y Descuento Exacto de Stock */}
-          <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-4 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-3.5 sm:p-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-1.5">
               <span className="text-xs font-extrabold text-slate-700">
                 2. Cantidad de {mode === 'caja' ? `Cajas (${unitsPerBox} und c/u)` : 'Unidades'}:
               </span>
-              <span className="text-xs font-bold text-catador-blue bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                Descuenta {requiredBaseUnits} {requiredBaseUnits === 1 ? 'unidad' : 'unidades'} de {product.stockQuantity} en stock
+              <span className="text-[11px] font-bold text-catador-blue bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                Descuenta {requiredBaseUnits} {requiredBaseUnits === 1 ? 'und' : 'unds'} de {product.stockQuantity}
               </span>
             </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center border border-slate-300 rounded-xl bg-white h-11">
                   <button
                     type="button"
@@ -300,12 +300,14 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                 )}
               </div>
 
-              <div className="text-right">
+              <div className="flex items-center justify-between sm:block border-t sm:border-t-0 border-slate-200/80 pt-2.5 sm:pt-0 sm:text-right">
                 <span className="text-[11px] font-bold text-slate-500 block">Subtotal Selección:</span>
-                <span className="text-xl font-black text-slate-900">{totalSelectionPrices.usdFormatted}</span>
-                <span className="block text-xs font-mono font-bold text-slate-600">
-                  {totalSelectionPrices.vesFormatted}
-                </span>
+                <div className="text-right">
+                  <span className="text-lg sm:text-xl font-black text-slate-900">{totalSelectionPrices.usdFormatted}</span>
+                  <span className="block text-xs font-mono font-bold text-slate-600">
+                    {totalSelectionPrices.vesFormatted}
+                  </span>
+                </div>
               </div>
             </div>
 

@@ -29,7 +29,7 @@ export function CatalogBrowser({
   const [activeSubgroup, setActiveSubgroup] = useState<string>(initialSubgroup);
   const [subgroups, setSubgroups] = useState<SmartVentasSubgroup[]>(initialSubgroups);
   const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(initialProducts.length === 0);
 
   const [onlyInStock, setOnlyInStock] = useState<boolean>(false);
   const [priceRange, setPriceRange] = useState<PriceRangeFilter>('all');
@@ -38,13 +38,50 @@ export function CatalogBrowser({
 
   // Caché en memoria del cliente para navegación instantánea entre grupos y subgrupos
   const cacheRef = useRef<Map<string, { products: Product[]; subgroups?: SmartVentasSubgroup[] }>>(
-    new Map([
-      [
-        `${initialGroup}-${initialSubgroup}`,
-        { products: initialProducts, subgroups: initialSubgroups },
-      ],
-    ])
+    new Map(
+      initialProducts.length > 0
+        ? [
+            [
+              `${initialGroup}-${initialSubgroup}`,
+              { products: initialProducts, subgroups: initialSubgroups },
+            ],
+          ]
+        : []
+    )
   );
+
+  React.useEffect(() => {
+    if (initialProducts.length > 0) return;
+    let mounted = true;
+    async function hydrateFallback() {
+      setIsLoading(true);
+      try {
+        const url =
+          initialSubgroup === 'todos'
+            ? `/api/catalog?codGrupo=${initialGroup}`
+            : `/api/catalog?codGrupo=${initialGroup}&codSubgrupo=${initialSubgroup}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!mounted) return;
+        const newProds: Product[] = data.products || [];
+        setProducts(newProds);
+        if (newProds.length > 0) {
+          cacheRef.current.set(`${initialGroup}-${initialSubgroup}`, {
+            products: newProds,
+            subgroups: initialSubgroups,
+          });
+        }
+      } catch {
+        // Silencioso
+      } finally {
+        if (mounted) setIsLoading(false);
+      }
+    }
+    void hydrateFallback();
+    return () => {
+      mounted = false;
+    };
+  }, [initialGroup, initialSubgroup, initialProducts.length, initialSubgroups]);
 
   // Cambio de Grupo instantáneo sin recarga pesada
   const handleSelectGroup = async (codGrupo: string) => {
@@ -185,9 +222,9 @@ export function CatalogBrowser({
     : activeGroupObj?.Nombre || 'Catálogo';
 
   return (
-    <div className="space-y-5 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 min-w-0 max-w-full">
       {/* Selector de Grupos Principales */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1.5 scrollbar-none w-full min-w-0 max-w-full">
         {activeGroups.map((group) => {
           const isActive = group.CodGrupo === activeGroup;
           return (
@@ -196,7 +233,7 @@ export function CatalogBrowser({
               type="button"
               onClick={() => handleSelectGroup(group.CodGrupo)}
               className={cn(
-                'px-4 py-2 min-h-[38px] text-xs font-extrabold rounded-xl transition-all whitespace-nowrap shadow-2xs cursor-pointer shrink-0',
+                'px-3 sm:px-4 py-1.5 sm:py-2 min-h-[36px] text-xs font-extrabold rounded-xl transition-all whitespace-nowrap shadow-2xs cursor-pointer shrink-0',
                 isActive
                   ? 'bg-catador-blue text-white shadow-sm ring-2 ring-catador-blue/20'
                   : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:text-catador-blue'
@@ -210,15 +247,15 @@ export function CatalogBrowser({
 
       {/* Selector de Subgrupos */}
       {subgroups.length > 0 && (
-        <div className="flex items-center gap-1.5 overflow-x-auto py-1.5 bg-slate-100/70 p-2.5 rounded-xl border border-slate-200/80 scrollbar-none">
-          <span className="text-[11px] font-bold text-slate-500 uppercase px-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto p-1.5 sm:p-2 bg-slate-100/70 rounded-xl border border-slate-200/80 scrollbar-none w-full min-w-0 max-w-full">
+          <span className="hidden xs:inline text-[11px] font-bold text-slate-500 uppercase px-2 shrink-0">
             Subgrupos:
           </span>
           <button
             type="button"
             onClick={() => handleSelectSubgroup('todos')}
             className={cn(
-              'px-3 py-1.5 min-h-[34px] text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer shrink-0',
+              'px-2.5 sm:px-3 py-1 sm:py-1.5 min-h-[32px] text-[11px] sm:text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer shrink-0',
               activeSubgroup === 'todos'
                 ? 'bg-catador-amber text-white shadow-xs'
                 : 'text-slate-600 hover:bg-white hover:text-slate-900'
@@ -234,7 +271,7 @@ export function CatalogBrowser({
                 type="button"
                 onClick={() => handleSelectSubgroup(sub.CodSubgrupo)}
                 className={cn(
-                  'px-3 py-1.5 min-h-[34px] text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer shrink-0',
+                  'px-2.5 sm:px-3 py-1 sm:py-1.5 min-h-[32px] text-[11px] sm:text-xs font-semibold rounded-lg transition-colors whitespace-nowrap cursor-pointer shrink-0',
                   isSubActive
                     ? 'bg-catador-amber text-white shadow-xs'
                     : 'text-slate-600 hover:bg-white hover:text-slate-900'
@@ -262,10 +299,10 @@ export function CatalogBrowser({
 
       {/* Grid de Productos */}
       {isLoading ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3.5">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="rounded-2xl border border-slate-200/80 bg-white p-4 space-y-3 shadow-2xs">
-              <Skeleton className="aspect-square w-full rounded-xl bg-slate-100" />
+            <div key={i} className="rounded-xl sm:rounded-2xl border border-slate-200/80 bg-white p-2.5 sm:p-4 space-y-2.5 shadow-2xs">
+              <Skeleton className="aspect-[4/3] sm:aspect-square w-full rounded-xl bg-slate-100" />
               <Skeleton className="h-3.5 w-1/3 rounded-md bg-slate-100" />
               <Skeleton className="h-4 w-3/4 rounded-md bg-slate-100" />
               <div className="pt-2 flex justify-between items-end">
@@ -273,20 +310,20 @@ export function CatalogBrowser({
                   <Skeleton className="h-4 w-full rounded-md bg-slate-100" />
                   <Skeleton className="h-3 w-4/5 rounded-md bg-slate-100" />
                 </div>
-                <Skeleton className="h-10 w-10 rounded-xl bg-slate-100" />
+                <Skeleton className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-slate-100" />
               </div>
             </div>
           ))}
         </div>
       ) : displayedProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center text-slate-500">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 sm:p-12 text-center text-slate-500">
           <p className="text-sm font-semibold">No se encontraron productos disponibles con estos filtros.</p>
           <p className="text-xs text-slate-400 mt-1">Prueba desactivando el filtro de stock o eligiendo otro subgrupo.</p>
         </div>
       ) : (
         <div
           key={`${activeGroup}-${activeSubgroup}`}
-          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3.5 animate-in fade-in-50 duration-200"
+          className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3.5 animate-in fade-in-50 duration-200"
         >
           {displayedProducts.map((product) => (
             <ProductCard key={product.id} product={product} />

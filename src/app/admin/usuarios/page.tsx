@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { Users, Search, Loader2, Edit3 } from 'lucide-react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { Search, Loader2, Edit3 } from 'lucide-react';
 import { Database } from '@/types/supabase';
 import { EditUserModal } from '@/components/admin/EditUserModal';
 
@@ -70,17 +70,27 @@ export default function AdminUsuariosPage() {
       (u.telefono && u.telefono.includes(searchTerm))
   );
 
+  const roleStats = useMemo(() => {
+    const total = users.length;
+    const clientes = users.filter((u) => u.rol === 'cliente').length;
+    const admins = users.filter((u) => u.rol === 'admin').length;
+    const repartidores = users.filter((u) => u.rol === 'repartidor').length;
+    return { total, clientes, admins, repartidores };
+  }, [users]);
+
   return (
-    <main className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Users className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Gestión de Usuarios y Roles</h1>
-            <p className="text-xs text-slate-500">Control de datos de clientes, permisos del CMS y repartidores</p>
-          </div>
+    <main className="p-4 sm:p-6 space-y-5 max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200/90 pb-4">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-400">
+            Directorio y Control de Acceso
+          </span>
+          <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-[-0.025em] mt-0.5">
+            Gestión de Usuarios y Roles
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Control de datos verificados de clientes, permisos del CMS y motorizados de despacho
+          </p>
         </div>
 
         <div className="relative w-full sm:w-72">
@@ -90,8 +100,56 @@ export default function AdminUsuariosPage() {
             placeholder="Buscar por nombre, cédula o teléfono..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full min-h-[42px] rounded-xl border border-slate-200 pl-9 pr-3 py-2 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+            className="w-full min-h-[42px] rounded-xl border border-slate-200/90 pl-9 pr-3 py-2 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue"
           />
+        </div>
+      </div>
+
+      {/* Banda de KPIs Reconciliados de Roles */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 bg-white rounded-xl border border-slate-200/90 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/90">
+        <div className="p-4">
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">
+            Cuentas Registradas
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-slate-900 tabular-nums tracking-tight">
+              {roleStats.total}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-400">perfiles</span>
+          </div>
+        </div>
+        <div className="p-4">
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">
+            Clientes Verificados
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-catador-blue tabular-nums tracking-tight">
+              {roleStats.clientes}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-400">compradores</span>
+          </div>
+        </div>
+        <div className="p-4">
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">
+            Administradores CMS
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-emerald-700 tabular-nums tracking-tight">
+              {roleStats.admins}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-400">acceso total</span>
+          </div>
+        </div>
+        <div className="p-4">
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-500">
+            Flota de Despacho
+          </span>
+          <div className="mt-1 flex items-baseline gap-2">
+            <span className="text-2xl font-black text-amber-600 tabular-nums tracking-tight">
+              {roleStats.repartidores}
+            </span>
+            <span className="text-[11px] font-semibold text-slate-400">repartidores</span>
+          </div>
         </div>
       </div>
 

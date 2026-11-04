@@ -20,18 +20,16 @@ export function HeaderMain() {
   const logoAncho = storeConfig?.logo_ancho_px || 200;
 
   return (
-    <div className="bg-white py-2.5 sm:py-3 border-b border-slate-200">
-      <div className="container mx-auto px-3 sm:px-4 space-y-2.5 md:space-y-0">
-        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8">
-          {/* Logotipo Oficial */}
+    <div className="bg-white py-2 sm:py-3 border-b border-slate-200">
+      <div className="container mx-auto max-w-7xl px-3 sm:px-4 space-y-2 md:space-y-0">
+        <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-8 min-w-0">
+          {/* Logotipo Oficial Adaptativo */}
           <Link href="/" className="shrink-0 flex items-center min-w-0">
             <div
-              className="relative transition-all duration-150 flex items-center"
+              className="relative transition-all duration-150 flex items-center h-9 w-[132px] xs:w-[155px] sm:h-11 sm:w-[200px]"
               style={{
-                height: `${logoAlto}px`,
-                width: `${logoAncho}px`,
-                maxHeight: `${Math.min(56, Math.max(40, logoAlto))}px`,
-                maxWidth: 'min(42vw, 280px)',
+                maxHeight: `${Math.min(52, Math.max(36, logoAlto))}px`,
+                maxWidth: `${Math.min(240, Math.max(132, logoAncho))}px`,
               }}
             >
               <Image
@@ -73,16 +71,16 @@ export function HeaderMain() {
           </div>
 
           {/* Acciones de Usuario & Carrito */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
             {/* Favoritos */}
             <Link
               href="/favoritos"
-              className="relative flex items-center justify-center min-h-[40px] min-w-[40px] text-slate-700 hover:text-red-500 transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
+              className="relative flex items-center justify-center h-10 w-10 text-slate-700 hover:text-red-500 transition-colors cursor-pointer rounded-xl hover:bg-slate-50"
               aria-label="Lista de Favoritos"
             >
               <Heart className="h-5 w-5" />
               {favCount > 0 && (
-                <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white shadow-xs">
+                <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white tabular-nums">
                   {favCount}
                 </span>
               )}
@@ -94,20 +92,20 @@ export function HeaderMain() {
             {/* Disparador de Carrito con Total en USD y Badge */}
             <Link
               href="/carrito"
-              className="flex items-center gap-1.5 sm:gap-2.5 rounded-xl bg-slate-50 hover:bg-slate-100 min-h-[44px] px-2.5 sm:px-3 py-1.5 border border-slate-200 transition-colors shrink-0"
+              className="flex items-center gap-1.5 sm:gap-2 rounded-xl bg-slate-50 hover:bg-slate-100 h-10 sm:min-h-[42px] px-2 sm:px-3 py-1.5 border border-slate-200 transition-colors shrink-0"
               aria-label="Ver Carrito de Compras"
             >
               <div className="relative flex items-center justify-center text-catador-blue">
-                <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+                <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
                 {totals.itemCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-full bg-catador-amber text-[10px] font-black text-white shadow-xs animate-scale-in">
+                  <span className="absolute -top-1.5 -right-2 flex h-4 sm:h-5 min-w-[16px] sm:min-w-[20px] px-1 items-center justify-center rounded-full bg-catador-amber text-[9px] sm:text-[10px] font-black text-white tabular-nums">
                     {totals.itemCount}
                   </span>
                 )}
               </div>
-              <div className="flex flex-col text-left">
+              <div className="flex flex-col text-left tabular-nums">
                 <span className="text-[10px] text-slate-600 leading-tight hidden sm:block">Mi Carrito</span>
-                <span className="text-xs font-extrabold text-catador-blue font-mono">
+                <span className="text-[11px] sm:text-xs font-extrabold text-catador-blue font-mono">
                   {formatUsd(totals.totalUsd)}
                 </span>
               </div>

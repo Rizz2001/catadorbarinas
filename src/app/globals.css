@@ -54,6 +54,26 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Taste Skill Typography & Tabular Figures */
+h1,
+h2,
+h3,
+h4 {
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.tabular-nums,
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Selección de texto con colores de marca */
+::selection {
+  background-color: #00227B;
+  color: #FFFFFF;
+}
+
 /* Scrollbar sutil estilo retail */
 ::-webkit-scrollbar {
   width: 8px;

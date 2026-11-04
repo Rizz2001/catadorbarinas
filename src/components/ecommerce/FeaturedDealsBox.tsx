@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Flame, Clock } from 'lucide-react';
 import { Product } from '@/types';
 import { ProductCard } from './ProductCard';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -12,7 +11,11 @@ interface FeaturedDealsBoxProps {
   customTitle?: string | null;
 }
 
-export function FeaturedDealsBox({ products, targetEndTime, customTitle }: FeaturedDealsBoxProps) {
+export function FeaturedDealsBox({
+  products,
+  targetEndTime,
+  customTitle,
+}: FeaturedDealsBoxProps) {
   const isMounted = React.useSyncExternalStore(
     () => () => {},
     () => true,
@@ -26,48 +29,51 @@ export function FeaturedDealsBox({ products, targetEndTime, customTitle }: Featu
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border-2 border-catador-blue bg-white p-4 md:p-5 shadow-sm">
-      {/* Cabecera de Ofertas */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-catador-blue text-white">
-            <Flame className="h-5 w-5 text-catador-amber fill-catador-amber" />
-          </div>
-          <div>
-            <h2 className="text-lg md:text-xl font-bold text-slate-900 tracking-tight">
-              {customTitle || 'Ofertas Destacadas del Día'}
-            </h2>
-            <p className="text-xs text-slate-600 hidden sm:block">
-              Precios especiales por tiempo limitado en Gran Catador
-            </p>
-          </div>
+    <section className="rounded-2xl border-2 border-catador-blue bg-white p-3 sm:p-6 min-w-0 max-w-full overflow-hidden">
+      {/* Cabecera Editorial de Ofertas */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 pb-3.5 sm:pb-4 mb-3.5 sm:mb-5 border-b border-slate-200/80">
+        <div className="border-l-4 border-catador-amber pl-3 min-w-0">
+          <h2 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+            {customTitle || 'Ofertas Destacadas del Día'}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">
+            Precios especiales por tiempo limitado en licores y despensa seleccionada
+          </p>
         </div>
 
-        {/* Temporizador Regresivo (Cajitas Ámbar) */}
-        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 self-start sm:self-auto bg-slate-50 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 max-w-full">
-          <Clock className="h-4 w-4 text-catador-amber shrink-0" />
-          <span className="text-[11px] sm:text-xs font-semibold text-slate-600">Termina en:</span>
+        {/* Temporizador Regresivo Tabular (Cajitas Ámbar Oficiales) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 self-start sm:self-auto">
+          <span className="text-[11px] sm:text-xs font-bold text-slate-600">Cierra en:</span>
           <div
-            className="flex items-center gap-1 font-mono text-xs font-bold text-white"
+            className="flex items-center gap-1 tabular-nums text-xs sm:text-sm font-black text-white"
             suppressHydrationWarning
           >
-            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
+            <span
+              className="bg-catador-amber px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md min-w-[30px] sm:min-w-[34px] text-center"
+              suppressHydrationWarning
+            >
               {isMounted ? String(timeLeft.hours).padStart(2, '0') : '12'}h
             </span>
-            <span className="text-catador-amber font-bold">:</span>
-            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs" suppressHydrationWarning>
+            <span className="text-catador-amber font-black">:</span>
+            <span
+              className="bg-catador-amber px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md min-w-[30px] sm:min-w-[34px] text-center"
+              suppressHydrationWarning
+            >
               {isMounted ? String(timeLeft.minutes).padStart(2, '0') : '00'}m
             </span>
-            <span className="text-catador-amber font-bold">:</span>
-            <span className="bg-catador-amber px-1.5 sm:px-2 py-0.5 rounded shadow-xs animate-pulse" suppressHydrationWarning>
+            <span className="text-catador-amber font-black">:</span>
+            <span
+              className="bg-catador-amber px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-md min-w-[30px] sm:min-w-[34px] text-center"
+              suppressHydrationWarning
+            >
               {isMounted ? String(timeLeft.seconds).padStart(2, '0') : '00'}s
             </span>
           </div>
         </div>
       </div>
 
-      {/* Grid de Productos en Oferta (Simétrico: 2 en móvil, 3 en tablet, 6 en desktop) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
+      {/* Grid de Productos en Oferta */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3.5">
         {products.slice(0, 6).map((product) => (
           <ProductCard key={product.id} product={product} isCompact />
         ))}

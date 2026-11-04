@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Camera, Upload, Search, CheckCircle2, Loader2, Barcode, FileImage } from 'lucide-react';
+import { Upload, Search, CheckCircle2, Loader2, Barcode, FileImage } from 'lucide-react';
 import { ProductImageMapping } from '@/types';
 import { getProductImages, uploadProductWebpImage, deleteProductWebpImage } from '@/services/cms.service';
 import { ProductImageCard } from '@/components/admin';
@@ -111,19 +111,21 @@ export default function AdminProductosPage() {
   );
 
   return (
-    <main className="p-6 space-y-6 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Camera className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">Fotos de Productos (WebP)</h1>
-            <p className="text-xs text-slate-500">Sube fotos WebP con el código de barras para asociarlas automáticamente al catálogo</p>
-          </div>
+    <main className="p-4 sm:p-6 space-y-5 max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/90 pb-4">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-400">
+            Activos Multimedia del Catálogo
+          </span>
+          <h1 className="text-xl font-black text-slate-900 tracking-[-0.025em] mt-0.5">
+            Fotos de Productos (WebP)
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Sube fotos WebP nombradas con el código de barras o SKU para vincularlas automáticamente al inventario
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-white border border-slate-200 px-3 py-1.5 rounded-xl">
+        <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 bg-white border border-slate-200/90 px-3 py-1.5 rounded-lg tabular-nums self-start">
           <FileImage className="h-4 w-4 text-catador-amber" />
           <span>{images.length} Fotos Registradas</span>
         </div>

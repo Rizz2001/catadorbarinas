@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { Shield, RefreshCw, ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import { RefreshCw, ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { AdminOrderQueue, AdminOrderDetail } from '@/components/admin';
 import { OrderLiveChat } from '@/components/orders';
+import { formatUsd, formatVes } from '@/lib/currency';
 import { soundFx } from '@/lib/sound';
 
 export default function AdminPedidosCommandCenterPage() {
@@ -17,7 +18,6 @@ export default function AdminPedidosCommandCenterPage() {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [mobilePanel, setMobilePanel] = useState<'cola' | 'detalle' | 'chat'>('cola');
 
-  // 1. Cargar lista completa de órdenes
   const loadOrders = useCallback(async () => {
     try {
       const res = await fetch('/api/pedidos');
@@ -27,7 +27,11 @@ export default function AdminPedidosCommandCenterPage() {
           setOrders(data.orders);
           setSelectedOrder((current) => {
             if (!current && data.orders.length > 0) return data.orders[0];
-            return data.orders.find((o: PedidoConDetalles) => o.id === current?.id) || data.orders[0] || null;
+            return (
+              data.orders.find((o: PedidoConDetalles) => o.id === current?.id) ||
+              data.orders[0] ||
+              null
+            );
           });
         }
       }
@@ -41,7 +45,6 @@ export default function AdminPedidosCommandCenterPage() {
       loadOrders();
     }, 0);
 
-    // 2. Suscripción en Tiempo Real para Nuevas Órdenes y Actualizaciones
     const channel = supabase
       .channel('admin-orders-stream')
       .on(
@@ -66,10 +69,11 @@ export default function AdminPedidosCommandCenterPage() {
           const msg = payload.new as unknown as { pedido_id: string; remitente_rol: string };
           if (msg.remitente_rol === 'cliente') {
             if (soundEnabled) soundFx.playMessageBubble();
-            // Incrementar contador de no leídos
             setOrders((prev) =>
               prev.map((o) =>
-                o.id === msg.pedido_id ? { ...o, mensajes_no_leidos: (o.mensajes_no_leidos || 0) + 1 } : o
+                o.id === msg.pedido_id
+                  ? { ...o, mensajes_no_leidos: (o.mensajes_no_leidos || 0) + 1 }
+                  : o
               )
             );
           }
@@ -83,7 +87,28 @@ export default function AdminPedidosCommandCenterPage() {
     };
   }, [loadOrders, soundEnabled]);
 
-  // Actualizar Estado de la Orden
+  // KPIs reconciliados directamente desde las filas reales (Regla Taste Skill App Screens §2.1)
+  const kpis = useMemo(() => {
+    const validOrders = orders.filter((o) => o.estado_pedido !== 'cancelado');
+    const receivedCount = orders.filter((o) => o.estado_pedido === 'recibido').length;
+    const pendingPayCount = validOrders.filter((o) => o.estado_pago === 'pendiente').length;
+    const activeDispatchCount = orders.filter(
+      (o) => o.estado_pedido === 'preparando' || o.estado_pedido === 'en_camino'
+    ).length;
+    const deliveredCount = orders.filter((o) => o.estado_pedido === 'entregado').length;
+    const revenueUsd = validOrders.reduce((acc, o) => acc + Number(o.total_usd || 0), 0);
+    const revenueVes = validOrders.reduce((acc, o) => acc + Number(o.total_ves || 0), 0);
+
+    return {
+      receivedCount,
+      pendingPayCount,
+      activeDispatchCount,
+      deliveredCount,
+      revenueUsd: Number(revenueUsd.toFixed(2)),
+      revenueVes: Number(revenueVes.toFixed(2)),
+    };
+  }, [orders]);
+
   const handleUpdateStatus = async (estadoPedido?: EstadoPedido, estadoPago?: EstadoPago) => {
     if (!selectedOrder) return;
     setIsUpdating(true);
@@ -98,7 +123,9 @@ export default function AdminPedidosCommandCenterPage() {
         const data = await res.json();
         if (data.order) {
           setSelectedOrder(data.order);
-          setOrders((prev) => prev.map((o) => (o.id === data.order.id ? { ...o, ...data.order } : o)));
+          setOrders((prev) =>
+            prev.map((o) => (o.id === data.order.id ? { ...o, ...data.order } : o))
+          );
         }
       }
     } catch (err) {
@@ -108,21 +135,15 @@ export default function AdminPedidosCommandCenterPage() {
     }
   };
 
-  // Eliminar Pedido
   const handleDeleteOrder = async (orderId: string) => {
     try {
-      const res = await fetch(`/api/pedidos/${orderId}`, {
-        method: 'DELETE',
-      });
+      const res = await fetch(`/api/pedidos/${orderId}`, { method: 'DELETE' });
       if (res.ok) {
         setOrders((prev) => {
           const updated = prev.filter((o) => o.id !== orderId);
-          setSelectedOrder((current) => {
-            if (current?.id === orderId) {
-              return updated[0] || null;
-            }
-            return current;
-          });
+          setSelectedOrder((current) =>
+            current?.id === orderId ? updated[0] || null : current
+          );
           return updated;
         });
       }
@@ -135,101 +156,143 @@ export default function AdminPedidosCommandCenterPage() {
     '¡Hola! Ya estamos revisando tu comprobante de pago.',
     'Pago confirmado ✅, ya estamos empacando tu pedido en el Bodegón.',
     'Por favor verifica el número de referencia o envíanos captura legible por aquí.',
-    'Nuestro motorizado ya va saliendo hacia tu ubicación en Barinas 🛵.',
+    'Nuestro motorizado ya va saliendo hacia tu ubicación en Barinas.',
     'Tu pedido ya fue entregado. ¡Gracias por confiar en Gran Catador!',
   ];
 
   return (
-    <main className="container mx-auto px-4 py-4 md:py-6 space-y-4 max-w-[1500px]">
-      {/* Barra de Control Superior */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Shield className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-lg md:text-xl font-black text-slate-900 tracking-tight">
-              Centro de Comando y Despacho • Gran Catador
-            </h1>
-            <p className="text-[11px] text-slate-500">
-              Operaciones en vivo, facturación en caja y chat multi-pedido en tiempo real
-            </p>
-          </div>
+    <main className="px-4 sm:px-6 py-5 space-y-4 max-w-[1560px]">
+      {/* Cabecera Operativa Limpia */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-3.5">
+        <div>
+          <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-none">
+            Centro de Comando y Despacho
+          </h1>
+          <p className="text-xs text-slate-500 mt-1">
+            Depósito 01 • Facturación en caja, verificación de pagos y chat en tiempo real
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white min-h-[38px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            {soundEnabled ? <Volume2 className="h-3.5 w-3.5 text-emerald-600" /> : <VolumeX className="h-3.5 w-3.5 text-slate-400" />}
-            <span>{soundEnabled ? 'Sonidos Activos' : 'Silenciado'}</span>
+            {soundEnabled ? (
+              <Volume2 className="h-3.5 w-3.5 text-emerald-600" />
+            ) : (
+              <VolumeX className="h-3.5 w-3.5 text-slate-400" />
+            )}
+            <span>{soundEnabled ? 'Alertas Sonoras' : 'Silenciado'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => loadOrders()}
-            className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white min-h-[38px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
-            <span>Refrescar</span>
+            <span>Sincronizar</span>
           </button>
 
           <Link
             href="/"
-            className="inline-flex items-center gap-1 rounded-xl bg-catador-blue min-h-[38px] px-3 py-1.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
+            className="inline-flex items-center gap-1 rounded-lg bg-catador-blue min-h-[36px] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Ir a la Tienda
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Tienda</span>
           </Link>
         </div>
       </div>
 
-      {/* Selector de Panel en Móvil / Tablet (< 1024px) para evitar scroll triple */}
-      <div className="grid grid-cols-3 gap-1.5 bg-slate-100 p-1.5 rounded-2xl border border-slate-200 lg:hidden">
+      {/* Banda de KPIs Reconciliados (Taste Skill: KPIs are type, not tiles) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-white border border-slate-200/90 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/90">
+        <div className="p-3.5 sm:px-4">
+          <span className="text-[11px] font-semibold text-slate-500 block">
+            Recibidos / Por Verificar
+          </span>
+          <div className="flex items-baseline gap-2 mt-1 tabular-nums">
+            <span className="text-xl font-black text-slate-900">{kpis.receivedCount}</span>
+            <span className="text-xs font-bold text-amber-700">
+              ({kpis.pendingPayCount} pagos pendientes)
+            </span>
+          </div>
+        </div>
+
+        <div className="p-3.5 sm:px-4">
+          <span className="text-[11px] font-semibold text-slate-500 block">
+            En Bodegón y En Ruta
+          </span>
+          <div className="flex items-baseline gap-2 mt-1 tabular-nums">
+            <span className="text-xl font-black text-catador-blue">{kpis.activeDispatchCount}</span>
+            <span className="text-xs font-medium text-slate-500">despachos en curso</span>
+          </div>
+        </div>
+
+        <div className="p-3.5 sm:px-4">
+          <span className="text-[11px] font-semibold text-slate-500 block">
+            Órdenes Completadas
+          </span>
+          <div className="flex items-baseline gap-2 mt-1 tabular-nums">
+            <span className="text-xl font-black text-emerald-700">{kpis.deliveredCount}</span>
+            <span className="text-xs font-medium text-slate-500">de {orders.length} totales</span>
+          </div>
+        </div>
+
+        <div className="p-3.5 sm:px-4">
+          <span className="text-[11px] font-semibold text-slate-500 block">
+            Volumen Facturado Activo
+          </span>
+          <div className="flex items-baseline gap-2 mt-1 tabular-nums">
+            <span className="text-xl font-black text-slate-900">
+              {formatUsd(kpis.revenueUsd)}
+            </span>
+            <span className="text-xs font-bold text-slate-500 truncate">
+              {formatVes(kpis.revenueVes)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Selector de Panel en Móvil / Tablet (< 1024px) */}
+      <div className="grid grid-cols-3 gap-1.5 bg-slate-200/70 p-1 rounded-xl border border-slate-200 lg:hidden tabular-nums">
         <button
           type="button"
           onClick={() => setMobilePanel('cola')}
-          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer ${
-            mobilePanel === 'cola'
-              ? 'bg-catador-blue text-white shadow-xs'
-              : 'text-slate-600 hover:bg-white/60'
+          className={`min-h-[38px] px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer ${
+            mobilePanel === 'cola' ? 'bg-catador-blue text-white' : 'text-slate-600'
           }`}
         >
-          1. Cola ({orders.length})
+          Cola ({orders.length})
         </button>
         <button
           type="button"
           onClick={() => setMobilePanel('detalle')}
-          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer truncate ${
-            mobilePanel === 'detalle'
-              ? 'bg-catador-blue text-white shadow-xs'
-              : 'text-slate-600 hover:bg-white/60'
+          className={`min-h-[38px] px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer truncate ${
+            mobilePanel === 'detalle' ? 'bg-catador-blue text-white' : 'text-slate-600'
           }`}
         >
-          2. {selectedOrder ? `Orden #${selectedOrder.numero_orden}` : 'Detalle'}
+          {selectedOrder ? `#${selectedOrder.numero_orden}` : 'Detalle'}
         </button>
         <button
           type="button"
           onClick={() => setMobilePanel('chat')}
-          className={`min-h-[40px] px-2.5 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-            mobilePanel === 'chat'
-              ? 'bg-catador-blue text-white shadow-xs'
-              : 'text-slate-600 hover:bg-white/60'
+          className={`min-h-[38px] px-2.5 py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer flex items-center justify-center gap-1 ${
+            mobilePanel === 'chat' ? 'bg-catador-blue text-white' : 'text-slate-600'
           }`}
         >
-          <span>3. Chat</span>
+          <span>Chat</span>
           {(selectedOrder?.mensajes_no_leidos || 0) > 0 && (
-            <span className="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[10px] font-black flex items-center justify-center">
+            <span className="h-4 min-w-[16px] px-1 rounded-full bg-catador-discount text-white text-[10px] font-black flex items-center justify-center">
               {selectedOrder?.mensajes_no_leidos}
             </span>
           )}
         </button>
       </div>
 
-      {/* Consola Split-Screen de 3 Columnas en Desktop y Pestañas Inteligentes en Móvil/Tablet */}
+      {/* Consola de 3 Columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        {/* Columna 1: Cola de Pedidos en Vivo (3 cols) */}
         <div className={`lg:col-span-3 ${mobilePanel === 'cola' ? 'block' : 'hidden lg:block'}`}>
           <AdminOrderQueue
             orders={orders}
@@ -237,15 +300,15 @@ export default function AdminPedidosCommandCenterPage() {
             onSelectOrder={(ord) => {
               setSelectedOrder(ord);
               setMobilePanel('detalle');
-              // Limpiar badge de no leídos al abrir
-              setOrders((prev) => prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o)));
+              setOrders((prev) =>
+                prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o))
+              );
             }}
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
           />
         </div>
 
-        {/* Columna 2: Detalle de Orden y Verificación de Pago (5 cols) */}
         <div className={`lg:col-span-5 ${mobilePanel === 'detalle' ? 'block' : 'hidden lg:block'}`}>
           <AdminOrderDetail
             order={selectedOrder}
@@ -255,13 +318,13 @@ export default function AdminPedidosCommandCenterPage() {
           />
         </div>
 
-        {/* Columna 3: Chat Directo con el Cliente (4 cols) */}
         <div className={`lg:col-span-4 ${mobilePanel === 'chat' ? 'block' : 'hidden lg:block'}`}>
           {selectedOrder ? (
             <OrderLiveChat
               pedidoId={selectedOrder.id}
               usuarioRol="admin"
               usuarioNombre="Administrador Gran Catador"
+              numeroOrden={selectedOrder.numero_orden}
               quickReplies={adminQuickReplies}
             />
           ) : (

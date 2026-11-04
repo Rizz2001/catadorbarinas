@@ -14,6 +14,7 @@ Este archivo rige de forma estricta todo el desarrollo en este repositorio.
 
 ## 1. Skills Obligatorias Activas
 - **UI / UX E-commerce:** `.agents/skills/catador-ecommerce-ui/SKILL.md` (Paleta oficial `#00227B` y `#E07A1F`, Header de 3 niveles, Bento Grid 5 columnas, Deals Countdown Timer).
+- **Design Taste Frontend (Anti-Slop Art Direction):** `.agents/skills/design-taste-frontend/SKILL.md` (Dirección de arte sin clichés de IA, tipografía con tracking ajustado y `tabular-nums`, jerarquía por contraste de superficie sin sombras pesadas en reposo, ni cajas de iconos arcoíris).
 - **Universal Responsive UI:** `.agents/skills/universal-responsive-ui/SKILL.md` (Diseño omni-dispositivo 320px–1920px+, mobile-first, zero horizontal overflow, touch targets >= 44px, safe areas, bimonetarismo adaptable).
 - **Clean & Scalable Architecture:** `.agents/skills/clean-scalable-architecture/SKILL.md` (Sistema de archivos estricto, regla de adaptadores, política de cero código muerto, límite de 180-200 líneas por componente).
 - **Browser Automation & Testing:** `.agents/skills/agent-browser/SKILL.md` (Pruebas E2E, accesibilidad y validación en vivo con agent-browser de Vercel Labs).

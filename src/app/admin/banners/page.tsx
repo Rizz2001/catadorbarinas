@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import {
-  Image as ImageIcon,
   Save,
   CheckCircle2,
   Loader2,
@@ -137,31 +136,29 @@ export default function AdminBannersPage() {
   }
 
   return (
-    <main className="p-6 space-y-6 max-w-5xl">
-      {/* Encabezado y Selector de Pestaña Principal */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <ImageIcon className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight">
-              Banners, Promociones &amp; Accesos
-            </h1>
-            <p className="text-xs text-slate-500">
-              Personaliza el Hero principal, la fila de 3 promociones y la tira de accesos rápidos
-            </p>
-          </div>
+    <main className="p-4 sm:p-6 space-y-5 max-w-5xl">
+      {/* Encabezado Operativo y Selector de Pestaña Principal */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200/90 pb-4">
+        <div>
+          <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-slate-400">
+            Dirección Visual de Portada
+          </span>
+          <h1 className="text-xl font-black text-slate-900 tracking-[-0.025em] mt-0.5">
+            Banners, Promociones &amp; Accesos Rápidos
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Personaliza el Hero principal, la fila de 3 promociones editoriales y los 6 accesos directos
+          </p>
         </div>
 
         {/* Pestañas Principales */}
-        <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl self-start">
           <button
             type="button"
             onClick={() => setMainTab('banners')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
               mainTab === 'banners'
-                ? 'bg-white text-catador-blue shadow-xs'
+                ? 'bg-white text-slate-900 border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -171,9 +168,9 @@ export default function AdminBannersPage() {
           <button
             type="button"
             onClick={() => setMainTab('quick_categories')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
               mainTab === 'quick_categories'
-                ? 'bg-white text-catador-blue shadow-xs'
+                ? 'bg-white text-slate-900 border border-slate-200/80'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
