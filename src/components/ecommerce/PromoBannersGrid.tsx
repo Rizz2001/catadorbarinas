@@ -7,56 +7,74 @@ interface PromoBannersGridProps {
   banners: Banner[];
 }
 
-const DEFAULT_PROMO_IMAGES = {
-  whisky: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=800&q=80',
-  cervezas: 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=800&q=80',
-  despensa: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80',
-};
-
 export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
-  const promo1 = banners.find((b) => b.tipo === 'promo_1' || b.tipo === 'promocion_grid') || null;
-  const promo2 = banners.find((b) => b.tipo === 'promo_2' || b.tipo === 'secundario') || null;
-  const promo3 = banners.find((b) => b.tipo === 'promo_3') || null;
+  // Solo incluir banners que estén explícitamente activos
+  const promo1 = banners.find(
+    (b) => (b.tipo === 'promo_1' || b.tipo === 'promocion_grid') && b.activo !== false
+  );
+  const promo2 = banners.find(
+    (b) => (b.tipo === 'promo_2' || b.tipo === 'secundario') && b.activo !== false
+  );
+  const promo3 = banners.find(
+    (b) => b.tipo === 'promo_3' && b.activo !== false
+  );
 
-  const cards = [
-    {
-      id: 'promo-1',
-      image: promo1?.imagen_url || DEFAULT_PROMO_IMAGES.whisky,
-      title: promo1?.titulo || 'Whiskies Escoceses y Reservas',
-      subtitle:
-        promo1?.subtitulo ||
-        "Buchanan's, Old Parr, Chivas Regal y Johnnie Walker por botella o caja.",
-      ctaText: promo1?.boton_texto || 'Explorar whiskies',
-      ctaUrl: promo1?.boton_url || '/catalogo/01/01',
+  const activeCards = [
+    promo1 && {
+      id: promo1.id || 'promo-1',
+      image: promo1.imagen_url || 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=800&q=80',
+      title: promo1.titulo || 'Whiskies Escoceses',
+      subtitle: promo1.subtitulo || "Buchanan's, Old Parr, Chivas y Black Label al mejor precio oficial.",
+      badge: promo1.badge_texto,
+      ctaText: promo1.boton_texto || 'Ver selección',
+      ctaUrl: promo1.boton_url || '/catalogo/01/01',
     },
-    {
-      id: 'promo-2',
-      image: promo2?.imagen_url || DEFAULT_PROMO_IMAGES.cervezas,
-      title: promo2?.titulo || 'Cervezas Frías y Cajas por Mayor',
-      subtitle:
-        promo2?.subtitulo ||
-        'Polar Pilsen, Solera, Zulia, Corona y bolsas de hielo listas para tu evento.',
-      ctaText: promo2?.boton_texto || 'Ver cervezas y cajas',
-      ctaUrl: promo2?.boton_url || '/catalogo/09',
+    promo2 && {
+      id: promo2.id || 'promo-2',
+      image: promo2.imagen_url || 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=800&q=80',
+      title: promo2.titulo || 'Cervezas & Refrescos',
+      subtitle: promo2.subtitulo || 'Polar Pilsen, Solera, Corona y combos con hielo.',
+      badge: promo2.badge_texto,
+      ctaText: promo2.boton_texto || 'Ver cervezas frías',
+      ctaUrl: promo2.boton_url || '/catalogo/09',
     },
-    {
-      id: 'promo-3',
-      image: promo3?.imagen_url || DEFAULT_PROMO_IMAGES.despensa,
-      title: promo3?.titulo || 'Despensa, Aceites y Alimentos',
-      subtitle:
-        promo3?.subtitulo ||
-        'Harina P.A.N., pastas, aceites de oliva, cafés y productos esenciales del hogar.',
-      ctaText: promo3?.boton_texto || 'Ir a despensa',
-      ctaUrl: promo3?.boton_url || '/catalogo/11',
+    promo3 && {
+      id: promo3.id || 'promo-3',
+      image: promo3.imagen_url || 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80',
+      title: promo3.titulo || 'Víveres & Despensa',
+      subtitle: promo3.subtitulo || 'Harina P.A.N., arroz, aceites de oliva y productos esenciales.',
+      badge: promo3.badge_texto,
+      ctaText: promo3.boton_texto || 'Explorar víveres',
+      ctaUrl: promo3.boton_url || '/catalogo/11',
     },
-  ];
+  ].filter(Boolean) as Array<{
+    id: string;
+    image: string;
+    title: string;
+    subtitle: string;
+    badge?: string | null;
+    ctaText: string;
+    ctaUrl: string;
+  }>;
+
+  // Si no hay ningún banner promocional activo, ocultamos la sección por completo
+  if (activeCards.length === 0) {
+    return null;
+  }
+
+  const gridColsClass =
+    activeCards.length === 1
+      ? 'grid-cols-1'
+      : activeCards.length === 2
+      ? 'grid-cols-1 md:grid-cols-2'
+      : 'grid-cols-1 md:grid-cols-3';
 
   return (
     <section
       aria-label="Colecciones Destacadas del Bodegón"
-      className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4"
+      className={`grid ${gridColsClass} gap-3 sm:gap-4`}
     >
-      {cards.map((card) => (
+      {activeCards.map((card) => (
         <Link
           key={card.id}
           href={card.ctaUrl}
@@ -68,6 +86,11 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
           }}
         >
           <div className="space-y-1">
+            {card.badge && (
+              <span className="inline-block rounded-md bg-catador-amber px-2 py-0.5 text-[10px] font-black uppercase text-white shadow-2xs tracking-wider mb-1">
+                {card.badge}
+              </span>
+            )}
             <h2 className="text-base sm:text-xl font-black text-white leading-tight tracking-tight">
               {card.title}
             </h2>

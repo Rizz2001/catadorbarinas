@@ -67,7 +67,7 @@ function ConfirmarCorreoContent() {
       } else {
         setResendFeedback(res.error || 'Error al reenviar.');
       }
-    } catch (err) {
+    } catch {
       setResendFeedback('Error de conexión al reenviar correo.');
     } finally {
       setResendLoading(false);

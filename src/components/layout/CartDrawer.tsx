@@ -22,8 +22,6 @@ import { IMAGE_FALLBACKS } from '@/constants/config';
 import { CartDrawerItemRow } from '@/components/cart/CartDrawerItemRow';
 import { supabase } from '@/lib/supabase';
 
-const FREE_DELIVERY_THRESHOLD_USD = 30;
-
 export function CartDrawer() {
   const {
     items,

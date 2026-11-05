@@ -12,6 +12,7 @@ import {
   canBuyBox,
   canBuyUnit,
   getEffectivePriceUsd,
+  getMaxAllowedQuantity,
   getUnitsPerPurchaseMode,
 } from '@/lib/inventory';
 import { IMAGE_FALLBACKS } from '@/constants/config';
@@ -83,6 +84,14 @@ export function CartItemList() {
           const totalBaseUnits = quantity * unitsPerItem;
           const supportsBothModes = canBuyUnit(product) && canBuyBox(product);
 
+          const otherItems = items.filter(
+            (i) => !(i.product.id === product.id && (i.purchaseMode || 'unidad') === mode)
+          );
+          const maxAllowed = getMaxAllowedQuantity(product, mode, otherItems);
+          const maxBoxes = getMaxAllowedQuantity(product, 'caja', otherItems);
+          const canAddMore = product.allowBackorder || quantity < maxAllowed;
+          const isOutOfStock = !product.allowBackorder && (product.stockQuantity <= 0 || maxAllowed <= 0);
+
           const rawImg = product.images?.[0];
           const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
           const itemImg = isNoImg ? cmsLogo : rawImg;
@@ -123,12 +132,15 @@ export function CartItemList() {
                         </button>
                         <button
                           type="button"
+                          disabled={!product.allowBackorder && maxBoxes <= 0}
                           onClick={() => switchPurchaseMode(product.id, mode, 'caja')}
                           className={cn(
-                            'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all cursor-pointer',
+                            'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all',
                             mode === 'caja'
                               ? 'bg-amber-500 text-white shadow-2xs'
-                              : 'text-slate-500 hover:text-slate-800'
+                              : !product.allowBackorder && maxBoxes <= 0
+                              ? 'text-slate-300 opacity-40 cursor-not-allowed'
+                              : 'text-slate-500 hover:text-slate-800 cursor-pointer'
                           )}
                         >
                           <Package className="h-2.5 w-2.5" />
@@ -175,9 +187,16 @@ export function CartItemList() {
                   <span className="w-8 text-center text-xs font-black text-slate-900">{quantity}</span>
                   <button
                     type="button"
+                    disabled={!canAddMore}
                     onClick={() => updateQuantity(product.id, quantity + 1, mode)}
-                    className="h-9 w-9 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors rounded-r-xl cursor-pointer"
                     aria-label="Aumentar cantidad"
+                    title={!canAddMore ? 'Stock máximo alcanzado' : 'Aumentar cantidad'}
+                    className={cn(
+                      'h-9 w-9 flex items-center justify-center transition-colors rounded-r-xl',
+                      canAddMore
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 cursor-pointer'
+                        : 'text-slate-300 opacity-40 cursor-not-allowed bg-slate-50'
+                    )}
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
@@ -199,6 +218,14 @@ export function CartItemList() {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
+
+              {isOutOfStock && (
+                <div className="w-full text-left pt-1">
+                  <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-2 py-0.5 inline-block">
+                    ⚠️ Stock insuficiente en inventario ({product.stockQuantity} unidades)
+                  </span>
+                </div>
+              )}
             </div>
           );
         })}

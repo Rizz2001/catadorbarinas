@@ -140,7 +140,6 @@ export function calculateSmartDeliveryQuote(params: {
 }): DeliveryQuoteResult {
   const {
     items,
-    subtotalUsd,
     deliveryType,
     userLat,
     userLng,

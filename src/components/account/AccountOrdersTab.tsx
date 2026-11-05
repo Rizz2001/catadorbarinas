@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Package, Clock, ArrowRight, Truck, MapPin, CheckCircle2 } from 'lucide-react';
+import { Package, Clock, ArrowRight, Truck, MapPin } from 'lucide-react';
 import { PedidoConDetalles, EstadoPedido } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
 import { IMAGE_FALLBACKS } from '@/constants/config';

@@ -227,32 +227,39 @@ export function HeaderSearch() {
                     </div>
 
                     {/* Botón de Agregar Rápido al Carrito */}
-                    <button
-                      type="button"
-                      disabled={!product.inStock}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        addItem(product, 1);
-                        setAddedId(product.id);
-                        setTimeout(() => setAddedId(null), 1200);
-                      }}
-                      aria-label={`Agregar ${product.name} al carrito`}
-                      className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all cursor-pointer shadow-2xs',
-                        !product.inStock
-                          ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
-                          : isItemAdded
-                          ? 'bg-emerald-600 text-white scale-105'
-                          : 'bg-slate-100 text-slate-700 hover:bg-catador-blue hover:text-white'
-                      )}
-                    >
-                      {isItemAdded ? (
-                        <Check className="h-4 w-4 stroke-[3]" />
-                      ) : (
-                        <ShoppingCart className="h-4 w-4" />
-                      )}
-                    </button>
+                    {(() => {
+                      const canBuy = (product.inStock || product.allowBackorder) && ((product.stockQuantity ?? 0) > 0 || product.allowBackorder);
+                      return (
+                        <button
+                          type="button"
+                          disabled={!canBuy}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!canBuy) return;
+                            addItem(product, 1);
+                            setAddedId(product.id);
+                            setTimeout(() => setAddedId(null), 1200);
+                          }}
+                          title={!canBuy ? 'Agotado en inventario' : `Agregar ${product.name} al carrito`}
+                          aria-label={`Agregar ${product.name} al carrito`}
+                          className={cn(
+                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all shadow-2xs',
+                            !canBuy
+                              ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
+                              : isItemAdded
+                              ? 'bg-emerald-600 text-white scale-105 cursor-pointer'
+                              : 'bg-slate-100 text-slate-700 hover:bg-catador-blue hover:text-white cursor-pointer'
+                          )}
+                        >
+                          {isItemAdded ? (
+                            <Check className="h-4 w-4 stroke-[3]" />
+                          ) : (
+                            <ShoppingCart className="h-4 w-4" />
+                          )}
+                        </button>
+                      );
+                    })()}
                   </Link>
                 );
               })

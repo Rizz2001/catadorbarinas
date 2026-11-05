@@ -1,14 +1,31 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ShieldCheck, Truck, Clock } from 'lucide-react';
+import { useCartStore } from '@/store/useCartStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { useBcvStore } from '@/store/useBcvStore';
-import { formatUsd, formatVes } from '@/lib/currency';
+import { useStoreConfigStore } from '@/store/useStoreConfigStore';
+import { formatUsd, formatVes, convertUsdToVes } from '@/lib/currency';
+import { calculateSmartDeliveryQuote } from '@/lib/delivery';
 
 export function CartOrderSummary() {
+  const { items } = useCartStore();
   const totals = useCartTotals();
-  const rateInfo = useBcvStore((state) => state.rateInfo);
+  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const storeConfig = useStoreConfigStore((state) => state.config);
+
+  const deliveryQuote = useMemo(() => {
+    return calculateSmartDeliveryQuote({
+      items,
+      subtotalUsd: totals.subtotalUsd,
+      deliveryType: 'delivery',
+      storeConfig,
+    });
+  }, [items, totals.subtotalUsd, storeConfig]);
+
+  const totalConDeliveryUsd = Number((totals.subtotalUsd + deliveryQuote.shippingUsd).toFixed(2));
+  const totalConDeliveryVes = Number((totals.subtotalVes + convertUsdToVes(deliveryQuote.shippingUsd, bcvRate)).toFixed(2));
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-2xs p-5 space-y-5">
@@ -36,29 +53,23 @@ export function CartOrderSummary() {
 
         <div className="flex justify-between items-center text-slate-600">
           <div className="flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5 text-slate-400" />
-            <span>Delivery en Barinas:</span>
+            <Truck className="h-3.5 w-3.5 text-catador-blue" />
+            <span>Delivery en Barinas ({deliveryQuote.tierBadge}):</span>
           </div>
-          <span className="font-bold text-emerald-600">
-            {totals.shippingUsd === 0 ? '¡Gratis!' : `${formatUsd(totals.shippingUsd)} / ${formatVes(totals.shippingVes)}`}
+          <span className="font-bold text-catador-blue">
+            {formatUsd(deliveryQuote.shippingUsd)} / {formatVes(convertUsdToVes(deliveryQuote.shippingUsd, bcvRate))}
           </span>
         </div>
-
-        {totals.subtotalUsd < 30 && totals.subtotalUsd > 0 && (
-          <p className="text-[11px] text-catador-amber bg-amber-50 p-2 rounded-lg border border-amber-200/60">
-            Agrega <strong>{formatUsd(30 - totals.subtotalUsd)}</strong> más para envío gratuito en Barinas.
-          </p>
-        )}
 
         {/* Total Final Bimonetario */}
         <div className="pt-3 border-t border-slate-200 flex justify-between items-baseline">
           <span className="text-sm font-extrabold text-slate-900">Total a Pagar:</span>
           <div className="text-right">
             <p className="text-xl font-black text-catador-blue leading-tight">
-              {formatUsd(totals.totalUsd)}
+              {formatUsd(totalConDeliveryUsd)}
             </p>
             <p className="text-xs font-bold text-slate-600 mt-0.5">
-              {formatVes(totals.totalVes)}
+              {formatVes(totalConDeliveryVes)}
             </p>
           </div>
         </div>
@@ -71,7 +82,7 @@ export function CartOrderSummary() {
           <span>Tasa Oficial BCV:</span>
         </div>
         <span className="font-extrabold text-catador-blue">
-          Bs. {rateInfo.rate.toFixed(2)} / $
+          Bs. {bcvRate.toFixed(2)} / $
         </span>
       </div>
 

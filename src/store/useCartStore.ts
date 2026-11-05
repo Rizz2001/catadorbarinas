@@ -182,7 +182,7 @@ export const useCartStore = create<CartState>()(
                   itemMode === 'caja'
                     ? `Stock máximo alcanzado: ${maxAllowed} ${
                         maxAllowed === 1 ? 'caja' : 'cajas'
-                      } (${item.product.stockQuantity} unidades en inventario).`
+                      } de ${unitsPerBox} und (${item.product.stockQuantity} unidades en inventario).`
                     : `Stock máximo disponible en inventario: ${maxAllowed} unidades.`;
               }
 

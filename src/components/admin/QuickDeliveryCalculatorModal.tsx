@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { X, Bike, Truck, Copy, Check, ExternalLink, Navigation, Compass, MessageCircle } from 'lucide-react';
+import { X, Bike, Truck, Copy, Check, MessageCircle } from 'lucide-react';
 import { BARINAS_ZONE_COORDS, getDeliveryTierInfo, calculateDistanceKm, formatDeliveryQuoteForWhatsApp } from '@/lib/delivery';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useBcvStore } from '@/store/useBcvStore';

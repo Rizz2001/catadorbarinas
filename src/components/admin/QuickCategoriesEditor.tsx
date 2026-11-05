@@ -72,6 +72,13 @@ export function QuickCategoriesEditor() {
     try {
       setSavingId(cat.id);
       await upsertQuickCategory(cat);
+
+      try {
+        await fetch('/api/admin/revalidate', { method: 'POST' });
+      } catch {
+        // Silencioso
+      }
+
       setSuccessId(cat.id);
       setTimeout(() => setSuccessId(null), 2500);
     } catch (err) {

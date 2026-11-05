@@ -165,9 +165,8 @@ export function validateStockAddition(
       maxTotalForMode,
       availableUnitsTotal: totalStockUnits,
       requiredUnits: (currentModeQty + availableToAdd) * unitsPerItem,
-      message: `Ajustado al máximo disponible en inventario (${maxTotalForMode} ${
-        mode === 'caja' ? 'cajas' : 'unidades'
-      } = ${totalStockUnits} botellas/und).`,
+      message: `Ajustado al máximo disponible en inventario (${maxTotalForMode} ${mode === 'caja' ? 'cajas' : 'unidades'
+        } = ${totalStockUnits} botellas/und).`,
     };
   }
 

@@ -117,6 +117,14 @@ export default function AdminBannersPage() {
       setSaving(true);
       const updated = await upsertBanner({ ...currentBanner, tipo: activeSlot });
       setBanners((prev) => ({ ...prev, [activeSlot]: updated }));
+
+      // Invalidar caché del servidor para que el cambio sea instantáneo en el inicio
+      try {
+        await fetch('/api/admin/revalidate', { method: 'POST' });
+      } catch {
+        // Silencioso si falla la revalidación
+      }
+
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {

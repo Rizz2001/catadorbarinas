@@ -148,8 +148,8 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
             {product.stockQuantity > 0
               ? `${product.stockQuantity} disp.`
               : product.allowBackorder
-              ? 'Disponible'
-              : 'Agotado'}
+                ? 'Disponible'
+                : 'Agotado'}
           </span>
         </div>
 
@@ -196,8 +196,8 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
                 mode === 'caja'
                   ? 'bg-catador-blue text-white cursor-pointer'
                   : maxForBox <= 0 && !product.allowBackorder
-                  ? 'text-slate-400 opacity-55 cursor-not-allowed'
-                  : 'text-slate-600 hover:text-slate-900 cursor-pointer'
+                    ? 'text-slate-400 opacity-55 cursor-not-allowed'
+                    : 'text-slate-600 hover:text-slate-900 cursor-pointer'
               )}
             >
               <Package className="hidden xs:inline-block h-2.5 w-2.5 shrink-0" />
@@ -268,8 +268,8 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
                 !canAddMore
                   ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'
                   : isAdded
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-catador-blue text-white hover:bg-catador-blue-light active:scale-95'
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-catador-blue text-white hover:bg-catador-blue-light active:scale-95'
               )}
             >
               {isAdded ? <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[3]" /> : <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />}
