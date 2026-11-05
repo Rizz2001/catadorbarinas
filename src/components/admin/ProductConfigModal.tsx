@@ -27,7 +27,9 @@ export function ProductConfigModal({
   const [precioCajaUsd, setPrecioCajaUsd] = useState<string>(
     existingConfig?.precio_caja_usd_custom
       ? String(existingConfig.precio_caja_usd_custom)
-      : String(product.boxPriceUsd || Number((product.priceUsd * (product.unitsPerBox || 12)).toFixed(2)))
+      : product.boxPriceUsd
+      ? String(product.boxPriceUsd)
+      : ''
   );
   const [permitirSinStock, setPermitirSinStock] = useState<string>(
     existingConfig?.permitir_venta_sin_stock === true

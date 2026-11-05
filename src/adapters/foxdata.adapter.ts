@@ -17,22 +17,36 @@ export interface RawFoxDataProductDto {
   cantidadGrup?: number;
   precioDiv1?: number;
   precioVentDiv1?: number;
-  precioDiv2?: number;
-  precioVentDiv2?: number;
-  precioDiv3?: number;
-  precioVentDiv3?: number;
-  precioDiv4?: number;
-  precioVentDiv4?: number;
-  precioDiv5?: number;
-  precioVentDiv5?: number;
-  precioDiv6?: number;
-  precioVentDiv6?: number;
-  precioDiv7?: number;
-  precioVentDiv7?: number;
-  precioDiv8?: number;
-  precioVentDiv8?: number;
   precioGrupDiv1?: number;
   precioVentGrupDiv1?: number;
+  precioDiv2?: number;
+  precioVentDiv2?: number;
+  precioGrupDiv2?: number;
+  precioVentGrupDiv2?: number;
+  precioDiv3?: number;
+  precioVentDiv3?: number;
+  precioGrupDiv3?: number;
+  precioVentGrupDiv3?: number;
+  precioDiv4?: number;
+  precioVentDiv4?: number;
+  precioGrupDiv4?: number;
+  precioVentGrupDiv4?: number;
+  precioDiv5?: number;
+  precioVentDiv5?: number;
+  precioGrupDiv5?: number;
+  precioVentGrupDiv5?: number;
+  precioDiv6?: number;
+  precioVentDiv6?: number;
+  precioGrupDiv6?: number;
+  precioVentGrupDiv6?: number;
+  precioDiv7?: number;
+  precioVentDiv7?: number;
+  precioGrupDiv7?: number;
+  precioVentGrupDiv7?: number;
+  precioDiv8?: number;
+  precioVentDiv8?: number;
+  precioGrupDiv8?: number;
+  precioVentGrupDiv8?: number;
   suspendido?: number;
   imagenUrl?: string | null;
   smartVentas?: number;
@@ -145,7 +159,24 @@ export function adaptFoxDataProduct(
     priceUsd = Number((basePriceUsd * (1 - cmsConfig.porcentaje_descuento_custom / 100)).toFixed(2));
   }
 
-  // Configuración de Caja / Bulto
+  // Configuración de Caja / Bulto consumida 100% de FoxData / SmartVentas
+  // Lista 5 (precioVentGrupDiv5) es el precio oficial de venta en divisas para Bodegón
+  const candidateBoxPrices = [
+    raw.precioVentGrupDiv5,
+    raw.precioVentGrupDiv1,
+    raw.precioVentGrupDiv2,
+    raw.precioVentGrupDiv3,
+    raw.precioVentGrupDiv4,
+    raw.precioVentGrupDiv6,
+    raw.precioVentGrupDiv7,
+    raw.precioVentGrupDiv8,
+    raw.precioGrupDiv5,
+    raw.precioGrupDiv1,
+  ];
+  const resolvedFoxBoxPrice = candidateBoxPrices.find((p) => typeof p === 'number' && p > 0);
+  const foxBoxPrice = resolvedFoxBoxPrice ? Number(resolvedFoxBoxPrice.toFixed(2)) : undefined;
+
+  // Unidades por caja directo de FoxData (cantidadGrup)
   const defaultBoxSize = raw.codGrupo === '09' ? 24 : 12;
   const foxBoxUnits = raw.cantidadGrup && raw.cantidadGrup > 1 ? Math.round(raw.cantidadGrup) : defaultBoxSize;
   const unitsPerBox =
@@ -153,17 +184,21 @@ export function adaptFoxDataProduct(
       ? Math.round(cmsConfig.unidades_por_caja_custom)
       : foxBoxUnits;
 
-  const foxBoxPrice =
-    raw.precioVentGrupDiv1 && raw.precioVentGrupDiv1 > priceUsd
-      ? Number(raw.precioVentGrupDiv1.toFixed(2))
-      : Number((priceUsd * unitsPerBox).toFixed(2));
-
+  // Precio final de caja: Si hay precio configurado en CMS se respeta, si no, se usa el de FoxData directamente
   const boxPriceUsd =
     cmsConfig?.precio_caja_usd_custom && Number(cmsConfig.precio_caja_usd_custom) > 0
       ? Number(Number(cmsConfig.precio_caja_usd_custom).toFixed(2))
       : foxBoxPrice;
 
-  const saleMode = cmsConfig?.modalidad_venta ?? 'ambos';
+  // Si FoxData NO tiene precio de caja/bulto para este artículo y el CMS no definió uno personalizado,
+  // el artículo NO se vende por caja (se restringe a solo_unidad para evitar inventar precios).
+  const hasBoxPriceAvailable = typeof boxPriceUsd === 'number' && boxPriceUsd > 0;
+
+  const defaultSaleMode = hasBoxPriceAvailable
+    ? (raw.esAgrupado === 1 || (raw.cantidadGrup && raw.cantidadGrup > 1) ? 'ambos' : 'solo_unidad')
+    : 'solo_unidad';
+
+  const saleMode = cmsConfig?.modalidad_venta ?? defaultSaleMode;
   const boxUnitLabel = (raw.unidadGrup && raw.unidadGrup.trim() !== '' ? raw.unidadGrup.trim() : 'CAJA');
 
   // Buscar imagen WebP cargada en el CMS por código de barras / SKU

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: '%s | Gran Catador Barinas',
   },
   description:
-    'Tienda online oficial de Gran Catador / Distribuidora Bodegón del Catador C.A. en Barinas. Compra licores, cervezas, refrescos, hielo y víveres por unidad o por caja con precios en $ USD y Bs. BCV. Cotizador de delivery GPS en tiempo real.',
+    'Tienda online oficial de Gran Catador / Distribuidora Bodegón del Catador C.A. en Barinas. Compra licores, cervezas, refrescos, hielo y víveres por unidad o por caja con precios en $ USD y Bs. BCV. Cálculo automático de delivery por GPS en tiempo real.',
   keywords: [
     'Gran Catador Barinas',
     'Bodegón en Barinas',

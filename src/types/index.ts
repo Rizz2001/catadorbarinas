@@ -161,6 +161,10 @@ export interface StoreConfig {
   permitir_venta_sin_stock_global?: boolean;
   tienda_lat?: number;
   tienda_lng?: number;
+  delivery_corta_usd?: number;
+  delivery_media_usd?: number;
+  delivery_larga_usd?: number;
+  delivery_extralarga_usd?: number;
   delivery_por_km_usd?: number;
   delivery_max_cajas_motorizado?: number;
   delivery_max_unidades_motorizado?: number;
@@ -244,6 +248,9 @@ export interface DeliveryQuoteResult {
   totalBoxesEquivalent: number;
   totalUnitsEquivalent: number;
   reasonText: string;
+  tierName?: string;
+  tierBadge?: string;
+  detailsBreakdown?: string;
 }
 
 export interface ProductImageMapping {

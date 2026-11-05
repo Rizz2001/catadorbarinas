@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Lock, Mail, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Lock, Mail, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { signInWithEmail } from '@/services/auth.service';
 import { supabase } from '@/lib/supabase/client';
 
@@ -13,6 +13,7 @@ export function LoginForm() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +55,12 @@ export function LoginForm() {
 
       window.location.href = target;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Credenciales inválidas. Verifica tu correo y contraseña.');
+      const rawMsg = err instanceof Error ? err.message : '';
+      if (rawMsg.toLowerCase().includes('invalid login credentials')) {
+        setError('Correo o contraseña incorrectos. Verifica que estén bien escritos.');
+      } else {
+        setError(rawMsg || 'Credenciales inválidas. Verifica tu correo y contraseña.');
+      }
       setLoading(false);
     }
   };
@@ -86,17 +92,31 @@ export function LoginForm() {
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className="block text-xs font-bold text-slate-700">Contraseña</label>
+          <Link
+            href="/recuperar-clave"
+            className="text-[11px] font-semibold text-catador-blue hover:underline"
+          >
+            ¿Olvidaste tu contraseña?
+          </Link>
         </div>
         <div className="relative">
           <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+            className="w-full rounded-xl border border-slate-200 pl-9 pr-10 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20 font-mono"
           />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
+          >
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 

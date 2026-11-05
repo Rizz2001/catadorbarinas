@@ -3,11 +3,13 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { MapPin, Phone } from 'lucide-react';
 import { APP_CONFIG } from '@/constants/config';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 
 export function Footer() {
+  const pathname = usePathname();
   const storeConfig = useStoreConfigStore((state) => state.config);
   const fetchConfig = useStoreConfigStore((state) => state.fetchConfig);
   const hasLoaded = useStoreConfigStore((state) => state.hasLoaded);
@@ -17,6 +19,11 @@ export function Footer() {
       fetchConfig();
     }
   }, [hasLoaded, fetchConfig]);
+
+  // Ocultar footer de la tienda en panel CMS
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
 
   const freeShipping =
     storeConfig?.delivery_gratis_minimo_usd ?? APP_CONFIG.freeShippingThresholdUsd;

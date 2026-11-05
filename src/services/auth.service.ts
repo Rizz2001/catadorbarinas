@@ -11,6 +11,8 @@ export interface SignUpData {
   telefono: string;
   cedula: string;
   direccion?: string;
+  latitud?: number | null;
+  longitud?: number | null;
 }
 
 export async function signInWithEmail(email: string, password: string) {
@@ -57,7 +59,7 @@ export async function signUpUser(data: SignUpData) {
   }
 
   if (authData.user) {
-    // Asegurar inserción directa en perfiles
+    // Asegurar inserción directa en perfiles con coordenadas GPS
     try {
       await supabase.from('perfiles').upsert({
         id: authData.user.id,
@@ -65,6 +67,8 @@ export async function signUpUser(data: SignUpData) {
         telefono: data.telefono,
         cedula: data.cedula,
         direccion: data.direccion || '',
+        latitud: data.latitud ?? null,
+        longitud: data.longitud ?? null,
         rol: 'cliente',
       });
     } catch {
@@ -78,6 +82,34 @@ export async function signUpUser(data: SignUpData) {
 export async function signOutUser() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
+}
+
+export async function sendPasswordResetEmail(email: string) {
+  const redirectTo = typeof window !== 'undefined'
+    ? `${window.location.origin}/actualizar-clave`
+    : 'http://localhost:3000/actualizar-clave';
+
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    redirectTo,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
+export async function updatePassword(newPassword: string) {
+  const { data, error } = await supabase.auth.updateUser({
+    password: newPassword,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 
 export async function getCurrentUserProfile(): Promise<{ user: User | null; perfil: PerfilRow | null }> {

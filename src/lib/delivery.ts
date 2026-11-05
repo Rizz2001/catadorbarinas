@@ -18,7 +18,7 @@ export const BARINAS_ZONE_COORDS: Record<string, { lat: number; lng: number; app
 };
 
 /**
- * Calcula la distancia vial estimada en kilómetros entre dos coordenadas GPS (Fórmula de Haversine × factor urbano 1.25)
+ * Calcula la distancia vial estimada en kilómetros entre dos coordenadas GPS (Fórmula de Haversine × factor vial urbano 1.25)
  */
 export function calculateDistanceKm(
   lat1: number,
@@ -37,15 +37,97 @@ export function calculateDistanceKm(
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const linearKm = R * c;
-  // Factor de ruta vial urbana en Barinas (1.25x sobre distancia lineal, mínimo 1.0 km)
+  // Factor vial urbano en Barinas (1.25x sobre distancia lineal, mínimo 1.0 km)
   return Number(Math.max(1.0, linearKm * 1.25).toFixed(1));
 }
 
 /**
+ * Información de franja tarifaria de delivery
+ */
+export interface DeliveryTierInfo {
+  tierName: string;
+  tierBadge: string;
+  baseDeliveryUsd: number;
+  description: string;
+}
+
+/**
+ * Calcula la franja y tarifa base por distancia según las reglas oficiales de Gran Catador:
+ * - Carrera corta (0 a 3 km): $1.50
+ * - Carrera media (> 3 a 6 km): $2.50
+ * - Carrera larga (> 6 a 9 km): $3.50
+ * - Carrera extra larga (> 9 a 12 km): $4.50
+ * - Carrera intermedia (> 12 a 20 km): $4.50 + $0.45 por km adicional
+ * - Carrera por Km foránea (desde 20 km en adelante): $0.45 por km
+ */
+export function getDeliveryTierInfo(
+  distanceKm: number,
+  storeConfig?: Partial<StoreConfig> | null
+): DeliveryTierInfo {
+  const cortaUsd = Number(storeConfig?.delivery_corta_usd ?? 1.50);
+  const mediaUsd = Number(storeConfig?.delivery_media_usd ?? 2.50);
+  const largaUsd = Number(storeConfig?.delivery_larga_usd ?? 3.50);
+  const extraLargaUsd = Number(storeConfig?.delivery_extralarga_usd ?? 4.50);
+  const perKmUsd = Number(storeConfig?.delivery_por_km_usd ?? 0.45);
+
+  if (distanceKm <= 3.0) {
+    return {
+      tierName: 'Carrera Corta (0 a 3 km)',
+      tierBadge: 'Corta (≤3 km)',
+      baseDeliveryUsd: cortaUsd,
+      description: `Carrera corta en Barinas hasta 3 km ($${cortaUsd.toFixed(2)})`,
+    };
+  }
+  if (distanceKm <= 6.0) {
+    return {
+      tierName: 'Carrera Media (3 a 6 km)',
+      tierBadge: 'Media (3-6 km)',
+      baseDeliveryUsd: mediaUsd,
+      description: `Carrera media en Barinas de 3 a 6 km ($${mediaUsd.toFixed(2)})`,
+    };
+  }
+  if (distanceKm <= 9.0) {
+    return {
+      tierName: 'Carrera Larga (6 a 9 km)',
+      tierBadge: 'Larga (6-9 km)',
+      baseDeliveryUsd: largaUsd,
+      description: `Carrera larga en Barinas de 6 a 9 km ($${largaUsd.toFixed(2)})`,
+    };
+  }
+  if (distanceKm <= 12.0) {
+    return {
+      tierName: 'Carrera Extra Larga (9 a 12 km)',
+      tierBadge: 'Extra Larga (9-12 km)',
+      baseDeliveryUsd: extraLargaUsd,
+      description: `Carrera extra larga de 9 a 12 km ($${extraLargaUsd.toFixed(2)})`,
+    };
+  }
+  if (distanceKm < 20.0) {
+    const extraKm = Number((distanceKm - 12.0).toFixed(1));
+    const totalUsd = Number((extraLargaUsd + extraKm * perKmUsd).toFixed(2));
+    return {
+      tierName: `Carrera Intermedia (${distanceKm} km)`,
+      tierBadge: 'Intermedia (12-20 km)',
+      baseDeliveryUsd: totalUsd,
+      description: `Carrera de 12 a 20 km ($${extraLargaUsd.toFixed(2)} base + ${extraKm} km extra a $${perKmUsd.toFixed(2)}/km)`,
+    };
+  }
+
+  // Desde 20 km en adelante: Carrera por Km (0.45$ / km)
+  const totalKmUsd = Number((distanceKm * perKmUsd).toFixed(2));
+  return {
+    tierName: `Carrera Foránea (${distanceKm} km • $${perKmUsd.toFixed(2)}/km)`,
+    tierBadge: 'Foránea (≥20 km)',
+    baseDeliveryUsd: totalKmUsd,
+    description: `Carrera foránea de larga distancia: ${distanceKm} km a $${perKmUsd.toFixed(2)}/km`,
+  };
+}
+
+/**
  * Cotiza automáticamente el delivery según:
- * 1) Ubicación GPS del cliente (o zona seleccionada en Barinas)
- * 2) Volumen de carga (Cajas y Unidades totales): determina si lo lleva un Motorizado o requiere Vehículo de Carga.
- * 3) Parámetros configurados por el administrador en el CMS (`StoreConfig`).
+ * 1) Distancia vial desde Gran Catador hasta la ubicación GPS (o zona elegida)
+ * 2) Franjas oficiales (Corta $1.50, Media $2.50, Larga $3.50, Extra Larga $4.50, Foránea $0.45/km)
+ * 3) Volumen de carga: evalúa si cabe en motorizado o requiere vehículo de carga (+ recargo por mucha cantidad)
  */
 export function calculateSmartDeliveryQuote(params: {
   items: CartItem[];
@@ -95,19 +177,19 @@ export function calculateSmartDeliveryQuote(params: {
       totalBoxesEquivalent,
       totalUnitsEquivalent,
       reasonText: 'Retiro Pick-Up en sede Gran Catador (Sin costo de envío)',
+      tierName: 'Retiro Pick-Up',
+      tierBadge: 'Pick-Up',
+      detailsBreakdown: 'Retiro directo en tienda sin costo de envío',
     };
   }
 
   const storeLat = Number(storeConfig?.tienda_lat ?? 8.6226);
   const storeLng = Number(storeConfig?.tienda_lng ?? -70.2075);
-  const baseFeeUsd = Number(storeConfig?.delivery_base_usd ?? 2.0);
-  const perKmUsd = Number(storeConfig?.delivery_por_km_usd ?? 0.45);
-  const freeMinUsd = Number(storeConfig?.delivery_gratis_minimo_usd ?? 30.0);
   const maxBoxesMoto = Number(storeConfig?.delivery_max_cajas_motorizado ?? 2);
   const maxUnitsMoto = Number(storeConfig?.delivery_max_unidades_motorizado ?? 24);
-  const heavyLoadSurcharge = Number(storeConfig?.delivery_recargo_vehiculo_usd ?? 3.5);
+  const heavyLoadSurcharge = Number(storeConfig?.delivery_recargo_vehiculo_usd ?? 3.50);
 
-  // Calcular distancia en km
+  // 1. Calcular distancia en km desde la tienda hasta el destino
   let distanceKm = 2.5;
   if (typeof userLat === 'number' && typeof userLng === 'number') {
     distanceKm = calculateDistanceKm(storeLat, storeLng, userLat, userLng);
@@ -115,49 +197,89 @@ export function calculateSmartDeliveryQuote(params: {
     distanceKm = BARINAS_ZONE_COORDS[zonaBarinas].approxKm;
   }
 
-  // Evaluar si requiere vehículo de carga por volumen (más cajas o botellas de las que lleva un motorizado)
+  // 2. Obtener la franja tarifaria por distancia
+  const tierInfo = getDeliveryTierInfo(distanceKm, storeConfig);
+
+  // 3. Evaluar si supera la capacidad de un motorizado (mucha cantidad -> vehículo de carga)
   const exceedsMotoCapacity =
     explicitBoxesCount > maxBoxesMoto ||
     totalBoxesEquivalent > maxBoxesMoto ||
     totalUnitsEquivalent > maxUnitsMoto;
 
   const transportType = exceedsMotoCapacity ? 'vehiculo_carga' : 'motorizado';
-
-  // Los primeros 2 km están incluidos en la tarifa base; kilómetros adicionales suman perKmUsd
-  const extraKm = Math.max(0, distanceKm - 2.0);
-  const distanceFeeUsd = Number((extraKm * perKmUsd).toFixed(2));
   const appliedHeavySurcharge = exceedsMotoCapacity ? heavyLoadSurcharge : 0;
 
-  // Si supera el mínimo de envío gratis, el envío base en motorizado es gratis,
-  // pero si es carga pesada (varias cajas) o distancia extra larga (>5km), mantiene el recargo logístico de carga
-  const qualifiesBaseFree = subtotalUsd >= freeMinUsd;
-  let shippingUsd = 0;
+  // 4. Monto final de envío
+  const shippingUsd = Number((tierInfo.baseDeliveryUsd + appliedHeavySurcharge).toFixed(2));
 
-  if (qualifiesBaseFree && !exceedsMotoCapacity && distanceKm <= 6.0) {
-    shippingUsd = 0;
-  } else if (qualifiesBaseFree && exceedsMotoCapacity) {
-    shippingUsd = Number((appliedHeavySurcharge + distanceFeeUsd * 0.5).toFixed(2));
-  } else {
-    shippingUsd = Number((baseFeeUsd + distanceFeeUsd + appliedHeavySurcharge).toFixed(2));
-  }
-
+  // 5. Explicaciones legibles
   const reasonText = exceedsMotoCapacity
-    ? `Despacho en Vehículo de Carga (${totalUnitsEquivalent} und / ~${Math.ceil(totalBoxesEquivalent)} cajas • ${distanceKm} km)`
-    : shippingUsd === 0
-      ? `Delivery Motorizado Gratis (${distanceKm} km)`
-      : `Delivery en Motorizado Express (${distanceKm} km)`;
+    ? `Despacho en Vehículo de Carga (${tierInfo.tierBadge} • ${totalUnitsEquivalent} und / ~${Math.ceil(totalBoxesEquivalent)} cajas • ${distanceKm} km)`
+    : `${tierInfo.tierName} en Motorizado Express (${distanceKm} km)`;
+
+  const detailsBreakdown = exceedsMotoCapacity
+    ? `Tarifa distancia: $${tierInfo.baseDeliveryUsd.toFixed(2)} (${tierInfo.tierBadge}) + Recargo carga por volumen: $${appliedHeavySurcharge.toFixed(2)}`
+    : `Tarifa oficial por distancia: $${tierInfo.baseDeliveryUsd.toFixed(2)} (${tierInfo.tierName})`;
 
   return {
     distanceKm,
     transportType,
     shippingUsd,
-    baseFeeUsd,
-    distanceFeeUsd,
+    baseFeeUsd: tierInfo.baseDeliveryUsd,
+    distanceFeeUsd: 0,
     heavyLoadSurchargeUsd: appliedHeavySurcharge,
     isFreeShipping: shippingUsd === 0,
     totalBoxesEquivalent,
     totalUnitsEquivalent,
     reasonText,
+    tierName: tierInfo.tierName,
+    tierBadge: tierInfo.tierBadge,
+    detailsBreakdown,
   };
 }
 
+/**
+ * Genera texto formateado para enviar la cotización de delivery al cliente por WhatsApp con 1 toque
+ */
+export function formatDeliveryQuoteForWhatsApp(params: {
+  distanceKm: number;
+  shippingUsd: number;
+  tierName?: string;
+  transportType?: 'motorizado' | 'vehiculo_carga' | 'pickup';
+  bcvRate?: number;
+  zonaOrDireccion?: string;
+  totalBoxes?: number;
+  totalUnits?: number;
+}): string {
+  const {
+    distanceKm,
+    shippingUsd,
+    tierName = 'Carrera',
+    transportType = 'motorizado',
+    bcvRate = 1,
+    zonaOrDireccion = 'Barinas',
+    totalBoxes,
+    totalUnits,
+  } = params;
+
+  const vesAmount = (shippingUsd * bcvRate).toLocaleString('es-VE', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const transportLabel =
+    transportType === 'vehiculo_carga'
+      ? 'Camioneta / Vehículo de Carga (Pedido de Mayor Volumen)'
+      : 'Motorizado Express';
+
+  let msg = `🛵 *Cotización de Delivery - Gran Catador* 🍾\n`;
+  msg += `📍 *Destino:* ${zonaOrDireccion} (~${distanceKm} km)\n`;
+  msg += `⚡ *Tipo:* ${tierName}\n`;
+  msg += `🚗 *Transporte:* ${transportLabel}\n`;
+  if (totalBoxes && totalBoxes > 0) {
+    msg += `📦 *Carga:* ${totalUnits || Math.ceil(totalBoxes * 12)} und (~${Math.ceil(totalBoxes)} cajas)\n`;
+  }
+  msg += `💵 *Monto:* $${shippingUsd.toFixed(2)} USD (Bs. ${vesAmount} BCV)\n`;
+  msg += `⏱️ *Tiempo estimado de entrega:* 25 a 45 minutos tras verificar su pago.`;
+  return msg;
+}

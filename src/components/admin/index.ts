@@ -7,4 +7,6 @@ export * from './BannerImageUploader';
 export * from './PromoCardPreview';
 export * from './QuickCategoriesEditor';
 export * from './EditUserModal';
+export * from './DeleteUserModal';
 export * from './DeleteOrderModal';
+export * from './QuickDeliveryCalculatorModal';

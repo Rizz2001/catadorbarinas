@@ -12,7 +12,10 @@ import {
   CreditCard,
   Edit3,
   MessageSquareText,
+  AlertTriangle,
+  Mail,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { CartItem, DeliveryQuoteResult } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
 import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
@@ -33,6 +36,10 @@ interface CheckoutStepSummaryProps {
   bcvRate: number;
   deliveryQuote: DeliveryQuoteResult;
   isSubmitting: boolean;
+  isEmailConfirmed?: boolean;
+  onResendConfirmEmail?: () => void;
+  resendingEmail?: boolean;
+  resendEmailMsg?: string | null;
   onEditStep: (step: 1 | 2) => void;
   onProcessOrder: () => void;
 }
@@ -50,6 +57,10 @@ export function CheckoutStepSummary({
   bcvRate,
   deliveryQuote,
   isSubmitting,
+  isEmailConfirmed = true,
+  onResendConfirmEmail,
+  resendingEmail = false,
+  resendEmailMsg,
   onEditStep,
   onProcessOrder,
 }: CheckoutStepSummaryProps) {
@@ -226,6 +237,42 @@ export function CheckoutStepSummary({
           </div>
         </div>
 
+        {/* Bloqueo si el correo no está confirmado */}
+        {!isEmailConfirmed && (
+          <div className="rounded-2xl border-2 border-amber-300 bg-amber-50 p-4 space-y-2.5 text-xs text-amber-950">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h4 className="font-black text-xs text-amber-950 uppercase tracking-wide">
+                  🔒 Confirmación de Correo Requerida para Comprar
+                </h4>
+                <p className="text-xs text-amber-900 leading-relaxed">
+                  Para evitar registros no verificados y asegurar el despacho de tu pedido, <strong>debes confirmar tu correo ({deliveryData.email || 'tu email'}) antes de procesar la compra</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              {onResendConfirmEmail && (
+                <button
+                  type="button"
+                  onClick={onResendConfirmEmail}
+                  disabled={resendingEmail}
+                  className="px-3.5 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-60 shadow-xs"
+                >
+                  <Mail className="h-3.5 w-3.5" />
+                  <span>{resendingEmail ? 'Reenviando...' : 'Reenviar Enlace de Confirmación'}</span>
+                </button>
+              )}
+              {resendEmailMsg && (
+                <span className="text-[11px] font-bold text-amber-900 bg-amber-100 px-2.5 py-1 rounded-lg border border-amber-300">
+                  {resendEmailMsg}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-2">
           <button
             type="button"
@@ -239,14 +286,24 @@ export function CheckoutStepSummary({
 
           <button
             type="button"
-            disabled={isSubmitting || items.length === 0}
+            disabled={isSubmitting || items.length === 0 || !isEmailConfirmed}
             onClick={onProcessOrder}
-            className="w-full sm:flex-1 min-h-[48px] flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 p-3.5 text-sm font-extrabold text-white shadow-lg transition-all active:scale-[0.99] cursor-pointer"
+            className={cn(
+              'w-full sm:flex-1 min-h-[48px] flex items-center justify-center gap-2 rounded-xl p-3.5 text-sm font-extrabold text-white shadow-lg transition-all active:scale-[0.99]',
+              !isEmailConfirmed
+                ? 'bg-slate-400 opacity-80 cursor-not-allowed shadow-none'
+                : 'bg-emerald-600 hover:bg-emerald-700 cursor-pointer'
+            )}
           >
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>Procesando Orden y Abriendo Chat...</span>
+              </>
+            ) : !isEmailConfirmed ? (
+              <>
+                <AlertTriangle className="h-4 w-4" />
+                <span>Confirma tu Correo para Ordenar</span>
               </>
             ) : (
               <>

@@ -168,7 +168,7 @@ export default function AdminCatalogoConfigPage() {
             </select>
           </div>
 
-          <div className="md:col-span-5 flex gap-1 bg-slate-100 p-1 rounded-lg tabular-nums">
+          <div className="md:col-span-5 flex gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar tabular-nums">
             {(
               [
                 { id: 'all', label: `Todos (${tabCounts.all})` },
@@ -182,8 +182,10 @@ export default function AdminCatalogoConfigPage() {
                 type="button"
                 onClick={() => setFilterTab(tab.id)}
                 className={cn(
-                  'flex-1 py-1.5 px-2 rounded-md text-[11px] font-bold transition-colors cursor-pointer truncate',
-                  filterTab === tab.id ? 'bg-catador-blue text-white' : 'text-slate-600 hover:text-slate-900'
+                  'flex-1 min-h-[42px] py-2 px-3 rounded-xl text-xs font-black transition-colors cursor-pointer shrink-0 text-center',
+                  filterTab === tab.id
+                    ? 'bg-catador-blue text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 )}
               >
                 {tab.label}
@@ -195,12 +197,12 @@ export default function AdminCatalogoConfigPage() {
 
       {/* Tabla Operativa de Reglas de Artículos */}
       {loading ? (
-        <div className="p-12 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
+        <div className="p-12 flex items-center justify-center gap-2 text-sm font-bold text-slate-500">
           <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
           <span>Cargando inventario y reglas del CMS...</span>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200/90 overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm">
           <div className="divide-y divide-slate-100">
             {filteredProducts.slice(0, 60).map((product) => {
               const cfg = configsMap.get(product.id);
@@ -214,20 +216,20 @@ export default function AdminCatalogoConfigPage() {
                 <div
                   key={product.id}
                   className={cn(
-                    'p-3.5 sm:px-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3 transition-colors',
-                    isHidden ? 'bg-rose-50/40' : 'hover:bg-slate-50/80'
+                    'p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 transition-colors',
+                    isHidden ? 'bg-rose-50/50' : 'hover:bg-slate-50'
                   )}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-1.5 tabular-nums">
-                      <span className="text-[11px] font-mono font-bold text-slate-500">
+                    <div className="flex flex-wrap items-center gap-2 tabular-nums">
+                      <span className="text-xs font-mono font-black text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
                         #{product.sku}
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-800">
                         Stock: {product.stockQuantity} und
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-catador-blue">
-                        <Package className="h-3 w-3 inline mr-1" />
+                      <span className="text-xs font-black px-2.5 py-0.5 rounded-md bg-blue-50 text-catador-blue border border-blue-200">
+                        <Package className="h-3.5 w-3.5 inline mr-1" />
                         {saleMode === 'solo_unidad'
                           ? 'Solo Unidad'
                           : saleMode === 'solo_caja'
@@ -235,28 +237,29 @@ export default function AdminCatalogoConfigPage() {
                             : `Unidad y Caja x${unitsBox}`}
                       </span>
                     </div>
-                    <div className="flex items-baseline gap-2 mt-1">
-                      <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 truncate">
+                    <div className="flex items-baseline gap-2 mt-1.5">
+                      <h3 className="text-sm font-black text-slate-900 truncate">
                         {product.name}
                       </h3>
-                      <span className="text-xs font-black text-catador-blue tabular-nums shrink-0">
+                      <span className="text-sm font-black text-catador-blue tabular-nums shrink-0">
                         {formatUsd(product.priceUsd)}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+                  {/* Botonera de Acciones Adaptada para Móvil (2x2) y Desktop */}
+                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 shrink-0">
                     <button
                       type="button"
                       onClick={() => handleQuickToggle(product, 'es_tendencia')}
                       className={cn(
-                        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer',
+                        'flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl text-xs font-extrabold border transition-colors cursor-pointer',
                         isTrend
-                          ? 'bg-catador-blue text-white border-catador-blue'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                          ? 'bg-catador-blue text-white border-catador-blue shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      <TrendingUp className="h-3.5 w-3.5" />
+                      <TrendingUp className="h-4 w-4 shrink-0" />
                       <span>1. Tendencia</span>
                     </button>
 
@@ -264,13 +267,13 @@ export default function AdminCatalogoConfigPage() {
                       type="button"
                       onClick={() => handleQuickToggle(product, 'es_oferta_destacada')}
                       className={cn(
-                        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer',
+                        'flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl text-xs font-extrabold border transition-colors cursor-pointer',
                         isDeal
-                          ? 'bg-catador-amber text-white border-catador-amber'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                          ? 'bg-catador-amber text-white border-catador-amber shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      <Flame className="h-3.5 w-3.5" />
+                      <Flame className="h-4 w-4 shrink-0" />
                       <span>2. Oferta</span>
                     </button>
 
@@ -278,23 +281,23 @@ export default function AdminCatalogoConfigPage() {
                       type="button"
                       onClick={() => handleQuickToggle(product, 'oculto_en_web')}
                       className={cn(
-                        'inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition-colors cursor-pointer',
+                        'flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl text-xs font-extrabold border transition-colors cursor-pointer',
                         isHidden
-                          ? 'bg-rose-600 text-white border-rose-600'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                          ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
+                          : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      {isHidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                      {isHidden ? <EyeOff className="h-4 w-4 shrink-0" /> : <Eye className="h-4 w-4 shrink-0" />}
                       <span>{isHidden ? 'Oculto' : 'Visible'}</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={() => setEditingProduct(product)}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black shadow-xs cursor-pointer"
                     >
-                      <Edit3 className="h-3.5 w-3.5" />
-                      <span>Caja y Ficha</span>
+                      <Edit3 className="h-4 w-4 shrink-0" />
+                      <span>Caja / Ficha</span>
                     </button>
                   </div>
                 </div>

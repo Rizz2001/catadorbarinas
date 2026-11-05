@@ -72,7 +72,30 @@ export async function createOrder(payload: CreateOrderPayload): Promise<PedidoCo
     );
   }
 
-  // 1. Validar existencias reales en unidades base contra FoxData Depósito 01
+  // 0. Validar que la cuenta de usuario no esté suspendida y tenga correo confirmado
+  const supabase = getSupabaseAdmin();
+  const { data: perfilUsuario } = await supabase
+    .from('perfiles')
+    .select('suspendido, motivo_suspension, correo_confirmado, rol')
+    .eq('id', payload.usuarioId)
+    .single();
+
+  if (perfilUsuario?.suspendido) {
+    const motivo = perfilUsuario.motivo_suspension
+      ? `: ${perfilUsuario.motivo_suspension}`
+      : '.';
+    throw new Error(
+      `Tu cuenta se encuentra temporalmente inhabilitada${motivo} Por favor comunícate con atención al cliente.`
+    );
+  }
+
+  if (perfilUsuario?.rol !== 'admin' && perfilUsuario?.correo_confirmado === false) {
+    throw new Error(
+      'Debes confirmar tu correo electrónico antes de realizar un pedido. Revisa tu bandeja de entrada o solicita un nuevo enlace en tu panel de cuenta.'
+    );
+  }
+
+  // 1. Validar existencias reales en unidades base contra FoxData Bodegón
   const [existencias, cmsConfigsMap, storeConfig] = await Promise.all([
     fetchExistenciasBodegonMap(),
     getProductCmsConfigsMap(),

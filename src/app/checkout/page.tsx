@@ -23,6 +23,7 @@ import {
 } from '@/components/checkout';
 import { PedidoConDetalles } from '@/types';
 import { supabase } from '@/lib/supabase';
+import { resendConfirmationEmailAction } from '@/actions/auth.actions';
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCartStore();
@@ -34,6 +35,9 @@ export default function CheckoutPage() {
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<CheckoutWizardStep>(1);
   const [createdOrder, setCreatedOrder] = useState<PedidoConDetalles | null>(null);
+  const [isEmailConfirmed, setIsEmailConfirmed] = useState<boolean>(true);
+  const [checkoutResending, setCheckoutResending] = useState<boolean>(false);
+  const [checkoutResendMsg, setCheckoutResendMsg] = useState<string | null>(null);
 
   const [deliveryData, setDeliveryData] = useState<DeliveryDataState>({
     nombre: '',
@@ -62,6 +66,9 @@ export default function CheckoutPage() {
           .single();
 
         if (!active) return;
+        const confirmed = perfil?.rol === 'admin' || perfil?.correo_confirmado === true;
+        setIsEmailConfirmed(Boolean(confirmed));
+
         setDeliveryData((prev) => ({
           ...prev,
           nombre: perfil?.nombre || prev.nombre,
@@ -69,6 +76,8 @@ export default function CheckoutPage() {
           telefono: perfil?.telefono || prev.telefono,
           direccion: perfil?.direccion || prev.direccion,
           email: user.email || prev.email,
+          latitud: typeof perfil?.latitud === 'number' ? perfil.latitud : prev.latitud,
+          longitud: typeof perfil?.longitud === 'number' ? perfil.longitud : prev.longitud,
         }));
       }
       setAuthChecking(false);
@@ -174,10 +183,35 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleResendCheckoutEmail = async () => {
+    if (!deliveryData.email) return;
+    setCheckoutResending(true);
+    setCheckoutResendMsg(null);
+    try {
+      const res = await resendConfirmationEmailAction(deliveryData.email);
+      if (res.success) {
+        setCheckoutResendMsg(res.message || 'Enlace reenviado.');
+      } else {
+        setCheckoutResendMsg(res.error || 'Error al reenviar.');
+      }
+    } catch {
+      setCheckoutResendMsg('Error de conexión.');
+    } finally {
+      setCheckoutResending(false);
+    }
+  };
+
   const handleProcessOrder = async () => {
     setErrorMessage(null);
     if (!userId) {
       setErrorMessage('Debes registrarte o iniciar sesión para poder procesar tu compra.');
+      return;
+    }
+
+    if (!isEmailConfirmed) {
+      setErrorMessage(
+        'Debes confirmar tu correo electrónico antes de realizar tu pedido. Revisa tu bandeja de entrada o haz clic en reenviar enlace.'
+      );
       return;
     }
 
@@ -394,6 +428,10 @@ export default function CheckoutPage() {
           bcvRate={bcvRate}
           deliveryQuote={deliveryQuote}
           isSubmitting={isSubmitting}
+          isEmailConfirmed={isEmailConfirmed}
+          onResendConfirmEmail={handleResendCheckoutEmail}
+          resendingEmail={checkoutResending}
+          resendEmailMsg={checkoutResendMsg}
           onEditStep={(step) => setCurrentStep(step)}
           onProcessOrder={handleProcessOrder}
         />

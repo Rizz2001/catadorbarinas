@@ -16,7 +16,8 @@ import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
-import { formatUsd, formatVes } from '@/lib/currency';
+import { formatUsd, formatVes, convertUsdToVes } from '@/lib/currency';
+import { calculateSmartDeliveryQuote } from '@/lib/delivery';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { CartDrawerItemRow } from '@/components/cart/CartDrawerItemRow';
 import { supabase } from '@/lib/supabase';
@@ -40,24 +41,55 @@ export function CartDrawer() {
   const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
 
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userLocation, setUserLocation] = useState<{
+    latitud?: number | null;
+    longitud?: number | null;
+    direccion?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     let active = true;
-    async function checkAuth() {
+    async function checkAuthAndLocation() {
       const { data: { user } } = await supabase.auth.getUser();
-      if (active) setIsAuthenticated(Boolean(user));
+      if (!active) return;
+      setIsAuthenticated(Boolean(user));
+      if (user) {
+        const { data: perfil } = await supabase
+          .from('perfiles')
+          .select('latitud, longitud, direccion')
+          .eq('id', user.id)
+          .single();
+        if (active && perfil) {
+          setUserLocation({
+            latitud: typeof perfil.latitud === 'number' ? perfil.latitud : null,
+            longitud: typeof perfil.longitud === 'number' ? perfil.longitud : null,
+            direccion: perfil.direccion || null,
+          });
+        }
+      }
     }
-    checkAuth();
+    checkAuthAndLocation();
     return () => {
       active = false;
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const deliveryQuote = React.useMemo(() => {
+    return calculateSmartDeliveryQuote({
+      items,
+      subtotalUsd: totals.subtotalUsd,
+      deliveryType: 'delivery',
+      userLat: userLocation?.latitud ?? null,
+      userLng: userLocation?.longitud ?? null,
+      storeConfig,
+    });
+  }, [items, totals.subtotalUsd, userLocation, storeConfig]);
 
-  const remainingForFreeDelivery = Math.max(0, FREE_DELIVERY_THRESHOLD_USD - totals.subtotalUsd);
-  const progressPercent = Math.min(100, (totals.subtotalUsd / FREE_DELIVERY_THRESHOLD_USD) * 100);
+  const totalConDeliveryUsd = Number((totals.subtotalUsd + deliveryQuote.shippingUsd).toFixed(2));
+  const totalConDeliveryVes = Number((totals.subtotalVes + convertUsdToVes(deliveryQuote.shippingUsd, bcvRate)).toFixed(2));
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -107,35 +139,31 @@ export function CartDrawer() {
             </div>
           </div>
 
-          {/* Barra de progreso hacia Delivery Gratis */}
+          {/* Banner de Entrega Automática según Ubicación del Cliente */}
           {items.length > 0 && (
-            <div className="px-4 py-2.5 bg-blue-50/70 border-b border-blue-100">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1.5">
-                <span className="flex items-center gap-1.5">
-                  <Truck className="h-3.5 w-3.5 text-catador-blue shrink-0" />
-                  {remainingForFreeDelivery <= 0 ? (
-                    <span className="text-emerald-700 font-extrabold">
-                      ¡Tienes Delivery Base Gratis en Barinas!
-                    </span>
-                  ) : (
-                    <span>
-                      Te faltan{' '}
-                      <strong className="text-catador-blue">
-                        {formatUsd(remainingForFreeDelivery)}
-                      </strong>{' '}
-                      para Delivery Gratis
-                    </span>
-                  )}
-                </span>
-                <span className="text-[10px] font-black text-catador-blue">
-                  {Math.round(progressPercent)}%
-                </span>
+            <div className="px-4 py-2.5 bg-blue-50/70 border-b border-blue-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-catador-blue/10 flex items-center justify-center text-catador-blue shrink-0">
+                  <Truck className="h-4 w-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-slate-800 leading-tight">
+                    Delivery Automático: {deliveryQuote.tierBadge}
+                  </p>
+                  <p className="text-[10px] text-slate-500">
+                    {userLocation?.latitud
+                      ? `Calculado a tu GPS (${deliveryQuote.distanceKm} km)`
+                      : 'Tarifa base calculada para Barinas (0-3 km)'}
+                  </p>
+                </div>
               </div>
-              <div className="h-1.5 w-full rounded-full bg-slate-200 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-emerald-500 transition-all duration-300"
-                  style={{ width: `${progressPercent}%` }}
-                />
+              <div className="text-right">
+                <span className="text-xs font-black text-catador-blue block">
+                  {formatUsd(deliveryQuote.shippingUsd)}
+                </span>
+                <span className="text-[10px] font-mono text-slate-500">
+                  {formatVes(convertUsdToVes(deliveryQuote.shippingUsd, bcvRate))}
+                </span>
               </div>
             </div>
           )}
@@ -180,18 +208,44 @@ export function CartDrawer() {
 
           {items.length > 0 && (
             <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-200 bg-slate-50 space-y-3">
-              <div className="flex items-center justify-between">
+              {/* Desglose Transparente: Subtotal y Delivery Automático */}
+              <div className="space-y-1.5 text-xs text-slate-600 border-b border-slate-200/90 pb-2.5">
+                <div className="flex justify-between items-center">
+                  <span className="font-medium text-slate-600">Subtotal Productos:</span>
+                  <div className="text-right font-bold text-slate-800">
+                    <span>{formatUsd(totals.subtotalUsd)}</span>
+                    <span className="text-[10px] font-mono text-slate-500 ml-1.5">
+                      ({formatVes(totals.subtotalVes)})
+                    </span>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="flex items-center gap-1.5 font-medium text-slate-700">
+                    <Truck className="h-3.5 w-3.5 text-catador-blue shrink-0" />
+                    <span>Delivery Automático ({deliveryQuote.tierBadge}):</span>
+                  </span>
+                  <div className="text-right font-bold text-catador-blue">
+                    <span>{formatUsd(deliveryQuote.shippingUsd)}</span>
+                    <span className="text-[10px] font-mono text-slate-500 ml-1.5">
+                      ({formatVes(convertUsdToVes(deliveryQuote.shippingUsd, bcvRate))})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total General a Pagar */}
+              <div className="flex items-center justify-between pt-0.5">
                 <div>
-                  <span className="text-xs font-bold text-slate-500 block">Subtotal Estimado</span>
-                  <span className="text-[11px] font-bold text-slate-600 font-mono">
-                    {formatVes(totals.subtotalVes)}
+                  <span className="text-xs font-black text-slate-900 block">Total a Pagar</span>
+                  <span className="text-[11px] font-bold text-catador-blue font-mono">
+                    {formatVes(totalConDeliveryVes)}
                   </span>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black text-catador-blue leading-none">
-                    {formatUsd(totals.subtotalUsd)}
+                  <p className="text-xl font-black text-catador-blue leading-none">
+                    {formatUsd(totalConDeliveryUsd)}
                   </p>
-                  <span className="text-[10px] text-slate-400">Tasa BCV Oficial</span>
+                  <span className="text-[10px] text-slate-400">Tasa Oficial BCV</span>
                 </div>
               </div>
 
@@ -201,7 +255,7 @@ export function CartDrawer() {
                   onClick={closeCart}
                   className="w-full min-h-[46px] flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light py-3 text-sm font-extrabold text-white shadow-md transition-colors"
                 >
-                  <span>Cotizar Delivery y Pagar</span>
+                  <span>Continuar al Pago</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               ) : (

@@ -37,11 +37,10 @@ export function getEffectivePriceUsd(
   mode: PurchaseMode = 'unidad'
 ): number {
   if (mode === 'caja') {
-    const units = getUnitsPerPurchaseMode(product, 'caja');
     if (product.boxPriceUsd && product.boxPriceUsd > 0) {
       return Number(product.boxPriceUsd.toFixed(2));
     }
-    return Number((product.priceUsd * units).toFixed(2));
+    return product.priceUsd;
   }
   return product.priceUsd;
 }

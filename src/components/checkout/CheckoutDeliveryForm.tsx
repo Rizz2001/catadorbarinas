@@ -159,10 +159,10 @@ export function CheckoutDeliveryForm({
               <div>
                 <h4 className="font-extrabold text-slate-900 text-xs flex items-center gap-1.5">
                   <Navigation className="h-3.5 w-3.5 text-catador-blue" />
-                  Cotizador de Delivery por Ubicación y Volumen
+                  Tarifa de Entrega a Domicilio en Barinas
                 </h4>
                 <p className="text-[11px] text-slate-500">
-                  Detecta tu ubicación GPS o selecciona tu sector para calcular tarifa en Motorizado o Vehículo.
+                  Calculada automáticamente según tu distancia GPS y el volumen de productos.
                 </p>
               </div>
               <button
@@ -206,37 +206,88 @@ export function CheckoutDeliveryForm({
             {deliveryQuote && (
               <div
                 className={cn(
-                  'flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl border',
+                  'rounded-xl border p-3 space-y-2.5 transition-all',
                   deliveryQuote.transportType === 'vehiculo_carga'
-                    ? 'bg-amber-50/90 border-amber-200 text-amber-900'
-                    : 'bg-white border-slate-200 text-slate-800'
+                    ? 'bg-amber-50/90 border-amber-200 text-amber-950'
+                    : 'bg-white border-blue-100 text-slate-800 shadow-2xs'
                 )}
               >
-                <div className="flex items-center gap-2">
-                  {deliveryQuote.transportType === 'vehiculo_carga' ? (
-                    <Truck className="h-5 w-5 text-amber-600 shrink-0" />
-                  ) : (
-                    <Bike className="h-5 w-5 text-catador-blue shrink-0" />
-                  )}
-                  <div>
-                    <span className="font-extrabold block text-xs">{deliveryQuote.reasonText}</span>
-                    <span className="text-[10px] opacity-80 block">
-                      Carga: {deliveryQuote.totalUnitsEquivalent} botellas/und • Distancia estimada: {deliveryQuote.distanceKm} km
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    {deliveryQuote.transportType === 'vehiculo_carga' ? (
+                      <div className="p-2 rounded-lg bg-amber-100 text-amber-700">
+                        <Truck className="h-5 w-5 shrink-0" />
+                      </div>
+                    ) : (
+                      <div className="p-2 rounded-lg bg-blue-50 text-catador-blue">
+                        <Bike className="h-5 w-5 shrink-0" />
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-extrabold text-xs text-slate-900">
+                          {deliveryQuote.tierName || deliveryQuote.reasonText}
+                        </span>
+                        {deliveryQuote.tierBadge && (
+                          <span className="inline-block px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-catador-blue text-white">
+                            {deliveryQuote.tierBadge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-500 block">
+                        Distancia: <strong>{deliveryQuote.distanceKm} km</strong> • Carga:{' '}
+                        <strong>
+                          {deliveryQuote.totalUnitsEquivalent} unidades
+                          {deliveryQuote.totalBoxesEquivalent > 0
+                            ? ` (~${Math.ceil(deliveryQuote.totalBoxesEquivalent)} cajas)`
+                            : ''}
+                        </strong>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right font-mono">
+                    <span className="font-black text-base text-catador-blue block">
+                      {deliveryQuote.shippingUsd === 0 ? '¡GRATIS!' : formatUsd(deliveryQuote.shippingUsd)}
                     </span>
+                    {deliveryQuote.shippingUsd > 0 && (
+                      <span className="text-[11px] font-bold text-slate-600">
+                        {formatVes(deliveryQuote.shippingUsd * bcvRate)}
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="text-right font-mono">
-                  <span className="font-black text-sm text-catador-blue block">
-                    {deliveryQuote.shippingUsd === 0 ? '¡GRATIS!' : formatUsd(deliveryQuote.shippingUsd)}
-                  </span>
-                  {deliveryQuote.shippingUsd > 0 && (
-                    <span className="text-[10px] font-bold text-slate-600">
-                      {formatVes(deliveryQuote.shippingUsd * bcvRate)}
-                    </span>
-                  )}
-                </div>
+
+                {deliveryQuote.detailsBreakdown && (
+                  <p className="text-[10px] text-slate-500 bg-slate-50/80 rounded-lg p-2 border border-slate-100">
+                    💡 <strong>Desglose:</strong> {deliveryQuote.detailsBreakdown}
+                  </p>
+                )}
               </div>
             )}
+
+            {/* Escala oficial de tarifas para conocimiento del cliente */}
+            <div className="rounded-xl border border-slate-200/80 bg-white p-2.5 text-[10px] text-slate-600">
+              <span className="font-extrabold uppercase text-[9px] tracking-wider text-slate-500 block mb-1">
+                Tarifario Oficial de Carreras Gran Catador:
+              </span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-medium">
+                <span className="p-1 rounded bg-slate-50 border border-slate-100">
+                  ⚡ 0 a 3 km: <strong>$1.50</strong>
+                </span>
+                <span className="p-1 rounded bg-slate-50 border border-slate-100">
+                  🛵 3 a 6 km: <strong>$2.50</strong>
+                </span>
+                <span className="p-1 rounded bg-slate-50 border border-slate-100">
+                  📍 6 a 9 km: <strong>$3.50</strong>
+                </span>
+                <span className="p-1 rounded bg-slate-50 border border-slate-100">
+                  🚀 9 a 12 km: <strong>$4.50</strong>
+                </span>
+              </div>
+              <p className="text-[9px] text-slate-400 mt-1.5">
+                🚴🏼 Carreras desde 20 km en adelante: <strong>$0.45 por km</strong>. Pedidos de alto volumen se despachan en vehículo de carga (+ recargo logístico).
+              </p>
+            </div>
           </div>
 
           <div>

@@ -15,9 +15,11 @@ import {
   MapPin,
   Phone,
   Truck,
+  ArrowLeft,
 } from 'lucide-react';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
+import { getDeliveryTierInfo } from '@/lib/delivery';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { DeleteOrderModal } from './DeleteOrderModal';
 
@@ -26,6 +28,7 @@ interface AdminOrderDetailProps {
   onUpdateStatus: (estadoPedido?: EstadoPedido, estadoPago?: EstadoPago) => Promise<void>;
   onDeleteOrder: (orderId: string) => Promise<void>;
   isUpdating: boolean;
+  onBackToList?: () => void;
 }
 
 export function AdminOrderDetail({
@@ -33,6 +36,7 @@ export function AdminOrderDetail({
   onUpdateStatus,
   onDeleteOrder,
   isUpdating,
+  onBackToList,
 }: AdminOrderDetailProps) {
   const [copiedRef, setCopiedRef] = useState(false);
   const [showProofModal, setShowProofModal] = useState(false);
@@ -41,8 +45,8 @@ export function AdminOrderDetail({
 
   if (!order) {
     return (
-      <div className="flex h-[calc(100vh-14rem)] min-h-[520px] max-h-[720px] items-center justify-center rounded-2xl border border-slate-200/90 bg-white p-8 text-center text-xs text-slate-400">
-        Selecciona un pedido de la cola izquierda para gestionar su facturación y despacho.
+      <div className="flex h-[calc(100vh-16rem)] min-h-[460px] lg:h-[calc(100vh-14rem)] lg:min-h-[520px] lg:max-h-[720px] items-center justify-center rounded-2xl border border-slate-200/90 bg-white p-8 text-center text-sm font-medium text-slate-400">
+        Selecciona un pedido de la lista para gestionar su pago, despacho y entrega.
       </div>
     );
   }
@@ -71,130 +75,167 @@ export function AdminOrderDetail({
       : null;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-14rem)] min-h-[520px] max-h-[720px] rounded-2xl border border-slate-200/90 bg-white overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-16rem)] min-h-[460px] lg:h-[calc(100vh-14rem)] lg:min-h-[520px] lg:max-h-[720px] rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-sm">
       {/* Cabecera Operativa */}
-      <div className="p-3.5 border-b border-slate-200 bg-slate-50/70 space-y-2.5">
+      <div className="p-3.5 sm:p-4 border-b border-slate-200 bg-slate-50 space-y-3">
+        {onBackToList && (
+          <button
+            type="button"
+            onClick={onBackToList}
+            className="lg:hidden flex items-center gap-1.5 px-3 py-2 min-h-[42px] rounded-xl bg-slate-200/80 hover:bg-slate-300 text-slate-800 font-extrabold text-xs w-full transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>← Volver a la Lista de Pedidos</span>
+          </button>
+        )}
+
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h3 className="text-sm font-black text-slate-900 tabular-nums">
-              Orden #{order.numero_orden} • {order.cliente_nombre}
-            </h3>
-            <div className="flex items-center gap-2 text-[11px] text-slate-600 mt-0.5 tabular-nums">
-              <span>CI/RIF: {order.cliente_cedula || 'No indicada'}</span>
-              <span>•</span>
-              {waUrl ? (
-                <a
-                  href={waUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-700 hover:underline flex items-center gap-1 font-bold"
-                >
-                  <Phone className="h-3 w-3" /> {order.cliente_telefono}
-                </a>
-              ) : (
-                <span>{order.cliente_telefono}</span>
-              )}
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-base font-black text-slate-900 tabular-nums">
+                Orden #{order.numero_orden}
+              </h3>
+              <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-catador-blue/10 text-catador-blue">
+                {order.tipo_entrega === 'delivery' ? 'Delivery Barinas' : 'Pick-Up Bodegón'}
+              </span>
             </div>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">
+              {order.cliente_nombre}
+            </p>
+            <p className="text-xs text-slate-500 font-mono mt-0.5">
+              Cédula / RIF: {order.cliente_cedula || 'No indicada'}
+            </p>
           </div>
-          <div className="text-right tabular-nums">
-            <span className="text-base font-black text-catador-blue block leading-none">
+
+          <div className="text-right tabular-nums shrink-0">
+            <span className="text-lg font-black text-catador-blue block leading-none">
               {formatUsd(order.total_usd)}
             </span>
-            <span className="text-[11px] font-bold text-slate-600 block mt-1">
+            <span className="text-xs font-bold text-slate-600 block mt-1">
               {formatVes(order.total_ves)}
             </span>
           </div>
         </div>
 
-        {/* Botonera de Estado (1 Clic) */}
-        <div className="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-200/80 text-xs">
-          <div className="flex flex-wrap gap-1">
+        {/* Botón WhatsApp Gigante para el Administrador / Adulto Mayor */}
+        {waUrl && (
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white min-h-[46px] px-4 py-2 font-black text-sm shadow-sm transition-colors cursor-pointer"
+          >
+            <Phone className="h-4 w-4 shrink-0" />
+            <span>Chatear por WhatsApp ({order.cliente_telefono})</span>
+          </a>
+        )}
+
+        {/* Botonera de Acciones Rápidas (Organizada y con Touch Targets >= 44px) */}
+        <div className="space-y-2 pt-1 border-t border-slate-200">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Cambiar Estado del Pedido
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowDeleteModal(true)}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-800 p-1 cursor-pointer"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              <span>Eliminar Pedido</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5">
             <button
               type="button"
               disabled={isUpdating}
               onClick={() => onUpdateStatus(undefined, 'verificado')}
-              className="flex items-center gap-1 rounded-md bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 px-2.5 py-1 text-white font-bold text-[11px] cursor-pointer"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <CheckCircle className="h-3 w-3" /> Pago OK
+              <CheckCircle className="h-4 w-4 shrink-0" />
+              <span>Pago OK</span>
             </button>
+
             <button
               type="button"
               disabled={isUpdating}
               onClick={() => onUpdateStatus(undefined, 'rechazado')}
-              className="flex items-center gap-1 rounded-md bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 px-2.5 py-1 text-white font-bold text-[11px] cursor-pointer"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <AlertTriangle className="h-3 w-3" /> Rechazar
+              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <span>Rechazar</span>
             </button>
+
             <button
               type="button"
               disabled={isUpdating}
               onClick={() => onUpdateStatus('preparando')}
-              className="flex items-center gap-1 rounded-md bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 px-2.5 py-1 text-white font-bold text-[11px] cursor-pointer"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <PackageCheck className="h-3 w-3" /> Bodegón
+              <PackageCheck className="h-4 w-4 shrink-0" />
+              <span>Bodegón</span>
             </button>
+
             <button
               type="button"
               disabled={isUpdating}
               onClick={() => onUpdateStatus('en_camino')}
-              className="flex items-center gap-1 rounded-md bg-catador-amber hover:bg-catador-amber-dark disabled:bg-slate-300 px-2.5 py-1 text-white font-bold text-[11px] cursor-pointer"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-catador-amber hover:bg-catador-amber-dark disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <Bike className="h-3 w-3" /> En Ruta
+              <Bike className="h-4 w-4 shrink-0" />
+              <span>En Ruta</span>
             </button>
+
             <button
               type="button"
               disabled={isUpdating}
               onClick={() => onUpdateStatus('entregado')}
-              className="flex items-center gap-1 rounded-md bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 px-2.5 py-1 text-white font-bold text-[11px] cursor-pointer"
+              className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <CheckCheck className="h-3 w-3" /> Entregado
+              <CheckCheck className="h-4 w-4 shrink-0" />
+              <span>Entregado</span>
             </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setShowDeleteModal(true)}
-            className="flex items-center gap-1 rounded-md border border-rose-200 text-rose-600 hover:bg-rose-50 px-2 py-1 font-bold text-[11px] transition-colors cursor-pointer"
-          >
-            <Trash2 className="h-3 w-3" /> Borrar
-          </button>
         </div>
       </div>
 
       {/* Cuerpo de Datos */}
-      <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 text-xs">
+      <div className="flex-1 overflow-y-auto p-3.5 sm:p-4 space-y-4 text-xs">
+        {/* Desglose de Totales */}
         <div className="grid grid-cols-2 sm:grid-cols-4 rounded-xl bg-slate-50 border border-slate-200 divide-y sm:divide-y-0 sm:divide-x divide-slate-200 tabular-nums">
-          <div className="p-2.5">
-            <span className="text-[10px] text-slate-500 font-semibold block">Subtotal</span>
-            <span className="font-extrabold text-slate-900">{formatUsd(order.subtotal_usd)}</span>
+          <div className="p-3">
+            <span className="text-[11px] text-slate-500 font-semibold block">Subtotal</span>
+            <span className="font-extrabold text-slate-900 text-sm">{formatUsd(order.subtotal_usd)}</span>
             <span className="text-[10px] text-slate-500 block">{formatVes(order.subtotal_ves)}</span>
           </div>
-          <div className="p-2.5">
-            <span className="text-[10px] text-slate-500 font-semibold block">Delivery</span>
-            <span className="font-extrabold text-slate-900">{formatUsd(order.delivery_usd)}</span>
+          <div className="p-3">
+            <span className="text-[11px] text-slate-500 font-semibold block">Delivery</span>
+            <span className="font-extrabold text-slate-900 text-sm">{formatUsd(order.delivery_usd)}</span>
             <span className="text-[10px] text-slate-500 block">{formatVes(order.delivery_ves)}</span>
           </div>
-          <div className="p-2.5">
-            <span className="text-[10px] text-slate-500 font-semibold block">Total Orden</span>
-            <span className="font-black text-catador-blue">{formatUsd(order.total_usd)}</span>
+          <div className="p-3">
+            <span className="text-[11px] text-slate-500 font-semibold block">Total Orden</span>
+            <span className="font-black text-catador-blue text-sm">{formatUsd(order.total_usd)}</span>
             <span className="text-[10px] text-slate-600 font-bold block">
               {formatVes(order.total_ves)}
             </span>
           </div>
-          <div className="p-2.5">
-            <span className="text-[10px] text-slate-500 font-semibold block">Tasa BCV</span>
-            <span className="font-black text-catador-amber">Bs. {order.tasa_bcv.toFixed(2)}</span>
+          <div className="p-3">
+            <span className="text-[11px] text-slate-500 font-semibold block">Tasa BCV</span>
+            <span className="font-black text-catador-amber text-sm">Bs. {order.tasa_bcv.toFixed(2)}</span>
             <span className="text-[10px] text-slate-400 block">por $1.00 USD</span>
           </div>
         </div>
 
-        {/* Logística y GPS */}
-        <div className="p-3 rounded-xl border border-slate-200 bg-white space-y-1.5">
+        {/* Logística y Coordenadas GPS */}
+        <div className="p-3.5 rounded-xl border border-slate-200 bg-white space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="flex items-center gap-1.5 font-extrabold text-slate-900">
+            <span className="flex items-center gap-2 font-extrabold text-slate-900 text-sm">
               {order.tipo_transporte === 'vehiculo_carga' ? (
-                <Truck className="h-4 w-4 text-catador-amber" />
+                <Truck className="h-5 w-5 text-catador-amber shrink-0" />
               ) : (
-                <MapPin className="h-4 w-4 text-catador-blue" />
+                <MapPin className="h-5 w-5 text-catador-blue shrink-0" />
               )}
               <span>
                 {order.tipo_entrega === 'pickup'
@@ -204,14 +245,23 @@ export function AdminOrderDetail({
                   : 'Delivery en Motorizado'}
               </span>
             </span>
-            <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 font-bold text-slate-700">
-              {order.zona_barinas}
-              {order.distancia_km ? ` • ${order.distancia_km} km` : ''}
-            </span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {order.distancia_km ? (
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-100 text-catador-blue font-black uppercase tracking-wider">
+                  {getDeliveryTierInfo(order.distancia_km).tierBadge}
+                </span>
+              ) : null}
+              <span className="text-xs px-2.5 py-1 rounded-md bg-slate-100 font-bold text-slate-700">
+                {order.zona_barinas}
+                {order.distancia_km ? ` • ${order.distancia_km} km` : ''}
+              </span>
+            </div>
           </div>
 
           {order.direccion_entrega && (
-            <p className="text-slate-700 text-[11px]">{order.direccion_entrega}</p>
+            <p className="text-slate-800 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 font-medium">
+              📍 {order.direccion_entrega}
+            </p>
           )}
 
           {mapsUrl && (
@@ -219,40 +269,42 @@ export function AdminOrderDetail({
               href={mapsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] font-extrabold text-catador-blue hover:underline"
+              className="flex items-center justify-center gap-1.5 min-h-[42px] px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-catador-blue font-extrabold text-xs border border-blue-200 transition-colors"
             >
-              <ExternalLink className="h-3 w-3" /> Abrir Coordenadas GPS en Google Maps
+              <ExternalLink className="h-4 w-4 shrink-0" />
+              <span>Abrir Ubicación en Google Maps (GPS)</span>
             </a>
           )}
 
           {order.notas && (
-            <div className="text-[11px] text-amber-900 bg-amber-50 p-2 rounded-lg border border-amber-200">
-              <strong>Nota:</strong> {order.notas}
+            <div className="text-xs text-amber-900 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+              <strong>Nota del Cliente:</strong> {order.notas}
             </div>
           )}
         </div>
 
-        {/* Datos de Pago */}
+        {/* Datos de Pago y Comprobante */}
         {order.pago && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="font-extrabold text-slate-900 text-[11px]">
-                Método: {order.pago.metodo_pago.toUpperCase()} • Estado: {order.estado_pago.toUpperCase()}
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <span className="font-extrabold text-slate-900 text-xs">
+                Método: <strong className="text-catador-blue">{order.pago.metodo_pago.toUpperCase()}</strong> • Estado: <strong className={order.estado_pago === 'verificado' ? 'text-emerald-700' : 'text-amber-700'}>{order.estado_pago.toUpperCase()}</strong>
               </span>
               {order.pago.referencia && (
                 <div className="flex items-center gap-1 tabular-nums">
-                  <span className="font-mono font-bold text-slate-800 bg-white px-2 py-0.5 rounded border text-[11px]">
+                  <span className="font-mono font-bold text-slate-800 bg-white px-2.5 py-1 rounded-lg border text-xs">
                     Ref: #{order.pago.referencia}
                   </span>
                   <button
                     type="button"
                     onClick={() => copyRef(order.pago?.referencia || '')}
-                    className="p-1 text-slate-500 hover:text-catador-blue cursor-pointer"
+                    className="p-1.5 text-slate-500 hover:text-catador-blue cursor-pointer"
+                    title="Copiar referencia"
                   >
                     {copiedRef ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      <Check className="h-4 w-4 text-emerald-600" />
                     ) : (
-                      <Copy className="h-3.5 w-3.5" />
+                      <Copy className="h-4 w-4" />
                     )}
                   </button>
                 </div>
@@ -260,66 +312,74 @@ export function AdminOrderDetail({
             </div>
 
             {order.pago.billete_pago_usd && (
-              <p className="text-[11px] text-slate-700 tabular-nums">
+              <p className="text-xs text-slate-700 tabular-nums">
                 Cliente paga con billete de{' '}
                 <strong className="text-emerald-700">${order.pago.billete_pago_usd}</strong> •
-                Vuelto: <strong className="text-catador-blue">${order.pago.vuelto_calculado_usd || 0}</strong>
+                Vuelto a entregar: <strong className="text-catador-blue">${order.pago.vuelto_calculado_usd || 0}</strong>
               </p>
             )}
 
             {order.pago.comprobante_url && (
-              <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-white border">
-                <Image
-                  src={order.pago.comprobante_url}
-                  alt="Comprobante de pago"
-                  fill
-                  sizes="(max-width: 768px) 90vw, 480px"
-                  className="object-contain cursor-pointer"
-                  onClick={() => setShowProofModal(true)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowProofModal(true)}
-                  className="absolute bottom-2 right-2 bg-slate-900/85 text-white px-2.5 py-1 rounded-md text-[10px] font-bold flex items-center gap-1 cursor-pointer"
-                >
-                  <ExternalLink className="h-3 w-3" /> Ampliar Comprobante
-                </button>
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-slate-500 block">
+                  Comprobante Adjunto por el Cliente:
+                </span>
+                <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-white border border-slate-200">
+                  <Image
+                    src={order.pago.comprobante_url}
+                    alt="Comprobante de pago"
+                    fill
+                    sizes="(max-width: 768px) 90vw, 480px"
+                    className="object-contain cursor-pointer"
+                    onClick={() => setShowProofModal(true)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowProofModal(true)}
+                    className="absolute bottom-2 right-2 bg-slate-900/90 text-white min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Ampliar Comprobante</span>
+                  </button>
+                </div>
               </div>
             )}
           </div>
         )}
 
-        {/* Tabla de Facturación en Caja */}
-        <div className="space-y-1.5">
-          <span className="font-extrabold text-slate-900 text-[11px] block">
+        {/* Tabla de Artículos para Facturación en Caja */}
+        <div className="space-y-2">
+          <span className="font-extrabold text-slate-900 text-xs block">
             Artículos para Facturación en Caja ({order.items.length})
           </span>
           <div className="border border-slate-200 rounded-xl divide-y divide-slate-100 overflow-hidden bg-white">
             {order.items.map((it) => (
-              <div key={it.id} className="p-2.5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="relative h-9 w-9 rounded-lg bg-slate-50 border shrink-0 overflow-hidden">
+              <div key={it.id} className="p-3 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="relative h-11 w-11 rounded-lg bg-slate-50 border shrink-0 overflow-hidden">
                     <Image
                       src={it.imagen_url || IMAGE_FALLBACKS.product}
                       alt=""
                       fill
-                      sizes="36px"
+                      sizes="44px"
                       className="object-contain p-0.5"
                     />
                   </div>
                   <div className="min-w-0">
-                    <p className="font-bold text-slate-900 truncate text-xs">{it.nombre_articulo}</p>
-                    <p className="text-[10px] font-mono text-slate-500 tabular-nums">
+                    <p className="font-extrabold text-slate-900 truncate text-xs sm:text-sm">
+                      {it.nombre_articulo}
+                    </p>
+                    <p className="text-[11px] font-mono text-slate-500 tabular-nums">
                       SKU: <strong className="text-catador-blue">{it.cod_articulo_foxdata}</strong>
                       {it.unidades_totales_descontadas
-                        ? ` • Descuenta ${it.unidades_totales_descontadas} und de stock`
+                        ? ` • Descuenta ${it.unidades_totales_descontadas} und`
                         : ''}
                     </p>
                   </div>
                 </div>
                 <div className="text-right shrink-0 tabular-nums">
-                  <span className="font-black text-slate-900">{it.cantidad}x</span>
-                  <span className="text-slate-600 font-semibold block text-[11px]">
+                  <span className="font-black text-slate-900 text-sm block">{it.cantidad}x</span>
+                  <span className="text-slate-600 font-bold block text-xs">
                     {formatUsd(it.subtotal_usd)}
                   </span>
                 </div>
@@ -331,9 +391,9 @@ export function AdminOrderDetail({
         {showProofModal && order.pago?.comprobante_url && (
           <div
             onClick={() => setShowProofModal(false)}
-            className="fixed inset-0 z-50 bg-slate-950/80 flex items-center justify-center p-4 cursor-pointer"
+            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
           >
-            <div className="relative max-w-2xl w-full aspect-4/3 bg-white rounded-2xl overflow-hidden p-2">
+            <div className="relative max-w-2xl w-full aspect-4/3 bg-white rounded-2xl overflow-hidden p-2 shadow-2xl">
               <Image src={order.pago.comprobante_url} alt="Comprobante" fill className="object-contain" />
             </div>
           </div>
