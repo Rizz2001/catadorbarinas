@@ -134,7 +134,7 @@ export async function createOrder(payload: CreateOrderPayload): Promise<PedidoCo
           ? cmsCfg.permitir_venta_sin_stock
           : globalAllowBackorder;
 
-      if (!allowBackorder && existencias.has(code)) {
+      if (!allowBackorder) {
         const stockActual = Math.max(0, Math.floor(existencias.get(code) ?? 0));
         if (reqInfo.totalUnits > stockActual) {
           throw new Error(

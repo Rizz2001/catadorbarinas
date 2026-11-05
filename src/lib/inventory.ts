@@ -74,11 +74,17 @@ export function getMaxAllowedQuantity(
   if (saleMode === 'solo_unidad' && mode === 'caja') return 0;
   if (saleMode === 'solo_caja' && mode === 'unidad') return 0;
 
+  const totalStockUnits = Math.max(0, Math.floor(product.stockQuantity || 0));
+
+  // Si no permite venta sin stock y el inventario en FoxData es 0 o negativo
+  if (!product.allowBackorder && totalStockUnits <= 0) {
+    return 0;
+  }
+
   if (product.allowBackorder) {
     return 999;
   }
 
-  const totalStockUnits = Math.max(0, Math.floor(product.stockQuantity || 0));
   const committedByOtherMode = getCommittedBaseUnits(
     currentCartItems,
     product.id,
@@ -87,7 +93,7 @@ export function getMaxAllowedQuantity(
   const availableBaseUnits = Math.max(0, totalStockUnits - committedByOtherMode);
   const unitsPerItem = getUnitsPerPurchaseMode(product, mode);
 
-  return Math.floor(availableBaseUnits / unitsPerItem);
+  return Math.max(0, Math.floor(availableBaseUnits / unitsPerItem));
 }
 
 /**
@@ -115,6 +121,17 @@ export function validateStockAddition(
   const availableToAdd = Math.max(0, maxTotalForMode - currentModeQty);
   const totalStockUnits = Math.max(0, Math.floor(product.stockQuantity || 0));
   const requiredUnits = (currentModeQty + quantityToAdd) * unitsPerItem;
+
+  if (!product.allowBackorder && totalStockUnits <= 0) {
+    return {
+      allowed: false,
+      allowedQuantityToAdd: 0,
+      maxTotalForMode: 0,
+      availableUnitsTotal: 0,
+      requiredUnits: 0,
+      message: `El producto "${product.name}" se encuentra agotado en inventario.`,
+    };
+  }
 
   if (product.allowBackorder) {
     return {

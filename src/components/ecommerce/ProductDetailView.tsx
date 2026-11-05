@@ -64,10 +64,14 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
   const activePriceUsd = getEffectivePriceUsd(product, mode);
   const totalSelectionPrices = formatPrices(activePriceUsd * quantity, bcvRate);
 
-  const maxUnitsAllowed = getMaxAllowedQuantity(product, 'unidad', cartItems);
-  const maxBoxesAllowed = getMaxAllowedQuantity(product, 'caja', cartItems);
+  const otherCartItems = cartItems.filter(
+    (i) => !(i.product.id === product.id && (i.purchaseMode || 'unidad') === mode)
+  );
+  const maxUnitsAllowed = getMaxAllowedQuantity(product, 'unidad', otherCartItems);
+  const maxBoxesAllowed = getMaxAllowedQuantity(product, 'caja', otherCartItems);
   const currentMax = mode === 'caja' ? maxBoxesAllowed : maxUnitsAllowed;
-  const safeQuantity = currentMax > 0 ? Math.min(quantity, currentMax) : 1;
+  const isOutOfStock = !product.allowBackorder && (!product.inStock || currentMax <= 0);
+  const safeQuantity = currentMax > 0 ? Math.min(quantity, currentMax) : (product.allowBackorder ? Math.max(1, quantity) : 0);
   const requiredBaseUnits = safeQuantity * getUnitsPerPurchaseMode(product, mode);
 
   const handleModeSwitch = (nextMode: PurchaseMode) => {
@@ -211,7 +215,11 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                       <Box className="h-4 w-4 text-catador-blue shrink-0" /> Por Unidad (1 {product.unit})
                     </span>
                     <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                      Máx: {maxUnitsAllowed}
+                      {maxUnitsAllowed > 0
+                        ? `Máx: ${maxUnitsAllowed}`
+                        : product.allowBackorder
+                        ? 'Bajo Pedido'
+                        : 'Agotado'}
                     </span>
                   </div>
                   <span className="text-lg sm:text-xl font-black text-catador-blue">{unitPrices.usdFormatted}</span>
@@ -238,7 +246,11 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                       <Package className="h-4 w-4 text-catador-amber shrink-0" /> Por {product.boxUnitLabel || 'Caja'} ({unitsPerBox} und)
                     </span>
                     <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full shrink-0">
-                      {maxBoxesAllowed > 0 || product.allowBackorder ? `Máx: ${maxBoxesAllowed}` : 'Sin stock'}
+                      {maxBoxesAllowed > 0
+                        ? `Máx: ${maxBoxesAllowed}`
+                        : product.allowBackorder
+                        ? 'Bajo Pedido'
+                        : 'Sin stock'}
                     </span>
                   </div>
                   <span className="text-lg sm:text-xl font-black text-catador-blue">{boxPrices.usdFormatted}</span>
@@ -324,19 +336,21 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
             <button
               type="button"
               onClick={handleAddToCart}
-              disabled={!product.inStock || (currentMax <= 0 && !product.allowBackorder)}
+              disabled={isOutOfStock}
               className={cn(
-                'flex items-center justify-center gap-2 h-12 px-5 rounded-xl font-black text-sm transition-all shadow-sm cursor-pointer',
-                !product.inStock || (currentMax <= 0 && !product.allowBackorder)
-                  ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                'flex items-center justify-center gap-2 h-12 px-5 rounded-xl font-black text-sm transition-all shadow-sm',
+                isOutOfStock
+                  ? 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
                   : isAdded
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-catador-blue text-white hover:bg-catador-blue-light'
+                  ? 'bg-emerald-600 text-white cursor-pointer'
+                  : 'bg-catador-blue text-white hover:bg-catador-blue-light cursor-pointer'
               )}
             >
               {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
               <span>
-                {isAdded
+                {isOutOfStock
+                  ? 'Agotado en Bodegón'
+                  : isAdded
                   ? '¡Agregado al Carrito!'
                   : `Agregar ${safeQuantity} ${mode === 'caja' ? (safeQuantity === 1 ? 'Caja' : 'Cajas') : (safeQuantity === 1 ? 'Unidad' : 'Unidades')}`}
               </span>
@@ -345,10 +359,16 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
             <button
               type="button"
               onClick={handleDirectBuy}
-              disabled={!product.inStock || (currentMax <= 0 && !product.allowBackorder)}
-              className="flex items-center justify-center gap-2 h-12 px-5 rounded-xl bg-catador-amber hover:bg-catador-amber-dark disabled:opacity-40 text-white font-black text-sm shadow-sm transition-colors cursor-pointer"
+              disabled={isOutOfStock}
+              className={cn(
+                'flex items-center justify-center gap-2 h-12 px-5 rounded-xl font-black text-sm shadow-sm transition-colors',
+                isOutOfStock
+                  ? 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
+                  : 'bg-catador-amber hover:bg-catador-amber-dark text-white cursor-pointer'
+              )}
             >
-              <Zap className="h-4 w-4" /> Comprar Ahora Directo
+              <Zap className="h-4 w-4" />
+              <span>{isOutOfStock ? 'Sin Existencias' : 'Comprar Ahora Directo'}</span>
             </button>
           </div>
 

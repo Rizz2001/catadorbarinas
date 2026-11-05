@@ -22,6 +22,7 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   delivery_max_cajas_motorizado: 2,
   delivery_max_unidades_motorizado: 24,
   delivery_recargo_vehiculo_usd: 3.5,
+  permitir_venta_sin_stock_global: false,
   delivery_gratis_minimo_usd: APP_CONFIG.freeShippingThresholdUsd,
   pago_movil_banco: 'Banesco (0134)',
   pago_movil_telefono: '0414-5738890',

@@ -51,13 +51,18 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
     product.originalPriceUsd && product.originalPriceUsd > product.priceUsd
   );
 
-  const maxForCurrentMode = getMaxAllowedQuantity(product, mode, cartItems);
-  const maxForBox = getMaxAllowedQuantity(product, 'caja', cartItems);
+  const otherCartItems = cartItems.filter(
+    (i) => !(i.product.id === product.id && (i.purchaseMode || 'unidad') === mode)
+  );
+  const maxForCurrentMode = getMaxAllowedQuantity(product, mode, otherCartItems);
+  const maxForBox = getMaxAllowedQuantity(product, 'caja', otherCartItems);
   const currentCartItem = cartItems.find(
     (i) => i.product.id === product.id && (i.purchaseMode || 'unidad') === mode
   );
   const inCartQty = currentCartItem ? currentCartItem.quantity : 0;
-  const canAddMore = product.inStock && (product.allowBackorder || inCartQty < maxForCurrentMode);
+  const canAddMore =
+    (product.inStock || product.allowBackorder) &&
+    (product.allowBackorder || (maxForCurrentMode > 0 && inCartQty < maxForCurrentMode));
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();

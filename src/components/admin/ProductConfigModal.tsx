@@ -150,17 +150,20 @@ export function ProductConfigModal({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-2">
               <label className="font-black text-slate-900 block">
-                Vender Artículo Sin Stock (Backorder)
+                Venta Sin Stock en FoxData
               </label>
               <select
                 value={permitirSinStock}
                 onChange={(e) => setPermitirSinStock(e.target.value)}
                 className="w-full rounded-xl border border-amber-300 bg-white p-2 font-bold text-slate-900"
               >
-                <option value="global">Usar regla global de la tienda</option>
-                <option value="true">Activado (Permitir vender sin stock)</option>
-                <option value="false">Desactivado (Exigir stock disponible)</option>
+                <option value="false">Desactivado (Estricto: exigir stock en FoxData)</option>
+                <option value="true">Activado (Permitir vender sin stock / bajo pedido)</option>
+                <option value="global">Regla global de la tienda (Exigir stock)</option>
               </select>
+              <p className="text-[10px] text-amber-800">
+                Si está desactivado, el cliente solo podrá comprar lo que haya en existencia real.
+              </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200 flex flex-col justify-between">

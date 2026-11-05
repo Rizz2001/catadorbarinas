@@ -9,8 +9,10 @@ import {
   canBuyBox,
   canBuyUnit,
   getEffectivePriceUsd,
+  getMaxAllowedQuantity,
   getUnitsPerPurchaseMode,
 } from '@/lib/inventory';
+import { useCartStore } from '@/store/useCartStore';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
@@ -37,6 +39,14 @@ export function CartDrawerItemRow({
   const itemPrices = formatPrices(unitPriceUsd * quantity, bcvRate);
   const unitsPerBox = getUnitsPerPurchaseMode(product, 'caja');
   const supportsBothModes = canBuyUnit(product) && canBuyBox(product);
+
+  const cartItems = useCartStore((state) => state.items);
+  const otherItems = cartItems.filter(
+    (i) => !(i.product.id === product.id && (i.purchaseMode || 'unidad') === mode)
+  );
+  const maxAllowed = getMaxAllowedQuantity(product, mode, otherItems);
+  const canAddMore = product.allowBackorder || quantity < maxAllowed;
+  const isOutOfStock = !product.allowBackorder && (product.stockQuantity <= 0 || maxAllowed <= 0);
 
   const rawImg = product.images?.[0];
   const isNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
@@ -87,12 +97,15 @@ export function CartDrawerItemRow({
               </button>
               <button
                 type="button"
+                disabled={!product.allowBackorder && getMaxAllowedQuantity(product, 'caja', otherItems) <= 0}
                 onClick={() => onSwitchMode(product.id, mode, 'caja')}
                 className={cn(
-                  'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all cursor-pointer',
+                  'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all',
                   mode === 'caja'
                     ? 'bg-amber-500 text-white shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    : !product.allowBackorder && getMaxAllowedQuantity(product, 'caja', otherItems) <= 0
+                    ? 'text-slate-300 opacity-40 cursor-not-allowed'
+                    : 'text-slate-500 hover:text-slate-800 cursor-pointer'
                 )}
               >
                 <Package className="h-2.5 w-2.5" />
@@ -137,14 +150,27 @@ export function CartDrawerItemRow({
             </span>
             <button
               type="button"
+              disabled={!canAddMore}
               onClick={() => onUpdateQuantity(product.id, quantity + 1, mode)}
               aria-label="Aumentar cantidad"
-              className="h-9 w-9 flex items-center justify-center text-slate-600 hover:text-slate-900 active:bg-slate-100 rounded-r-xl cursor-pointer"
+              title={!canAddMore ? 'Stock máximo alcanzado' : 'Aumentar cantidad'}
+              className={cn(
+                'h-9 w-9 flex items-center justify-center rounded-r-xl transition-colors',
+                canAddMore
+                  ? 'text-slate-600 hover:text-slate-900 active:bg-slate-100 cursor-pointer'
+                  : 'text-slate-300 opacity-40 cursor-not-allowed bg-slate-50'
+              )}
             >
               <Plus className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
+
+        {isOutOfStock && (
+          <p className="mt-1.5 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2 py-0.5 inline-block">
+            ⚠️ Stock insuficiente en inventario ({product.stockQuantity} unidades)
+          </p>
+        )}
       </div>
     </div>
   );

@@ -63,6 +63,14 @@ export const useCartStore = create<CartState>()(
       ) => {
         const mode: PurchaseMode = purchaseMode || getDefaultPurchaseMode(product);
         const currentItems = get().items;
+
+        // Si el producto no permite venta sin stock y su stock es 0 o inferior
+        if (!product.allowBackorder && (!product.inStock || (product.stockQuantity ?? 0) <= 0)) {
+          const msg = `El producto "${product.name}" está agotado en inventario.`;
+          set({ lastStockWarning: msg });
+          return { added: false, message: msg };
+        }
+
         const validation = validateStockAddition(
           product,
           mode,
@@ -139,33 +147,48 @@ export const useCartStore = create<CartState>()(
 
         set((state) => {
           let warning: string | null = null;
-          const updatedItems = state.items.map((item) => {
-            const itemMode = item.purchaseMode || 'unidad';
-            const matches =
-              item.product.id === productId &&
-              (!purchaseMode || itemMode === purchaseMode);
+          const updatedItems = state.items
+            .map((item) => {
+              const itemMode = item.purchaseMode || 'unidad';
+              const matches =
+                item.product.id === productId &&
+                (!purchaseMode || itemMode === purchaseMode);
 
-            if (!matches) return item;
+              if (!matches) return item;
 
-            const maxAllowed = getMaxAllowedQuantity(
-              item.product,
-              itemMode,
-              state.items
-            );
-            const finalQty = Math.min(quantity, Math.max(1, maxAllowed));
+              // Calcular stock disponible excluyendo la cantidad actual de este mismo ítem
+              const otherItems = state.items.filter(
+                (i) => !(i.product.id === productId && (i.purchaseMode || 'unidad') === itemMode)
+              );
+              const maxAllowed = getMaxAllowedQuantity(
+                item.product,
+                itemMode,
+                otherItems
+              );
 
-            if (quantity > maxAllowed && !item.product.allowBackorder) {
-              const unitsPerBox = getUnitsPerPurchaseMode(item.product, 'caja');
-              warning =
-                itemMode === 'caja'
-                  ? `Stock máximo: ${maxAllowed} ${
-                      maxAllowed === 1 ? 'caja' : 'cajas'
-                    } (${item.product.stockQuantity} botellas en inventario, ${unitsPerBox} por caja).`
-                  : `Stock máximo disponible en inventario: ${maxAllowed} unidades.`;
-            }
+              // Si el producto no permite venta sin stock y no queda nada disponible
+              if (!item.product.allowBackorder && maxAllowed <= 0) {
+                warning = `El producto "${item.product.name}" ya no cuenta con stock disponible en inventario.`;
+                return { ...item, quantity: 0 };
+              }
 
-            return { ...item, quantity: finalQty };
-          });
+              const finalQty = item.product.allowBackorder
+                ? Math.max(1, quantity)
+                : Math.min(quantity, maxAllowed);
+
+              if (quantity > maxAllowed && !item.product.allowBackorder) {
+                const unitsPerBox = getUnitsPerPurchaseMode(item.product, 'caja');
+                warning =
+                  itemMode === 'caja'
+                    ? `Stock máximo alcanzado: ${maxAllowed} ${
+                        maxAllowed === 1 ? 'caja' : 'cajas'
+                      } (${item.product.stockQuantity} unidades en inventario).`
+                    : `Stock máximo disponible en inventario: ${maxAllowed} unidades.`;
+              }
+
+              return { ...item, quantity: finalQty };
+            })
+            .filter((item) => item.quantity > 0);
 
           return { items: updatedItems, lastStockWarning: warning };
         });
