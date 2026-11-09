@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { Truck, RefreshCw, ShieldCheck, CreditCard } from 'lucide-react';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { TrustMetricItem } from '@/types';
 
@@ -32,6 +33,8 @@ const DEFAULT_METRICS: TrustMetricItem[] = [
   },
 ];
 
+const METRIC_ICONS = [Truck, RefreshCw, ShieldCheck, CreditCard];
+
 export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarProps) {
   const storeConfig = useStoreConfigStore((state) => state.config);
 
@@ -54,25 +57,28 @@ export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarPr
       aria-label="Garantías operativas de Gran Catador Barinas"
       className="rounded-xl bg-white border border-slate-200 overflow-hidden"
     >
-      <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-slate-200">
-        {metrics.map((item, idx) => (
-          <div key={idx} className="p-3.5 sm:p-5 flex flex-col justify-between gap-1 min-w-0">
-            <div className="flex items-baseline justify-between gap-1.5">
-              <span className="text-sm sm:text-xl font-black text-catador-blue tracking-tight tabular-nums truncate">
-                {item.figura}
-              </span>
-              <span className="h-1.5 w-1.5 rounded-full bg-catador-amber shrink-0" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200">
+        {metrics.map((item, idx) => {
+          const Icon = METRIC_ICONS[idx % METRIC_ICONS.length];
+          return (
+            <div key={idx} className="p-4 sm:p-5 flex items-start gap-3.5 min-w-0">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-catador-blue mt-0.5">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-catador-blue tabular-nums block">
+                  {item.figura}
+                </span>
+                <h3 className="text-[13px] sm:text-sm font-black text-slate-900 leading-snug mt-0.5">
+                  {item.titulo}
+                </h3>
+                <p className="text-xs sm:text-[13px] text-slate-600 leading-snug mt-1">
+                  {item.subtitulo}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h3 className="text-[11px] sm:text-sm font-extrabold text-slate-900 leading-snug line-clamp-1">
-                {item.titulo}
-              </h3>
-              <p className="text-[10px] sm:text-[11px] text-slate-600 leading-snug mt-0.5 line-clamp-2">
-                {item.subtitulo}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

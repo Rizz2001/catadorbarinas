@@ -36,3 +36,27 @@ Este archivo rige de forma estricta todo el desarrollo en este repositorio.
 - Validación obligatoria con `npx tsc --noEmit` con 0 errores.
 - Bimonetarismo permanente: todo precio debe renderizar en USD ($) y VES (Bs. BCV).
 
+## 4. Estándares de Conversión UX y Jerarquía Visual (7 Reglas de Oro)
+1. **Hero Limpio + Carrusel Destacado:** Prohibido superponer logotipos o imágenes con texto detrás del titular del Hero. El lado derecho del Hero debe presentar un carrusel de 3 a 5 productos destacados/ofertas con botella grande sobre fondo blanco y acción directa.
+2. **Tarjetas de Producto Uniformes (`ProductCard`):**
+   - Contenedor de imagen de altura fija (`h-44 sm:h-48`), fondo blanco puro (`bg-white`), `object-contain` y padding holgado (`p-4`).
+   - Nombre con altura fija de 2 líneas (`h-[40px] sm:h-[44px] line-clamp-2`) para alinear selectores y precios entre filas.
+   - Selector `Unidad / Caja` legible (`min-h-[36px] text-xs font-extrabold`); cuando `Caja` no esté disponible, mostrar texto informativo claro.
+   - Badges de urgencia cuando queden pocas unidades (`¡Última unidad!`, `¡Últimas X und!`).
+   - Botón explícito **`+ Agregar`** en naranja (`#E07A1F`) o contador de cantidad (`- 1 +`).
+3. **Secciones Completas y Sin Redundancia:**
+   - Ocultar `AlliedBrandsSection` si hay menos de 6 marcas activas (`brands.length < 6`).
+   - Categorías rápidas (`QuickCategoriesStrip`) siempre con icono representativo de e-commerce.
+   - Una sola barra de beneficios (`TrustValueBar`) con iconos claros; no duplicar las 4 garantías en el `Footer`.
+4. **Navegación y Filtros con Pistas de Scroll:**
+   - Añadir flechas (`ChevronLeft` / `ChevronRight`) y degradado lateral en barras de pestañas deslizables (`LiveCatalogSection`).
+   - Subcategorías (fila 2) visualmente más ligeras que los departamentos principales (fila 1).
+   - Un solo estilo de activo en el menú azul (`HeaderNav`), sin pintar enlaces fijos en amarillo.
+5. **Tipografía y Contraste (Mínimo 13–14px):**
+   - Textos de interfaz, navegación, top bar y footer en `13px–14px` mínimo con alto contraste; `HeaderTopBar` con mayor peso visual para la Tasa BCV.
+6. **Jerarquía de Color de Botones:**
+   - **Naranja (`#E07A1F`):** Acción principal de compra/conversión (`+ Agregar`, `Comprar`, `Ver Ofertas`, `Carrito`).
+   - **Azul (`#00227B`):** Navegación, búsqueda (`Buscar`), departamentos y controles secundarios.
+7. **Footer Equilibrado:**
+   - Sin alertas naranjas confusas, títulos de columna blancos con alto contraste, mayor espaciado entre bloques y columna izquierda sin espacio muerto.
+

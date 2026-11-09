@@ -49,13 +49,13 @@ export function HeaderMain() {
             </div>
           </Link>
 
-          {/* Buscador Central Desktop + Búsquedas Recientes Reales (Diseño 1 Editorial) */}
+          {/* Buscador Central Desktop + Búsquedas Recientes Reales (13px legible) */}
           <div className="hidden md:flex flex-col flex-1 max-w-2xl min-w-0">
             <HeaderSearch />
             {recentTerms.length > 0 && (
-              <div className="flex items-center justify-between gap-2 pt-1.5 text-[11px] text-slate-500 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 pt-1.5 text-[13px] text-slate-600 overflow-hidden">
                 <div className="flex items-center gap-1.5 overflow-hidden truncate">
-                  <span className="font-semibold text-slate-400 shrink-0">
+                  <span className="font-semibold text-slate-500 shrink-0">
                     Búsquedas recientes:
                   </span>
                   <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
@@ -64,7 +64,7 @@ export function HeaderMain() {
                         <span className="inline-flex items-center gap-0.5 whitespace-nowrap">
                           <Link
                             href={`/buscar?q=${encodeURIComponent(term)}`}
-                            className="text-slate-700 hover:text-catador-blue font-medium transition-colors"
+                            className="text-slate-700 hover:text-catador-blue font-semibold transition-colors"
                           >
                             {term}
                           </Link>
@@ -73,9 +73,9 @@ export function HeaderMain() {
                             onClick={() => removeTerm(term)}
                             title={`Quitar "${term}" de recientes`}
                             aria-label={`Quitar ${term}`}
-                            className="text-slate-300 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                            className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
                           >
-                            <X className="h-2.5 w-2.5" />
+                            <X className="h-3 w-3" />
                           </button>
                         </span>
                         {idx < recentTerms.length - 1 && (
@@ -90,7 +90,7 @@ export function HeaderMain() {
                   <button
                     type="button"
                     onClick={clearAllTerms}
-                    className="text-[11px] font-medium text-slate-400 hover:text-slate-700 shrink-0 transition-colors cursor-pointer"
+                    className="text-xs font-semibold text-slate-500 hover:text-slate-800 shrink-0 transition-colors cursor-pointer"
                   >
                     Limpiar
                   </button>
@@ -104,12 +104,12 @@ export function HeaderMain() {
             {/* Favoritos */}
             <Link
               href="/favoritos"
-              className="relative flex items-center justify-center h-9 w-9 sm:h-10 sm:w-10 text-slate-700 hover:text-catador-blue transition-colors cursor-pointer rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200"
+              className="relative flex items-center justify-center h-10 w-10 text-slate-700 hover:text-catador-blue transition-colors cursor-pointer rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200"
               aria-label="Lista de Favoritos"
             >
-              <Heart className="h-4 w-4 sm:h-5 sm:w-5" />
+              <Heart className="h-5 w-5" />
               {favCount > 0 && (
-                <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white tabular-nums">
+                <span className="absolute top-1 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-red-500 text-[10px] font-black text-white tabular-nums">
                   {favCount}
                 </span>
               )}
@@ -118,19 +118,19 @@ export function HeaderMain() {
             {/* Usuario / Mi Cuenta Dinámico */}
             <UserNavMenu />
 
-            {/* Disparador de Carrito Editorial (Diseño 1) */}
+            {/* Disparador de Carrito en Naranja (#E07A1F - Acción Principal de Compra) */}
             <Link
               href="/carrito"
-              className="flex items-center gap-2 rounded-lg bg-catador-blue hover:bg-catador-blue-light h-9 sm:min-h-[40px] px-2.5 sm:px-3.5 py-1.5 text-white transition-colors shrink-0 tabular-nums"
+              className="flex items-center gap-2 rounded-lg bg-catador-amber hover:bg-catador-amber-dark min-h-[42px] px-3 sm:px-4 py-2 text-white transition-colors shrink-0 tabular-nums"
               aria-label="Ver Carrito de Compras"
             >
-              <ShoppingBag className="h-4 w-4 shrink-0 text-amber-300" />
-              <span className="hidden sm:inline text-xs font-bold">
+              <ShoppingBag className="h-4 w-4 shrink-0 text-white" />
+              <span className="hidden sm:inline text-[13px] font-extrabold">
                 Carrito
                 {totals.itemCount > 0 ? ` (${totals.itemCount})` : ''}
               </span>
-              <span className="hidden sm:inline text-blue-300">·</span>
-              <span className="text-xs font-black font-mono">
+              <span className="hidden sm:inline text-amber-200">·</span>
+              <span className="text-[13px] font-black">
                 {formatUsd(totals.totalUsd)}
               </span>
             </Link>
@@ -141,13 +141,13 @@ export function HeaderMain() {
         <div className="block md:hidden w-full pt-0.5 space-y-1.5">
           <HeaderSearch />
           {recentTerms.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-[11px] text-slate-500">
-              <span className="text-slate-400 font-semibold shrink-0">Recientes:</span>
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs sm:text-[13px] text-slate-600">
+              <span className="text-slate-500 font-semibold shrink-0">Recientes:</span>
               {recentTerms.slice(0, 4).map((term, idx, arr) => (
                 <React.Fragment key={term}>
                   <Link
                     href={`/buscar?q=${encodeURIComponent(term)}`}
-                    className="text-slate-700 hover:text-catador-blue font-medium whitespace-nowrap"
+                    className="text-slate-700 hover:text-catador-blue font-semibold whitespace-nowrap"
                   >
                     {term}
                   </Link>

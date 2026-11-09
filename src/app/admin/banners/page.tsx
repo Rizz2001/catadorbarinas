@@ -132,7 +132,6 @@ export default function AdminBannersPage() {
       const updated = await upsertBanner({
         ...currentBanner,
         tipo: activeSlot,
-        badge_texto: '',
       });
       setBanners((prev) => ({ ...prev, [activeSlot]: updated }));
 
@@ -266,7 +265,7 @@ export default function AdminBannersPage() {
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
+              <div>
                 <label className="block font-bold text-slate-700 mb-1">
                   Título Principal *
                 </label>
@@ -275,6 +274,19 @@ export default function AdminBannersPage() {
                   required
                   value={currentBanner.titulo || ''}
                   onChange={(e) => updateCurrent({ titulo: e.target.value })}
+                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">
+                  Texto Superior / Sub-etiqueta (Opcional)
+                </label>
+                <input
+                  type="text"
+                  value={currentBanner.badge_texto || ''}
+                  onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
+                  placeholder="ej. DISTRIBUIDORA Y BODEGÓN OFICIAL"
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
                 />
               </div>

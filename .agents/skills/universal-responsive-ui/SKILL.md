@@ -29,15 +29,13 @@ Todo diseño debe construirse pensando en **Mobile-First** con adaptación progr
 
 ---
 
-## 2. Regla Cero: Cero Desbordamiento Horizontal (Zero Horizontal Scroll)
+## 2. Regla Cero: Cero Desbordamiento Horizontal y Pistas de Scroll Clarísimas
 
-El desbordamiento horizontal es considerado un fallo crítico de calidad:
+El desbordamiento horizontal accidental es considerado un fallo crítico de calidad:
 1. **Contenedor Raíz:** Prohibido que cualquier elemento fuerce un ancho mayor al viewport (`max-w-full`, `overflow-x-clip` o `overflow-x-hidden` en estructuras base).
-2. **Tratamiento de Texto Largo:** Todo título o código SKU debe contar con clases de corte de texto seguro (`truncate`, `line-clamp-1`, `line-clamp-2` o `break-words`).
-3. **Tablas y Listados Densos:** En pantallas móviles, las tablas complejas deben:
-   - Convertirse en tarjetas apiladas verticales (ej. pedidos, recibos), o
-   - Envolverse en un contenedor con scroll horizontal suave dedicado (`overflow-x-auto -mx-4 px-4 scrollbar-thin`).
-4. **Fórmulas Flex:** Todo hijo directo dentro de un contenedor flex que contenga texto debe incluir `min-w-0` para permitir que el truncamiento de texto funcione correctamente y no desborde el layout.
+2. **Tratamiento de Texto Largo y Alineación de Filas:** Todo título de producto debe contar con `line-clamp-2` y una **altura fija reservada (`h-[40px] sm:h-[44px]`)** para que los selectores `Unidad / Caja` y botones `+ Agregar` queden 100% alineados horizontalmente entre tarjetas de la misma fila.
+3. **Barras de Filtros y Pestañas Deslizables:** Cuando una tira de departamentos o subcategorías tenga scroll horizontal, es **obligatorio** añadir flechas de desplazamiento (`ChevronLeft` / `ChevronRight`) y/o un degradado lateral (`bg-gradient-to-l`) para que el usuario nunca vea textos cortados sin saber que puede deslizar.
+4. **Fórmulas Flex:** Todo hijo directo dentro de un contenedor flex que contenga texto debe incluir `min-w-0` para permitir que el truncamiento funcione correctamente.
 
 ---
 
@@ -56,18 +54,19 @@ En dispositivos móviles (>70% del tráfico retail en Venezuela), la interacció
 
 ---
 
-## 4. Jerarquía Tipográfica y Bimonetarismo Responsivo
+## 4. Jerarquía Tipográfica, Contraste (Mínimo 13–14px) y Bimonetarismo Responsivo
 
-La visualización de precios duales (**Dólares $ USD** y **Bolívares Bs. BCV**) debe ser legible y estéticamente impecable en cualquier ancho:
-1. **Fichas de Producto en Móvil (`< 640px`):**
-   - El precio en USD y el precio en Bs. se muestran apilados verticalmente:
-     - USD: `text-sm sm:text-base font-black text-slate-900` (o rojo si es oferta).
-     - Bs. BCV: `text-[11px] sm:text-xs font-semibold text-slate-500 block leading-tight`.
-   - Prohibido forzar ambos precios en una sola línea si el ancho del contenedor no lo permite con holgura.
-2. **Encabezados Principales:**
+La visualización de precios duales (**Dólares $ USD** y **Bolívares Bs. BCV**) y los textos de interfaz deben ser legibles en cualquier pantalla:
+1. **Tamaño Mínimo de Lectura (13px–14px):**
+   - Textos de navegación, barra superior (dirección y tasa BCV), descripciones de categorías, enlaces de footer y filtros deben usar como mínimo **`13px–14px` (`text-[13px] sm:text-sm`)** con alto contraste (`text-slate-700` sobre fondo claro, `text-slate-200`/`text-white` sobre fondo oscuro).
+2. **Fichas de Producto en Móvil y Escritorio:**
+   - Contenedor de imagen unificado en fondo blanco puro (`bg-white`), `object-contain` y padding amplio (`p-4`).
+   - USD: `text-base sm:text-lg font-black text-slate-900 tabular-nums` (o rojo si es oferta).
+   - Bs. BCV: `text-xs sm:text-[13px] font-bold text-slate-600 block leading-tight tabular-nums`.
+   - Botón explícito **`+ Agregar`** en naranja (`#E07A1F`) o contador de cantidad (`- 1 +`).
+3. **Encabezados Principales:**
    - Escala fluida: `text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight`.
-   - Subtítulos: `text-xs sm:text-sm md:text-base text-slate-600`.
-   - Metadatos y badges: `text-[10px] sm:text-xs font-bold uppercase tracking-wider`.
+   - Subtítulos: `text-[13px] sm:text-base text-slate-600`.
 
 ---
 

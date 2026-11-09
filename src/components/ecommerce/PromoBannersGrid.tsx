@@ -28,6 +28,7 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
       subtitle:
         promo1.subtitulo ||
         "Buchanan's, Old Parr, Chivas y Black Label al mejor precio oficial.",
+      badge: promo1.badge_texto,
       ctaText: promo1.boton_texto || 'Ver selección',
       ctaUrl: promo1.boton_url || '/catalogo/01/01',
     },
@@ -39,6 +40,7 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
       title: promo2.titulo || 'Cervezas & Refrescos',
       subtitle:
         promo2.subtitulo || 'Polar Pilsen, Solera, Corona y combos con hielo.',
+      badge: promo2.badge_texto,
       ctaText: promo2.boton_texto || 'Ver cervezas frías',
       ctaUrl: promo2.boton_url || '/catalogo/09',
     },
@@ -51,6 +53,7 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
       subtitle:
         promo3.subtitulo ||
         'Harina P.A.N., arroz, aceites de oliva y productos esenciales.',
+      badge: promo3.badge_texto,
       ctaText: promo3.boton_texto || 'Explorar víveres',
       ctaUrl: promo3.boton_url || '/catalogo/11',
     },
@@ -59,6 +62,7 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
     image: string;
     title: string;
     subtitle: string;
+    badge?: string | null;
     ctaText: string;
     ctaUrl: string;
   }>;
@@ -91,15 +95,20 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
           }}
         >
           <div className="space-y-1.5">
+            {card.badge && card.badge.trim() !== '' && (
+              <span className="inline-block text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                {card.badge.replace(/^[★✨\s]+/, '')}
+              </span>
+            )}
             <h2 className="text-base sm:text-xl font-black text-white leading-tight tracking-tight">
               {card.title}
             </h2>
-            <p className="text-[11px] sm:text-xs text-slate-200 leading-relaxed line-clamp-2">
+            <p className="text-[13px] text-slate-200 leading-relaxed line-clamp-2">
               {card.subtitle}
             </p>
-            <div className="pt-1.5 inline-flex items-center gap-1.5 text-xs font-extrabold text-amber-300 group-hover:text-white transition-colors">
+            <div className="pt-1.5 inline-flex items-center gap-1.5 text-[13px] font-extrabold text-amber-300 group-hover:text-white transition-colors">
               <span>{card.ctaText}</span>
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </div>
           </div>
         </Link>

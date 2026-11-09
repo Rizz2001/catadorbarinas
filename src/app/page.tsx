@@ -53,6 +53,26 @@ export default async function HomePage() {
   const leanInitialProducts = allProducts.slice(0, 40);
   const heroBanner = banners.find((b) => b.tipo === 'hero') || null;
 
+  // Armamos la lista de 3 a 5 productos destacados/ofertas para el carrusel del Hero
+  const heroCarouselCandidates = [
+    ...(starProduct ? [starProduct] : []),
+    ...featuredDeals,
+    ...weeklyTrends,
+  ];
+  const seenHeroIds = new Set<string>();
+  const heroProducts = heroCarouselCandidates
+    .filter((p) => {
+      if (!p || seenHeroIds.has(p.id)) return false;
+      seenHeroIds.add(p.id);
+      return p.inStock || p.allowBackorder;
+    })
+    .sort((a, b) => {
+      const aHasPhoto = a.images?.[0] && !a.images[0].includes('logo') ? 1 : 0;
+      const bHasPhoto = b.images?.[0] && !b.images[0].includes('logo') ? 1 : 0;
+      return bHasPhoto - aHasPhoto;
+    })
+    .slice(0, 5);
+
   return (
     <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-10 overflow-x-clip">
       {/* 1. Hero Banner Principal y Departamentos Rápidos */}
@@ -60,6 +80,7 @@ export default async function HomePage() {
         initialBanner={heroBanner}
         initialQuickCategories={quickCategories}
         starProduct={starProduct}
+        heroProducts={heroProducts}
       />
 
       {/* 2. Banda Arquitectónica de Garantías y Métricas */}

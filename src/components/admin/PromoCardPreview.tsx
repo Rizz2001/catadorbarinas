@@ -24,6 +24,11 @@ export function PromoCardPreview({ banner }: PromoCardPreviewProps) {
         }}
       >
         <div className="space-y-1.5">
+          {banner.badge_texto && banner.badge_texto.trim() !== '' && (
+            <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
+              {banner.badge_texto.replace(/^[★✨\s]+/, '')}
+            </span>
+          )}
           <h3 className="text-lg font-black text-white leading-tight tracking-tight">
             {banner.titulo || 'Título de la Promoción'}
           </h3>

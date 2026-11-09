@@ -217,6 +217,9 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
             placeholder="Empresas y Marcas Aliadas Oficiales"
             className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
           />
+          <p className="text-[11px] text-slate-500">
+            Nota: Se muestra automáticamente en la portada cuando hay 6 o más marcas activas en Empresas Aliadas.
+          </p>
         </div>
 
         {/* 4. Catálogo en Vivo */}

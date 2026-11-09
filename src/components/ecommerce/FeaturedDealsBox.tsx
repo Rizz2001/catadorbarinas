@@ -33,17 +33,17 @@ export function FeaturedDealsBox({
       {/* Cabecera Editorial de Ofertas */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 pb-3.5 sm:pb-4 mb-3.5 sm:mb-5 border-b border-slate-200/80">
         <div className="border-l-4 border-catador-amber pl-3 min-w-0">
-          <h2 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             {customTitle || 'Ofertas Destacadas del Día'}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">
+          <p className="text-[13px] sm:text-sm text-slate-600 mt-1">
             Precios especiales por tiempo limitado en licores y despensa seleccionada
           </p>
         </div>
 
         {/* Temporizador Regresivo Tabular (Cajitas Ámbar Oficiales) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 self-start sm:self-auto">
-          <span className="text-[11px] sm:text-xs font-bold text-slate-600">Cierra en:</span>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <span className="text-[13px] font-bold text-slate-700">Cierra en:</span>
           <div
             className="flex items-center gap-1 tabular-nums text-xs sm:text-sm font-black text-white"
             suppressHydrationWarning

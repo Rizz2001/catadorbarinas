@@ -146,7 +146,7 @@ export function HeaderSearch() {
           onChange={(e) => setTerm(e.target.value)}
           onFocus={() => term.trim().length >= 2 && setIsOpen(true)}
           placeholder="Buscar por licor, marca, cerveza o víveres..."
-          className="w-full bg-transparent px-3 py-2 text-base md:text-xs text-slate-900 placeholder-slate-400 focus:outline-none min-h-[40px]"
+          className="w-full bg-transparent px-3 py-2 text-base md:text-sm text-slate-900 placeholder-slate-500 focus:outline-none min-h-[42px]"
         />
 
         {term && (
@@ -159,13 +159,13 @@ export function HeaderSearch() {
             className="p-1.5 text-slate-400 hover:text-slate-700 mr-1 cursor-pointer"
             aria-label="Limpiar búsqueda"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         )}
 
         <button
           type="submit"
-          className="flex items-center justify-center gap-1.5 px-4 min-h-[40px] bg-catador-blue hover:bg-catador-blue-light text-white text-xs font-extrabold transition-colors cursor-pointer shrink-0"
+          className="flex items-center justify-center gap-1.5 px-4 min-h-[42px] bg-catador-blue hover:bg-catador-blue-light text-white text-[13px] font-extrabold transition-colors cursor-pointer shrink-0"
           aria-label="Buscar"
         >
           {isLoading ? (

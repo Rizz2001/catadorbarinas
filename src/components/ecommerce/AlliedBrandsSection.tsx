@@ -15,29 +15,30 @@ export function AlliedBrandsSection({
   brands,
   title = 'Empresas y Marcas Aliadas Oficiales',
 }: AlliedBrandsSectionProps) {
-  if (!brands || brands.length === 0) return null;
+  // Regla de auditoría UX: Ocultar la sección en portada hasta tener 6 o más marcas activas en el CMS
+  if (!brands || brands.length < 6) return null;
 
   return (
-    <section className="rounded-xl bg-white border border-slate-200 p-3.5 sm:p-6 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-3 sm:pb-4">
+    <section className="rounded-xl bg-white border border-slate-200 p-4 sm:p-6 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-3.5 sm:pb-4">
         <div className="min-w-0">
-          <h2 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             {title || 'Empresas y Marcas Aliadas Oficiales'}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600 mt-0.5 sm:mt-1">
+          <p className="text-[13px] sm:text-sm text-slate-600 mt-1">
             Distribución directa con sello de autenticidad en el estado Barinas
           </p>
         </div>
         <Link
           href="/catalogo"
-          className="text-xs font-extrabold text-catador-blue hover:text-catador-blue-light inline-flex items-center gap-1 self-start sm:self-auto"
+          className="text-[13px] sm:text-sm font-extrabold text-catador-blue hover:text-catador-blue-light inline-flex items-center gap-1 self-start sm:self-auto"
         >
           <span>Explorar catálogo de marcas</span>
-          <ArrowUpRight className="h-3.5 w-3.5" />
+          <ArrowUpRight className="h-4 w-4" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
         {brands.map((brand) => {
           const initials = brand.nombre
             .split(/\s+/)
@@ -50,10 +51,10 @@ export function AlliedBrandsSection({
             <Link
               key={brand.id}
               href={brand.url_destino || '/catalogo'}
-              className="group relative flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl bg-slate-50/80 hover:bg-white border border-slate-200/80 hover:border-catador-blue transition-colors duration-150 min-w-0"
+              className="group relative flex items-center gap-2.5 sm:gap-3 p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-200 hover:border-catador-blue transition-colors duration-150 min-w-0"
             >
               <div
-                className="relative flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg text-white font-black text-[11px] sm:text-xs overflow-hidden"
+                className="relative flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg text-white font-black text-xs overflow-hidden"
                 style={{ backgroundColor: brand.color_acento || '#00227B' }}
               >
                 {brand.logo_url ? (
@@ -70,15 +71,15 @@ export function AlliedBrandsSection({
               </div>
 
               <div className="min-w-0 flex-1">
-                <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 group-hover:text-catador-blue transition-colors truncate">
+                <h3 className="text-[13px] sm:text-sm font-extrabold text-slate-900 group-hover:text-catador-blue transition-colors truncate">
                   {brand.nombre}
                 </h3>
-                <span className="text-[10px] sm:text-[11px] font-medium text-slate-500 block truncate">
+                <span className="text-xs font-medium text-slate-600 block truncate">
                   {brand.categoria_tag}
                 </span>
               </div>
 
-              <ArrowUpRight className="hidden xs:block h-4 w-4 text-slate-300 group-hover:text-catador-blue shrink-0 transition-colors" />
+              <ArrowUpRight className="hidden xs:block h-4 w-4 text-slate-400 group-hover:text-catador-blue shrink-0 transition-colors" />
             </Link>
           );
         })}
