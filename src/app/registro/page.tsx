@@ -8,7 +8,8 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Crear Cuenta | Gran Catador Barinas',
-  description: 'Regístrate en Gran Catador Barinas para realizar pedidos rápidos, seguimiento en vivo y pagos en línea.',
+  description:
+    'Regístrate en Gran Catador Barinas para realizar pedidos rápidos, seguimiento en vivo y pagos en línea.',
 };
 
 export default function RegisterPage() {
@@ -23,17 +24,22 @@ export default function RegisterPage() {
           <ArrowLeft className="h-3.5 w-3.5" /> Volver a la tienda
         </Link>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-4">
-          <div className="text-center space-y-1">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-5">
+          <div className="text-center space-y-1.5">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-catador-blue text-white font-black text-lg shadow-2xs mb-1">
+              GC
+            </div>
             <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
               Crear Cuenta en Gran Catador
             </h1>
             <p className="text-xs text-slate-500">
-              Registra tus datos de contacto y entrega para compras rápidas en Barinas
+              Completa tus datos personales y de contacto para tus compras en Barinas
             </p>
           </div>
 
-          <Suspense fallback={<div className="text-xs text-center p-4">Cargando formulario...</div>}>
+          <Suspense
+            fallback={<div className="text-xs text-center p-4">Cargando formulario...</div>}
+          >
             <RegisterForm />
           </Suspense>
 

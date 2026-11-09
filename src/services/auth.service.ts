@@ -1,5 +1,6 @@
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { translateAuthError } from '@/lib/auth-errors';
 import { Database } from '@/types/supabase';
 
 type PerfilRow = Database['public']['Tables']['perfiles']['Row'];
@@ -17,15 +18,20 @@ export interface SignUpData {
 
 export async function signInWithEmail(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
-    email,
+    email: email.trim().toLowerCase(),
     password,
   });
 
   if (error) {
-    throw error;
+    throw new Error(
+      translateAuthError(
+        error,
+        'El correo electrónico o la contraseña son incorrectos. Verifica tus datos.'
+      )
+    );
   }
 
-  // Obtener perfil para verificar rol
+  // Obtener perfil para verificar rol y estado de confirmación
   if (data.user) {
     const { data: perfil } = await supabase
       .from('perfiles')
@@ -41,7 +47,7 @@ export async function signInWithEmail(email: string, password: string) {
 
 export async function signUpUser(data: SignUpData) {
   const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: data.email,
+    email: data.email.trim().toLowerCase(),
     password: data.password,
     options: {
       data: {
@@ -55,11 +61,10 @@ export async function signUpUser(data: SignUpData) {
   });
 
   if (authError) {
-    throw authError;
+    throw new Error(translateAuthError(authError, 'No se pudo completar el registro.'));
   }
 
   if (authData.user) {
-    // Asegurar inserción directa en perfiles con coordenadas GPS
     try {
       await supabase.from('perfiles').upsert({
         id: authData.user.id,
@@ -81,20 +86,28 @@ export async function signUpUser(data: SignUpData) {
 
 export async function signOutUser() {
   const { error } = await supabase.auth.signOut();
-  if (error) throw error;
+  if (error) {
+    throw new Error(translateAuthError(error, 'Error al cerrar sesión.'));
+  }
 }
 
 export async function sendPasswordResetEmail(email: string) {
-  const redirectTo = typeof window !== 'undefined'
-    ? `${window.location.origin}/actualizar-clave`
-    : 'http://localhost:3000/actualizar-clave';
+  const redirectTo =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/actualizar-clave`
+      : 'http://localhost:3000/actualizar-clave';
 
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
     redirectTo,
   });
 
   if (error) {
-    throw error;
+    throw new Error(
+      translateAuthError(
+        error,
+        'No pudimos enviar el enlace de recuperación. Verifica tu correo e intenta nuevamente.'
+      )
+    );
   }
 
   return data;
@@ -106,13 +119,21 @@ export async function updatePassword(newPassword: string) {
   });
 
   if (error) {
-    throw error;
+    throw new Error(
+      translateAuthError(
+        error,
+        'No se pudo actualizar la contraseña. Verifica tu sesión e intenta nuevamente.'
+      )
+    );
   }
 
   return data;
 }
 
-export async function getCurrentUserProfile(): Promise<{ user: User | null; perfil: PerfilRow | null }> {
+export async function getCurrentUserProfile(): Promise<{
+  user: User | null;
+  perfil: PerfilRow | null;
+}> {
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -4,17 +4,28 @@ import React, { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight, Mail, Store } from 'lucide-react';
-import { verifyEmailConfirmationTokenAction, resendConfirmationEmailAction } from '@/actions/auth.actions';
+import {
+  verifyEmailConfirmationTokenAction,
+  resendConfirmationEmailAction,
+  confirmUserEmailByIdAction,
+} from '@/actions/auth.actions';
+import { supabase } from '@/lib/supabase/client';
+import { EmailOtpType } from '@supabase/supabase-js';
 
 function ConfirmarCorreoContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
+  const tokenHash = searchParams.get('token_hash');
+  const otpType = searchParams.get('type') as EmailOtpType | null;
+  const code = searchParams.get('code');
   const statusParam = searchParams.get('status');
 
-  const [loading, setLoading] = useState<boolean>(Boolean(token));
+  const [loading, setLoading] = useState<boolean>(
+    Boolean(token || tokenHash || code || statusParam !== 'error')
+  );
   const [success, setSuccess] = useState<boolean>(statusParam === 'success');
   const [errorMessage, setErrorMessage] = useState<string | null>(
-    statusParam === 'error' ? 'El enlace de confirmación ha expirado o es inválido.' : null
+    statusParam === 'error' ? 'El enlace de confirmación ha expirado o no es válido.' : null
   );
 
   const [resendEmail, setResendEmail] = useState<string>('');
@@ -25,23 +36,77 @@ function ConfirmarCorreoContent() {
     let active = true;
 
     async function verify() {
-      if (!token) return;
       try {
         setLoading(true);
-        const res = await verifyEmailConfirmationTokenAction(token);
-        if (!active) return;
 
-        if (res.success) {
+        // 1. Verificar por token propio en tabla perfiles
+        if (token) {
+          const res = await verifyEmailConfirmationTokenAction(token);
+          if (!active) return;
+
+          if (res.success) {
+            setSuccess(true);
+            setErrorMessage(null);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 2. Verificar si viene token_hash de Supabase Auth
+        if (tokenHash && otpType) {
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: otpType,
+          });
+          if (!error && data?.user && active) {
+            await confirmUserEmailByIdAction(data.user.id);
+            setSuccess(true);
+            setErrorMessage(null);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 3. Verificar si viene código PKCE de Supabase Auth
+        if (code) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!error && data?.user && active) {
+            await confirmUserEmailByIdAction(data.user.id);
+            setSuccess(true);
+            setErrorMessage(null);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // 4. Comprobar si la sesión actual ya tiene email_confirmed_at en Supabase Auth
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user?.email) {
+          setResendEmail(user.email);
+        }
+        if (user?.email_confirmed_at && active) {
+          await confirmUserEmailByIdAction(user.id);
           setSuccess(true);
           setErrorMessage(null);
-        } else {
-          setSuccess(false);
-          setErrorMessage(res.error || 'No se pudo verificar el token de confirmación.');
+          setLoading(false);
+          return;
         }
-      } catch (err) {
-        if (!active) return;
-        setSuccess(false);
-        setErrorMessage(err instanceof Error ? err.message : 'Error al confirmar correo.');
+
+        if (active) {
+          setSuccess(false);
+          setErrorMessage(
+            token
+              ? 'El enlace de confirmación no es válido o ya fue utilizado anteriormente.'
+              : 'Ingresa tu correo electrónico para recibir un nuevo enlace de verificación.'
+          );
+        }
+      } catch {
+        if (active) {
+          setSuccess(false);
+          setErrorMessage('No pudimos verificar el enlace. Solicita uno nuevo a continuación.');
+        }
       } finally {
         if (active) setLoading(false);
       }
@@ -52,7 +117,7 @@ function ConfirmarCorreoContent() {
     return () => {
       active = false;
     };
-  }, [token]);
+  }, [token, tokenHash, otpType, code]);
 
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +126,17 @@ function ConfirmarCorreoContent() {
     setResendLoading(true);
     setResendFeedback(null);
     try {
-      const res = await resendConfirmationEmailAction(resendEmail);
+      const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+      const res = await resendConfirmationEmailAction(resendEmail, origin);
       if (res.success) {
-        setResendFeedback(res.message || 'Enlace de confirmación reenviado.');
+        setResendFeedback(
+          res.message || 'Hemos enviado un nuevo enlace de confirmación a tu correo.'
+        );
       } else {
-        setResendFeedback(res.error || 'Error al reenviar.');
+        setResendFeedback(res.error || 'No se pudo enviar el correo. Intenta nuevamente.');
       }
     } catch {
-      setResendFeedback('Error de conexión al reenviar correo.');
+      setResendFeedback('Error de conexión al intentar reenviar el correo.');
     } finally {
       setResendLoading(false);
     }
@@ -80,8 +148,12 @@ function ConfirmarCorreoContent() {
         {loading && (
           <div className="space-y-4 py-6">
             <Loader2 className="h-12 w-12 text-catador-blue animate-spin mx-auto" />
-            <h1 className="text-base font-black text-slate-900">Verificando tu correo electrónico...</h1>
-            <p className="text-xs text-slate-500">Estamos validando tu enlace con la base de datos de Gran Catador.</p>
+            <h1 className="text-base font-black text-slate-900">
+              Verificando tu correo electrónico...
+            </h1>
+            <p className="text-xs text-slate-500">
+              Estamos validando tu enlace de seguridad con Gran Catador Barinas.
+            </p>
           </div>
         )}
 
@@ -93,13 +165,13 @@ function ConfirmarCorreoContent() {
 
             <div className="space-y-2">
               <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-900 border border-emerald-200">
-                ✅ Correo Verificado
+                Correo Verificado
               </span>
               <h1 className="text-xl font-black text-slate-900 tracking-tight">
                 ¡Tu correo ha sido confirmado con éxito!
               </h1>
               <p className="text-xs text-slate-600 leading-relaxed max-w-sm mx-auto">
-                Tu cuenta de <strong>Gran Catador</strong> ya está 100% habilitada para realizar compras por unidad o por caja, cotizar delivery GPS y recibir despachos a domicilio.
+                Tu cuenta de <strong>Gran Catador Barinas</strong> ya está 100% habilitada para realizar pedidos por unidad o por caja y recibir despachos a domicilio.
               </p>
             </div>
 
@@ -124,35 +196,34 @@ function ConfirmarCorreoContent() {
 
         {!loading && !success && (
           <div className="space-y-5 py-2 animate-in fade-in duration-300">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-rose-100 text-rose-600">
-              <AlertCircle className="h-10 w-10 text-rose-600" />
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
+              <AlertCircle className="h-10 w-10 text-amber-600" />
             </div>
 
             <div className="space-y-2">
-              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-rose-100 text-rose-900 border border-rose-200">
-                ⚠️ Confirmación Requerida
+              <span className="inline-block px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-100 text-amber-900 border border-amber-200">
+                Confirmación de Correo
               </span>
               <h1 className="text-lg font-black text-slate-900 tracking-tight">
-                Enlace no válido o expirado
+                Solicitar enlace de verificación
               </h1>
               <p className="text-xs text-slate-600">
-                {errorMessage || 'El enlace de confirmación no es válido o ya caducó por seguridad.'}
+                {errorMessage || 'Solicita un nuevo enlace de confirmación para tu correo electrónico.'}
               </p>
             </div>
 
-            {/* Formulario de reenvío */}
             <form onSubmit={handleResend} className="space-y-3 pt-2 text-left text-xs">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Ingresa tu correo para recibir un nuevo enlace:
+                  Correo electrónico de tu cuenta:
                 </label>
                 <input
                   type="email"
                   required
-                  placeholder="ejemplo@correo.com"
+                  placeholder="tu@correo.com"
                   value={resendEmail}
                   onChange={(e) => setResendEmail(e.target.value)}
-                  className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-xs text-slate-900"
+                  className="w-full min-h-[44px] rounded-xl border border-slate-200 p-2.5 text-base md:text-xs text-slate-900 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/20"
                 />
               </div>
 
@@ -166,11 +237,15 @@ function ConfirmarCorreoContent() {
                 ) : (
                   <Mail className="h-4 w-4" />
                 )}
-                <span>Solicitar Nuevo Enlace de Confirmación</span>
+                <span>
+                  {resendLoading
+                    ? 'Enviando enlace...'
+                    : 'Enviar Nuevo Enlace de Confirmación'}
+                </span>
               </button>
 
               {resendFeedback && (
-                <p className="text-[11px] font-bold text-center p-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700">
+                <p className="text-[11px] font-bold text-center p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-700">
                   {resendFeedback}
                 </p>
               )}
@@ -204,4 +279,3 @@ export default function ConfirmarCorreoPage() {
     </Suspense>
   );
 }
-

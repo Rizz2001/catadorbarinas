@@ -188,7 +188,8 @@ export default function CheckoutPage() {
     setCheckoutResending(true);
     setCheckoutResendMsg(null);
     try {
-      const res = await resendConfirmationEmailAction(deliveryData.email);
+      const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+      const res = await resendConfirmationEmailAction(deliveryData.email, origin);
       if (res.success) {
         setCheckoutResendMsg(res.message || 'Enlace reenviado.');
       } else {

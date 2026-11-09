@@ -1,7 +1,14 @@
 'use server';
 
 import crypto from 'crypto';
+import { createClient } from '@supabase/supabase-js';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import {
+  translateAuthError,
+  normalizeCedulaOrRif,
+  isValidCedulaOrRif,
+  isValidPhone,
+} from '@/lib/auth-errors';
 
 export interface RegisterInput {
   email: string;
@@ -12,13 +19,14 @@ export interface RegisterInput {
   direccion?: string;
   latitud?: number | null;
   longitud?: number | null;
+  origin?: string;
 }
 
 export interface RegisterResult {
   success: boolean;
   error?: string;
   requiresEmailConfirmation?: boolean;
-  tokenConfirmacion?: string;
+  emailSent?: boolean;
   email?: string;
   nombre?: string;
   user?: {
@@ -27,10 +35,23 @@ export interface RegisterResult {
   };
 }
 
+function createEphemeralAnonClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+  return createClient(url, anonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+}
+
 /**
  * Server Action para registrar usuarios en Gran Catador.
- * Permite al usuario entrar a su cuenta/tienda inmediatamente,
- * pero marca `correo_confirmado: false` para bloquear pedidos hasta su confirmación.
+ * Envía el correo real de confirmación mediante Supabase Auth,
+ * permite iniciar sesión para explorar la tienda, pero mantiene
+ * `correo_confirmado: false` hasta que el usuario verifique su correo.
  */
 export async function registerUserAction(input: RegisterInput): Promise<RegisterResult> {
   try {
@@ -38,11 +59,29 @@ export async function registerUserAction(input: RegisterInput): Promise<Register
     const password = input.password;
     const nombre = input.nombre?.trim();
     const telefono = input.telefono?.trim();
-    const cedula = input.cedula?.trim();
+    const cedula = normalizeCedulaOrRif(input.cedula || '');
     const direccion = input.direccion?.trim() || '';
 
     if (!email || !password || !nombre || !telefono || !cedula) {
-      return { success: false, error: 'Por favor completa todos los campos requeridos.' };
+      return { success: false, error: 'Por favor completa todos los campos obligatorios.' };
+    }
+
+    if (nombre.length < 3) {
+      return { success: false, error: 'Ingresa tu nombre y apellido válidos.' };
+    }
+
+    if (!isValidCedulaOrRif(cedula)) {
+      return {
+        success: false,
+        error: 'Ingresa un número de Cédula o RIF válido (ejemplo: V-18456789).',
+      };
+    }
+
+    if (!isValidPhone(telefono)) {
+      return {
+        success: false,
+        error: 'Ingresa un número de teléfono móvil válido (ejemplo: 0414-1234567).',
+      };
     }
 
     if (password.length < 6) {
@@ -51,53 +90,101 @@ export async function registerUserAction(input: RegisterInput): Promise<Register
 
     const adminClient = getSupabaseAdmin();
 
-    // Generar token criptográfico único para verificación de correo (validez de 24 horas)
+    // 1. Verificar si el correo ya existe para dar un mensaje claro en español
+    const { data: existingList } = await adminClient.auth.admin.listUsers();
+    const alreadyExists = existingList?.users?.some(
+      (u) => u.email?.toLowerCase() === email
+    );
+
+    if (alreadyExists) {
+      return {
+        success: false,
+        error:
+          'Este correo electrónico ya está registrado en Gran Catador. Por favor inicia sesión o recupera tu contraseña.',
+      };
+    }
+
+    // 2. Generar token criptográfico único para el enlace de confirmación (validez de 24 horas)
     const tokenConfirmacion = crypto.randomBytes(32).toString('hex');
     const tokenExpira = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-    // Crear usuario en Supabase Auth
-    // Se deja email_confirm: true a nivel de Supabase Auth para que el usuario pueda iniciar sesión
-    // y navegar por la tienda, pero la regla de negocio bloquea pedidos mediante `correo_confirmado: false`.
-    const { data, error } = await adminClient.auth.admin.createUser({
+    const baseOrigin =
+      input.origin && input.origin.startsWith('http')
+        ? input.origin.replace(/\/$/, '')
+        : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    const emailRedirectTo = `${baseOrigin}/confirmar-correo?token=${tokenConfirmacion}`;
+
+    const userMetadata = {
+      nombre,
+      nombre_completo: nombre,
+      telefono,
+      cedula,
+      cedula_rif: cedula,
+      direccion,
+      latitud: input.latitud ?? null,
+      longitud: input.longitud ?? null,
+      rol: 'cliente',
+      correo_confirmado: false,
+    };
+
+    // 3. Registrar con signUp para disparar el envío real del correo de verificación de Supabase
+    const anonClient = createEphemeralAnonClient();
+    const { data: signUpData, error: signUpError } = await anonClient.auth.signUp({
       email,
       password,
-      email_confirm: true,
-      user_metadata: {
-        nombre,
-        nombre_completo: nombre,
-        telefono,
-        cedula,
-        cedula_rif: cedula,
-        direccion,
-        latitud: input.latitud ?? null,
-        longitud: input.longitud ?? null,
-        rol: 'cliente',
-        correo_confirmado: false,
+      options: {
+        emailRedirectTo,
+        data: userMetadata,
       },
     });
 
-    if (error) {
-      const msg = error.message.toLowerCase();
+    let createdUserId: string | null = signUpData?.user?.id || null;
+    let emailSent = true;
+
+    if (signUpError) {
+      const errLower = signUpError.message.toLowerCase();
+      // Si el servidor SMTP por defecto de Supabase alcanza el límite de envíos por hora,
+      // creamos el usuario con email_confirm: false para no bloquear el registro.
       if (
-        msg.includes('already registered') ||
-        msg.includes('duplicate') ||
-        msg.includes('unique')
+        errLower.includes('rate limit') ||
+        errLower.includes('over_email_send_rate_limit') ||
+        errLower.includes('can only request this after')
       ) {
+        emailSent = false;
+        const { data: fallbackData, error: fallbackError } =
+          await adminClient.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: false,
+            user_metadata: userMetadata,
+          });
+
+        if (fallbackError || !fallbackData.user) {
+          return {
+            success: false,
+            error: translateAuthError(fallbackError, 'No se pudo completar el registro.'),
+          };
+        }
+        createdUserId = fallbackData.user.id;
+      } else {
         return {
           success: false,
-          error: 'Este correo electrónico ya está registrado. Por favor inicia sesión.',
+          error: translateAuthError(signUpError, 'Error al crear la cuenta.'),
         };
       }
-      return { success: false, error: error.message };
     }
 
-    if (!data.user) {
-      return { success: false, error: 'No se pudo crear el usuario. Intenta nuevamente.' };
+    if (!createdUserId) {
+      return {
+        success: false,
+        error: 'No se pudo crear el usuario. Por favor intenta nuevamente.',
+      };
     }
 
-    // Guardar en tabla perfiles con correo_confirmado: false y el token
+    // 4. Guardar perfil con correo_confirmado: false y el token en base de datos
     await adminClient.from('perfiles').upsert({
-      id: data.user.id,
+      id: createdUserId,
       nombre,
       telefono,
       cedula,
@@ -114,49 +201,51 @@ export async function registerUserAction(input: RegisterInput): Promise<Register
     return {
       success: true,
       requiresEmailConfirmation: true,
+      emailSent,
       email,
       nombre,
-      tokenConfirmacion,
       user: {
-        id: data.user.id,
-        email: data.user.email,
+        id: createdUserId,
+        email,
       },
     };
   } catch (err) {
-    console.error('Error en registerUserAction:', err);
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Error inesperado al registrar usuario.',
+      error: translateAuthError(err, 'Error inesperado al registrar tu cuenta.'),
     };
   }
 }
 
 /**
- * Reenvía o regenera un nuevo enlace/token de confirmación de correo
+ * Reenvía el correo de confirmación al buzón del usuario
  */
-export async function resendConfirmationEmailAction(email: string): Promise<{
+export async function resendConfirmationEmailAction(
+  email: string,
+  origin?: string
+): Promise<{
   success: boolean;
   message?: string;
   error?: string;
-  tokenConfirmacion?: string;
 }> {
   try {
     const cleanEmail = email?.trim().toLowerCase();
     if (!cleanEmail) {
-      return { success: false, error: 'Correo electrónico requerido.' };
+      return { success: false, error: 'Por favor ingresa tu correo electrónico.' };
     }
 
     const adminClient = getSupabaseAdmin();
 
-    // Buscar usuario en auth.users
     const { data: userData } = await adminClient.auth.admin.listUsers();
     const foundUser = userData?.users?.find((u) => u.email?.toLowerCase() === cleanEmail);
 
     if (!foundUser) {
-      return { success: false, error: 'No se encontró ninguna cuenta con este correo.' };
+      return {
+        success: false,
+        error: 'No encontramos ninguna cuenta registrada con ese correo electrónico.',
+      };
     }
 
-    // Comprobar si ya está confirmado
     const { data: perfil } = await adminClient
       .from('perfiles')
       .select('correo_confirmado')
@@ -166,7 +255,7 @@ export async function resendConfirmationEmailAction(email: string): Promise<{
     if (perfil?.correo_confirmado) {
       return {
         success: true,
-        message: 'Tu correo electrónico ya se encuentra confirmado. Ya puedes realizar pedidos.',
+        message: 'Tu correo electrónico ya está verificado. Ya puedes realizar pedidos.',
       };
     }
 
@@ -182,16 +271,40 @@ export async function resendConfirmationEmailAction(email: string): Promise<{
       })
       .eq('id', foundUser.id);
 
+    const baseOrigin =
+      origin && origin.startsWith('http')
+        ? origin.replace(/\/$/, '')
+        : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+    const emailRedirectTo = `${baseOrigin}/confirmar-correo?token=${newToken}`;
+
+    const anonClient = createEphemeralAnonClient();
+    const { error: resendError } = await anonClient.auth.resend({
+      type: 'signup',
+      email: cleanEmail,
+      options: {
+        emailRedirectTo,
+      },
+    });
+
+    if (resendError) {
+      return {
+        success: false,
+        error: translateAuthError(
+          resendError,
+          'No pudimos reenviar el correo en este momento. Intenta en unos segundos.'
+        ),
+      };
+    }
+
     return {
       success: true,
-      message: `Hemos generado un nuevo enlace de confirmación para ${cleanEmail}.`,
-      tokenConfirmacion: newToken,
+      message: `Hemos enviado un nuevo enlace de confirmación a ${cleanEmail}. Revisa tu bandeja de entrada o spam.`,
     };
   } catch (err) {
-    console.error('Error en resendConfirmationEmailAction:', err);
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Error al reenviar confirmación.',
+      error: translateAuthError(err, 'Error al reenviar el correo de confirmación.'),
     };
   }
 }
@@ -208,12 +321,11 @@ export async function verifyEmailConfirmationTokenAction(token: string): Promise
   try {
     const cleanToken = token?.trim();
     if (!cleanToken) {
-      return { success: false, error: 'Token de confirmación inválido o ausente.' };
+      return { success: false, error: 'El enlace de confirmación es inválido o está incompleto.' };
     }
 
     const adminClient = getSupabaseAdmin();
 
-    // Buscar perfil con este token
     const { data: perfil, error } = await adminClient
       .from('perfiles')
       .select('id, nombre, correo_confirmado, token_confirmacion_expira')
@@ -223,22 +335,20 @@ export async function verifyEmailConfirmationTokenAction(token: string): Promise
     if (error || !perfil) {
       return {
         success: false,
-        error: 'El enlace de confirmación es inválido o ya fue utilizado.',
+        error: 'El enlace de confirmación no es válido o ya fue utilizado anteriormente.',
       };
     }
 
-    // Verificar expiración
     if (perfil.token_confirmacion_expira) {
       const expiraMs = new Date(perfil.token_confirmacion_expira).getTime();
       if (Date.now() > expiraMs) {
         return {
           success: false,
-          error: 'El enlace de confirmación ha expirado. Por favor solicita uno nuevo.',
+          error: 'El enlace de confirmación ha expirado. Solicita uno nuevo a continuación.',
         };
       }
     }
 
-    // Activar perfil
     await adminClient
       .from('perfiles')
       .update({
@@ -249,20 +359,55 @@ export async function verifyEmailConfirmationTokenAction(token: string): Promise
       })
       .eq('id', perfil.id);
 
-    // Actualizar metadatos en auth.users
     await adminClient.auth.admin.updateUserById(perfil.id, {
+      email_confirm: true,
       user_metadata: { correo_confirmado: true },
     });
 
     return {
       success: true,
-      message: '¡Correo confirmado con éxito! Tu cuenta ahora puede realizar pedidos.',
+      message: '¡Tu correo electrónico ha sido verificado con éxito! Ya puedes realizar pedidos.',
     };
   } catch (err) {
-    console.error('Error en verifyEmailConfirmationTokenAction:', err);
     return {
       success: false,
-      error: err instanceof Error ? err.message : 'Error al verificar token.',
+      error: translateAuthError(err, 'Error al verificar tu correo electrónico.'),
+    };
+  }
+}
+
+/**
+ * Sincroniza y confirma el perfil cuando Supabase Auth valida una sesión o código OTP
+ */
+export async function confirmUserEmailByIdAction(userId: string): Promise<{
+  success: boolean;
+  error?: string;
+}> {
+  try {
+    if (!userId) return { success: false, error: 'Identificador de usuario requerido.' };
+
+    const adminClient = getSupabaseAdmin();
+
+    await adminClient
+      .from('perfiles')
+      .update({
+        correo_confirmado: true,
+        token_confirmacion: null,
+        token_confirmacion_expira: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', userId);
+
+    await adminClient.auth.admin.updateUserById(userId, {
+      email_confirm: true,
+      user_metadata: { correo_confirmado: true },
+    });
+
+    return { success: true };
+  } catch (err) {
+    return {
+      success: false,
+      error: translateAuthError(err, 'Error al confirmar la cuenta.'),
     };
   }
 }

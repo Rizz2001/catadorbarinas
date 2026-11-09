@@ -58,7 +58,8 @@ export function AccountProfileTab({
     setResending(true);
     setResendMsg(null);
     try {
-      const res = await resendConfirmationEmailAction(userEmail);
+      const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+      const res = await resendConfirmationEmailAction(userEmail, origin);
       if (res.success) {
         setResendMsg(res.message || 'Correo de confirmación enviado.');
       } else {

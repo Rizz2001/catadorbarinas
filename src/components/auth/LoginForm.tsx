@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Lock, Mail, ArrowRight, Loader2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { signInWithEmail } from '@/services/auth.service';
+import { translateAuthError } from '@/lib/auth-errors';
 import { supabase } from '@/lib/supabase/client';
 
 export function LoginForm() {
@@ -17,14 +18,17 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Verificación en segundo plano sin bloquear el formulario
+  // Verificación de sesión activa en segundo plano
   useEffect(() => {
     let mounted = true;
     async function checkExistingSession() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (user && mounted) {
-          const target = redirectParam && redirectParam.startsWith('/') ? redirectParam : '/cuenta';
+          const target =
+            redirectParam && redirectParam.startsWith('/') ? redirectParam : '/cuenta';
           window.location.href = target;
         }
       } catch {
@@ -46,21 +50,21 @@ export function LoginForm() {
     try {
       const { perfil } = await signInWithEmail(email, password);
 
-      // Redirección con recarga limpia para garantizar envío de cookies httpOnly en móviles
-      const target = redirectParam && redirectParam.startsWith('/')
-        ? redirectParam
-        : perfil?.rol === 'admin'
-        ? '/admin/pedidos'
-        : '/cuenta';
+      const target =
+        redirectParam && redirectParam.startsWith('/')
+          ? redirectParam
+          : perfil?.rol === 'admin'
+          ? '/admin/pedidos'
+          : '/cuenta';
 
       window.location.href = target;
     } catch (err) {
-      const rawMsg = err instanceof Error ? err.message : '';
-      if (rawMsg.toLowerCase().includes('invalid login credentials')) {
-        setError('Correo o contraseña incorrectos. Verifica que estén bien escritos.');
-      } else {
-        setError(rawMsg || 'Credenciales inválidas. Verifica tu correo y contraseña.');
-      }
+      setError(
+        translateAuthError(
+          err,
+          'El correo electrónico o la contraseña son incorrectos. Verifica tus datos.'
+        )
+      );
       setLoading(false);
     }
   };
@@ -68,23 +72,29 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-700">
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium"
+        >
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
 
       <div>
-        <label className="block text-xs font-bold text-slate-700 mb-1">Correo Electrónico</label>
+        <label className="block text-xs font-bold text-slate-700 mb-1">
+          Correo Electrónico
+        </label>
         <div className="relative">
           <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
           <input
             type="email"
             required
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="tu@correo.com"
-            className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20"
+            className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/20"
           />
         </div>
       </div>
@@ -104,10 +114,11 @@ export function LoginForm() {
           <input
             type={showPassword ? 'text' : 'password'}
             required
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-xl border border-slate-200 pl-9 pr-10 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-catador-blue/20 font-mono"
+            className="w-full rounded-xl border border-slate-200 pl-9 pr-10 py-2.5 min-h-[44px] text-base md:text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/20 font-mono"
           />
           <button
             type="button"
@@ -123,12 +134,12 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 min-h-[44px] py-3 text-xs font-extrabold text-white shadow-md transition-all active:scale-[0.99] cursor-pointer"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 min-h-[46px] py-3 text-xs font-extrabold text-white shadow-md transition-all active:scale-[0.99] cursor-pointer"
       >
         {loading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            <span>Iniciando sesión...</span>
+            <span>Verificando credenciales...</span>
           </>
         ) : (
           <>
@@ -139,7 +150,7 @@ export function LoginForm() {
       </button>
 
       <p className="text-center text-xs text-slate-500 pt-2">
-        ¿Aún no tienes una cuenta?{' '}
+        ¿Aún no tienes una cuenta en Gran Catador?{' '}
         <Link
           href={`/registro${redirectParam ? `?redirect=${encodeURIComponent(redirectParam)}` : ''}`}
           className="font-bold text-catador-blue hover:underline"
