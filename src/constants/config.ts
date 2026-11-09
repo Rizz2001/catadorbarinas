@@ -4,14 +4,14 @@
  */
 
 export const APP_CONFIG = {
-  name: 'Gran Catador',
-  legalName: 'Distribuidora Bodegón del Catador C.A.',
+  name: 'EL CATADOR.',
+  legalName: 'Gran Catador Supermercado y Bodegon',
   city: 'Barinas',
   country: 'Venezuela',
-  address: 'Av. Alberto Arvelo Torrealba, Barinas, Edo. Barinas',
-  phone: '+58 414-0000000',
-  whatsappNumber: '584140000000',
-  whatsappDefaultMessage: '¡Hola Gran Catador! Me gustaría confirmar el siguiente pedido:',
+  address: 'Av. San Silvestre Detras de la Ciudad Deportiva, C.C Ciudad Catador Local N1',
+  phone: '+58 424-5496366',
+  whatsappNumber: '584245496366',
+  whatsappDefaultMessage: '¡Hola EL CATADOR.! Me gustaría confirmar el siguiente pedido:',
   freeShippingThresholdUsd: 30.0,
   flatShippingRateUsd: 2.0,
   defaultBcvRate: 886.23,
@@ -21,7 +21,7 @@ export const IMAGE_FALLBACKS = {
   product: '/logo-catador.svg',
   category: '/logo-catador.svg',
   banner: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=1200&q=80',
-  logoText: 'Gran Catador',
+  logoText: 'EL CATADOR.',
 } as const;
 
 /**

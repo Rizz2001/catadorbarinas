@@ -66,7 +66,7 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   footer_subdireccion: 'Av. 23 de Enero • Barinas, Estado Barinas, Venezuela',
   footer_garantias: [
     {
-      figura: 'Gratis desde $30',
+      figura: 'Despacho en Barinas',
       titulo: 'Delivery en Barinas',
       subtitulo: 'Cotización automática por GPS y volumen',
     },

@@ -77,11 +77,11 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between pb-4 border-b border-slate-800">
           <div className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-catador-amber flex items-center justify-center font-black text-white text-sm shadow-md">
-              GC
+              EC
             </div>
             <div>
               <h2 className="text-sm font-black text-white tracking-tight leading-none">
-                Gran Catador CMS
+                EL CATADOR. CMS
               </h2>
               <p className="text-xs text-slate-400 font-medium mt-1">
                 Bodegón • Barinas

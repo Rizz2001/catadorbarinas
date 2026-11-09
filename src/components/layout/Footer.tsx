@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { MapPin, Phone, Clock, Info } from 'lucide-react';
+import { MapPin, Phone, Clock } from 'lucide-react';
 import { APP_CONFIG } from '@/constants/config';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 
@@ -23,24 +23,6 @@ export function Footer() {
   if (pathname.startsWith('/admin')) {
     return null;
   }
-
-  const freeShipping =
-    storeConfig?.delivery_gratis_minimo_usd ?? APP_CONFIG.freeShippingThresholdUsd;
-
-  // Si en el CMS se configuró un aviso en el primer bloque del footer, lo formateamos como banner informativo amigable
-  const rawNotice = storeConfig?.footer_garantias?.[0]?.figura || '';
-  const hasCustomCmsNotice =
-    Boolean(rawNotice) && !rawNotice.toLowerCase().includes('restringid');
-
-  const shippingInfoTitle = hasCustomCmsNotice
-    ? rawNotice
-    : freeShipping > 0 && freeShipping <= 200
-      ? `Despacho a Domicilio en Barinas (Gratis desde $${freeShipping})`
-      : 'Despacho a Domicilio Calculado por GPS';
-
-  const shippingInfoSubtitle =
-    storeConfig?.footer_garantias?.[0]?.subtitulo ||
-    'Tarifa exacta según tu sector en Barinas y volumen de compra (motorizado o vehículo de carga).';
 
   return (
     <footer className="bg-[#0B1120] text-slate-200 mt-16 border-t-4 border-catador-blue">
@@ -72,7 +54,7 @@ export function Footer() {
             </h3>
             <p className="text-slate-300 leading-relaxed text-[13px] sm:text-sm mt-1">
               {storeConfig?.razon_social || APP_CONFIG.legalName} (RIF:{' '}
-              {storeConfig?.rif || 'J-50123456-7'}).{' '}
+              {storeConfig?.rif || 'J-41037406-3'}).{' '}
               {storeConfig?.footer_descripcion ||
                 'Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada.'}
             </p>
@@ -175,7 +157,7 @@ export function Footer() {
           </ul>
         </div>
 
-        {/* Columna 4 (3 cols): Transparencia Bimonetaria y Banner Informativo de Despacho */}
+        {/* Columna 4 (3 cols): Transparencia Bimonetaria */}
         <div className="lg:col-span-3 space-y-4">
           <h4 className="text-sm sm:text-base font-black text-white tracking-tight border-b border-slate-800 pb-2.5">
             Transparencia Bimonetaria
@@ -184,17 +166,6 @@ export function Footer() {
             {storeConfig?.footer_transparencia_texto ||
               'Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES) calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV).'}
           </p>
-
-          {/* Banner Informativo Azul (Sin parecer alerta naranja de error) */}
-          <div className="p-4 bg-blue-950/60 rounded-xl border border-blue-800/80 text-[13px] text-blue-100 space-y-1.5">
-            <div className="flex items-center gap-2 font-extrabold text-white">
-              <Info className="h-4 w-4 text-blue-300 shrink-0" />
-              <span>{shippingInfoTitle}</span>
-            </div>
-            <p className="text-xs sm:text-[13px] text-blue-200/90 leading-relaxed">
-              {shippingInfoSubtitle}
-            </p>
-          </div>
         </div>
       </div>
 

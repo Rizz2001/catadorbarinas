@@ -7,6 +7,7 @@ import {
   Footer,
   CookieConsentBanner,
 } from '@/components/layout';
+import { getStoreConfigServer } from '@/services/cms.server';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -16,35 +17,50 @@ export const viewport: Viewport = {
   themeColor: '#00227B',
 };
 
-export const metadata: Metadata = {
-  title: {
-    default: 'Gran Catador | Distribuidora & Bodegón del Catador en Barinas',
-    template: '%s | Gran Catador Barinas',
-  },
-  description:
-    'Tienda online oficial de Gran Catador / Distribuidora Bodegón del Catador C.A. en Barinas. Compra licores, cervezas, refrescos, hielo y víveres por unidad o por caja con precios en $ USD y Bs. BCV. Cálculo automático de delivery por GPS en tiempo real.',
-  keywords: [
-    'Gran Catador Barinas',
-    'Bodegón en Barinas',
-    'Licorería en Barinas',
-    'Comprar licores por caja Barinas',
-    'Delivery de licores y víveres Barinas',
-    'Distribuidora Bodegón del Catador',
-    'Precios BCV Barinas',
-  ],
-  openGraph: {
-    title: 'Gran Catador | Distribuidora & Bodegón del Catador Barinas',
+export async function generateMetadata(): Promise<Metadata> {
+  const storeConfig = await getStoreConfigServer();
+  const storeName = storeConfig?.nombre_tienda || 'EL CATADOR.';
+  const iconUrl = storeConfig?.logo_url || '/icon-catador.png';
+
+  return {
+    title: {
+      default: storeName,
+      template: `%s | ${storeName}`,
+    },
     description:
-      'Compra por unidad o caja cerrada con inventario en tiempo real y precios duales ($ USD y Bs. BCV). Delivery express en Barinas.',
-    locale: 'es_VE',
-    type: 'website',
-    siteName: 'Gran Catador Barinas',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+      'Tienda online oficial de EL CATADOR. en Barinas. Compra licores, cervezas, refrescos, hielo y víveres por unidad o por caja con precios en $ USD y Bs. BCV. Cálculo automático de delivery por GPS en tiempo real.',
+    icons: {
+      icon: [
+        { url: '/icon-catador.png', type: 'image/png' },
+        { url: iconUrl },
+      ],
+      shortcut: '/icon-catador.png',
+      apple: '/icon-catador.png',
+    },
+    keywords: [
+      'EL CATADOR.',
+      'El Catador Barinas',
+      'Gran Catador Barinas',
+      'Bodegón en Barinas',
+      'Licorería en Barinas',
+      'Comprar licores por caja Barinas',
+      'Delivery de licores y víveres Barinas',
+      'Precios BCV Barinas',
+    ],
+    openGraph: {
+      title: storeName,
+      description:
+        'Compra por unidad o caja cerrada con inventario en tiempo real y precios duales ($ USD y Bs. BCV). Delivery express en Barinas.',
+      locale: 'es_VE',
+      type: 'website',
+      siteName: storeName,
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -54,10 +70,10 @@ export default function RootLayout({
   const storeJsonLd = {
     '@context': 'https://schema.org',
     '@type': ['LiquorStore', 'GroceryStore'],
-    name: 'Gran Catador - Distribuidora Bodegón del Catador C.A.',
+    name: 'EL CATADOR.',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Av. Alberto Arvelo Torrealba',
+      streetAddress: 'Av. San Silvestre Detras de la Ciudad Deportiva, C.C Ciudad Catador Local N1',
       addressLocality: 'Barinas',
       addressRegion: 'Barinas',
       addressCountry: 'VE',
