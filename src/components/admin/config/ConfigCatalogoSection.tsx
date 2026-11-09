@@ -291,7 +291,7 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
               type="text"
               value={form.footer_subdireccion || ''}
               onChange={(e) => onChange({ footer_subdireccion: e.target.value })}
-              placeholder="Av. 23 de Enero • Barinas, Estado Barinas, Venezuela"
+              placeholder="C.C. Ciudad Catador • Barinas, Estado Barinas, Venezuela"
               className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
             />
           </div>

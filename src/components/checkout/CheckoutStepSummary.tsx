@@ -96,7 +96,7 @@ export function CheckoutStepSummary({
             <p>Teléfono: {deliveryData.telefono}</p>
             <p className="text-[11px] text-slate-700 bg-slate-50 rounded-lg p-2 border border-slate-100">
               {deliveryData.tipoEntrega === 'pickup' ? (
-                <strong className="text-emerald-700">Retiro en Tienda (Pick-Up Av. 23 de Enero)</strong>
+                <strong className="text-emerald-700">Retiro en Tienda (Pick-Up C.C. Ciudad Catador)</strong>
               ) : (
                 <>
                   <strong>{deliveryData.zonaBarinas}:</strong> {deliveryData.direccion}

@@ -81,7 +81,7 @@ export function HeroBanner({
     banner?.titulo || 'Licores Importados y Víveres al Precio Oficial en Barinas';
   const subtitulo =
     banner?.subtitulo ||
-    'Inventario real garantizado en nuestra sede (Av. 23 de Enero). Compra por unidad o por caja cerrada en Dólares ($ USD) y Bolívares (Bs. BCV).';
+    'Inventario real garantizado en nuestra sede (C.C. Ciudad Catador). Compra por unidad o por caja cerrada en Dólares ($ USD) y Bolívares (Bs. BCV).';
   const botonTexto = banner?.boton_texto || 'Ver Ofertas del Día';
   const botonUrl = banner?.boton_url || '/catalogo';
 

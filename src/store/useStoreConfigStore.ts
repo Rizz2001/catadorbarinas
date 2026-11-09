@@ -63,7 +63,7 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
     'Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada con despacho express.',
   footer_transparencia_texto:
     'Todos nuestros precios están expresados en Dólares ($ USD) y Bolívares (Bs. / VES) calculados a la tasa oficial vigente del Banco Central de Venezuela (BCV).',
-  footer_subdireccion: 'Av. 23 de Enero • Barinas, Estado Barinas, Venezuela',
+  footer_subdireccion: 'C.C. Ciudad Catador • Barinas, Estado Barinas, Venezuela',
   footer_garantias: [
     {
       figura: 'Despacho en Barinas',

@@ -178,7 +178,8 @@ export function Footer() {
           </p>
           <p className="font-semibold text-slate-300">
             {storeConfig?.footer_subdireccion ||
-              'Av. 23 de Enero • Barinas, Estado Barinas, Venezuela'}
+              storeConfig?.direccion_fisica ||
+              'C.C. Ciudad Catador • Barinas, Estado Barinas, Venezuela'}
           </p>
         </div>
       </div>
