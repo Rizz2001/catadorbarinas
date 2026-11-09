@@ -180,7 +180,7 @@ export function CheckoutDeliveryForm({
                   <>
                     <Navigation className="h-3.5 w-3.5" />
                     <span>
-                      {deliveryData.latitud ? 'Actualizar mi GPS' : '📍 Elegir mi ubicación actual (GPS)'}
+                      {deliveryData.latitud ? 'Actualizar mi GPS' : 'Elegir mi ubicación actual (GPS)'}
                     </span>
                   </>
                 )}
@@ -259,7 +259,7 @@ export function CheckoutDeliveryForm({
 
                 {deliveryQuote.detailsBreakdown && (
                   <p className="text-[10px] text-slate-500 bg-slate-50/80 rounded-lg p-2 border border-slate-100">
-                    💡 <strong>Desglose:</strong> {deliveryQuote.detailsBreakdown}
+                    <strong>Desglose:</strong> {deliveryQuote.detailsBreakdown}
                   </p>
                 )}
               </div>
@@ -270,22 +270,22 @@ export function CheckoutDeliveryForm({
               <span className="font-extrabold uppercase text-[9px] tracking-wider text-slate-500 block mb-1">
                 Tarifario Oficial de Carreras Gran Catador:
               </span>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-medium">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-medium tabular-nums">
                 <span className="p-1 rounded bg-slate-50 border border-slate-100">
-                  ⚡ 0 a 3 km: <strong>$1.50</strong>
+                  0 a 3 km: <strong>$1.50</strong>
                 </span>
                 <span className="p-1 rounded bg-slate-50 border border-slate-100">
-                  🛵 3 a 6 km: <strong>$2.50</strong>
+                  3 a 6 km: <strong>$2.50</strong>
                 </span>
                 <span className="p-1 rounded bg-slate-50 border border-slate-100">
-                  📍 6 a 9 km: <strong>$3.50</strong>
+                  6 a 9 km: <strong>$3.50</strong>
                 </span>
                 <span className="p-1 rounded bg-slate-50 border border-slate-100">
-                  🚀 9 a 12 km: <strong>$4.50</strong>
+                  9 a 12 km: <strong>$4.50</strong>
                 </span>
               </div>
               <p className="text-[9px] text-slate-400 mt-1.5">
-                🚴🏼 Carreras desde 20 km en adelante: <strong>$0.45 por km</strong>. Pedidos de alto volumen se despachan en vehículo de carga (+ recargo logístico).
+                Carreras desde 20 km en adelante: <strong>$0.45 por km</strong>. Pedidos de alto volumen se despachan en vehículo de carga (+ recargo logístico).
               </p>
             </div>
           </div>

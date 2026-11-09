@@ -222,7 +222,7 @@ export function CartItemList() {
               {isOutOfStock && (
                 <div className="w-full text-left pt-1">
                   <span className="text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-md px-2 py-0.5 inline-block">
-                    ⚠️ Stock insuficiente en inventario ({product.stockQuantity} unidades)
+                    Stock insuficiente en inventario ({product.stockQuantity} unidades)
                   </span>
                 </div>
               )}

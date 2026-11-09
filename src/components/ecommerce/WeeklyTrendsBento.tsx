@@ -55,7 +55,7 @@ export function WeeklyTrendsBento({
         </div>
 
         <div className="flex items-center gap-3 self-start sm:self-auto max-w-full overflow-x-auto scrollbar-none">
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/90 shrink-0">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200/90 shrink-0">
             {[
               { id: 'mas_vendidos' as const, label: 'Más Vendidos' },
               { id: 'ofertas' as const, label: 'En Oferta' },
@@ -66,7 +66,7 @@ export function WeeklyTrendsBento({
                 type="button"
                 onClick={() => setActiveTab(id)}
                 className={cn(
-                  'px-2.5 sm:px-3 py-1.5 min-h-[34px] text-[11px] sm:text-xs font-extrabold rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0',
+                  'px-2.5 sm:px-3 py-1.5 min-h-[34px] text-[11px] sm:text-xs font-extrabold rounded-md transition-colors cursor-pointer whitespace-nowrap shrink-0',
                   activeTab === id
                     ? 'bg-catador-blue text-white'
                     : 'text-slate-600 hover:text-slate-900'

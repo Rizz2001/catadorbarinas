@@ -168,7 +168,7 @@ export function CartDrawerItemRow({
 
         {isOutOfStock && (
           <p className="mt-1.5 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2 py-0.5 inline-block">
-            ⚠️ Stock insuficiente en inventario ({product.stockQuantity} unidades)
+            Stock insuficiente en inventario ({product.stockQuantity} unidades)
           </p>
         )}
       </div>

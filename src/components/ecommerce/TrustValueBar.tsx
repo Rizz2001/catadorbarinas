@@ -35,9 +35,10 @@ const DEFAULT_METRICS: TrustMetricItem[] = [
 export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarProps) {
   const storeConfig = useStoreConfigStore((state) => state.config);
 
-  const isVisible = storeConfig?.seccion_confianza_activa !== undefined
-    ? storeConfig.seccion_confianza_activa
-    : active;
+  const isVisible =
+    storeConfig?.seccion_confianza_activa !== undefined
+      ? storeConfig.seccion_confianza_activa
+      : active;
 
   if (isVisible === false) return null;
 
@@ -45,17 +46,17 @@ export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarPr
     storeConfig?.metricas_confianza && storeConfig.metricas_confianza.length > 0
       ? storeConfig.metricas_confianza
       : initialMetrics && initialMetrics.length > 0
-      ? initialMetrics
-      : DEFAULT_METRICS;
+        ? initialMetrics
+        : DEFAULT_METRICS;
 
   return (
     <section
       aria-label="Garantías operativas de Gran Catador Barinas"
-      className="rounded-2xl bg-white border border-slate-200/90 overflow-hidden"
+      className="rounded-xl bg-white border border-slate-200 overflow-hidden"
     >
-      <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-slate-200/90">
+      <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-slate-200">
         {metrics.map((item, idx) => (
-          <div key={idx} className="p-3 sm:p-5 flex flex-col justify-between gap-1 min-w-0">
+          <div key={idx} className="p-3.5 sm:p-5 flex flex-col justify-between gap-1 min-w-0">
             <div className="flex items-baseline justify-between gap-1.5">
               <span className="text-sm sm:text-xl font-black text-catador-blue tracking-tight tabular-nums truncate">
                 {item.figura}

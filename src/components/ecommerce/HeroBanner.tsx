@@ -79,7 +79,7 @@ export function HeroBanner({
 
   return (
     <div className="space-y-3 sm:space-y-4">
-      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-catador-blue p-4 sm:p-8 lg:p-10 text-white border border-blue-950">
+      <div className="relative overflow-hidden rounded-xl bg-catador-blue p-5 sm:p-8 lg:p-10 text-white border border-blue-950">
         {banner?.imagen_url && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-20"
@@ -87,50 +87,46 @@ export function HeroBanner({
           />
         )}
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 lg:gap-8 items-center">
           {/* Columna Editorial Izquierda */}
-          <div className="lg:col-span-7 space-y-3 sm:space-y-5 text-left min-w-0">
-            <div className="inline-flex flex-wrap items-center gap-1.5 sm:gap-2 rounded-lg bg-blue-950/75 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[11px] sm:text-xs font-bold text-blue-100 border border-blue-800/80 max-w-full">
-              <span className="h-2 w-2 rounded-full bg-emerald-400 shrink-0" />
-              <span className="truncate">Sede Barinas • Av. 23 de Enero</span>
-              <span className="text-amber-300 font-black tabular-nums">
-                BCV Bs. {bcvRate.toFixed(2)}
-              </span>
-            </div>
-
-            <h1 className="text-[clamp(1.35rem,4vw,2.75rem)] font-black tracking-[-0.03em] leading-[1.1] text-white max-w-2xl">
+          <div className="lg:col-span-7 space-y-3.5 sm:space-y-4 text-left min-w-0">
+            <h1 className="text-[clamp(1.4rem,3.8vw,2.65rem)] font-black tracking-[-0.03em] leading-[1.08] text-white max-w-2xl">
               {titulo}
             </h1>
 
-            <p className="text-xs sm:text-base text-blue-100/95 max-w-xl leading-relaxed line-clamp-3 sm:line-clamp-none">
+            <p className="text-xs sm:text-[15px] text-blue-100/90 max-w-xl leading-relaxed line-clamp-3 sm:line-clamp-none">
               {subtitulo}
             </p>
 
-            <div className="pt-1 grid grid-cols-2 xs:flex xs:flex-wrap items-center gap-2 sm:gap-3">
+            <div className="pt-1 grid grid-cols-2 xs:flex xs:flex-wrap items-center gap-2.5 sm:gap-3">
               <Link
                 href={botonUrl}
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-catador-amber hover:bg-catador-amber-dark min-h-[44px] px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-black text-white transition-colors text-center"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-catador-amber hover:bg-catador-amber-dark min-h-[44px] px-4 sm:px-6 py-2.5 text-xs sm:text-sm font-black text-white transition-colors text-center"
               >
                 <span className="truncate">{botonTexto}</span>
                 <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
               </Link>
               <Link
                 href="/catalogo"
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-white hover:bg-slate-100 min-h-[44px] px-3 sm:px-6 py-2.5 text-xs sm:text-sm font-black text-catador-blue transition-colors text-center"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-white hover:bg-slate-100 min-h-[44px] px-4 sm:px-5 py-2.5 text-xs sm:text-sm font-black text-catador-blue transition-colors text-center"
               >
-                <span className="truncate">Catálogo</span>
+                <span className="truncate">Catálogo Completo</span>
               </Link>
             </div>
           </div>
 
-          {/* Columna Derecha: Pieza Real del Inventario (Compacta en Móvil, Editorial en Desktop) */}
+          {/* Columna Derecha: Ficha Editorial del Inventario */}
           <div className="lg:col-span-5 flex justify-center lg:justify-end min-w-0">
             {hasPromo ? (
-              <div className="w-full lg:max-w-sm rounded-2xl bg-blue-950/80 border border-blue-800 p-4 sm:p-6 space-y-2">
-                <p className="text-xs font-bold text-amber-300">{banner?.promo_titulo}</p>
+              <div className="w-full lg:max-w-sm rounded-xl bg-blue-950/90 border border-blue-800 p-4 sm:p-6 space-y-2">
+                <p className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                  {banner?.promo_titulo}
+                </p>
                 {promoPrecio !== null && promoPrecio > 0 && (
                   <div className="tabular-nums">
-                    <p className="text-2xl sm:text-3xl font-black text-white">${promoPrecio.toFixed(2)}</p>
+                    <p className="text-2xl sm:text-3xl font-black text-white">
+                      ${promoPrecio.toFixed(2)}
+                    </p>
                     <p className="text-xs font-bold text-blue-200 mt-0.5">
                       {formatVes(convertUsdToVes(promoPrecio, bcvRate))}
                     </p>
@@ -143,11 +139,11 @@ export function HeroBanner({
             ) : starProduct ? (
               <Link
                 href={`/producto/${starProduct.id}${starProduct.codGrupo ? `?grupo=${starProduct.codGrupo}` : ''}`}
-                className="group w-full lg:max-w-sm rounded-2xl bg-white text-slate-900 p-3 sm:p-5 border border-slate-200 transition-transform duration-200 hover:-translate-y-0.5 min-w-0"
+                className="group w-full lg:max-w-sm rounded-xl bg-white text-slate-900 p-3.5 sm:p-5 border border-slate-200 transition-colors duration-150 hover:border-catador-amber min-w-0"
               >
                 {/* Vista Compacta Horizontal en Móvil/Tablet (< 1024px) */}
                 <div className="flex items-center gap-3 lg:hidden min-w-0">
-                  <div className="relative h-16 w-16 shrink-0 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden p-1.5">
+                  <div className="relative h-16 w-16 shrink-0 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden p-1.5">
                     <Image
                       src={starImage}
                       alt={starProduct.name}
@@ -160,9 +156,12 @@ export function HeroBanner({
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded tabular-nums">
-                        ★ Destacado • {starProduct.stockQuantity} disp.
+                    <div className="flex items-center justify-between gap-1.5 text-[10px]">
+                      <span className="font-bold uppercase tracking-wider text-slate-500 truncate">
+                        {starProduct.brand || 'Catálogo Oficial'}
+                      </span>
+                      <span className="font-bold text-emerald-700 tabular-nums shrink-0">
+                        {starProduct.stockQuantity} en almacén
                       </span>
                     </div>
                     <h2 className="text-xs font-extrabold text-slate-900 truncate mt-0.5">
@@ -182,16 +181,16 @@ export function HeroBanner({
 
                 {/* Vista Editorial Completa en Escritorio (>= 1024px) */}
                 <div className="hidden lg:block">
-                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
-                    <span className="text-xs font-extrabold text-slate-900 truncate">
-                      {starProduct.brand || 'Selección Gran Catador'}
+                  <div className="flex items-center justify-between gap-2 pb-2.5 border-b border-slate-100 text-[11px]">
+                    <span className="font-extrabold uppercase tracking-wider text-slate-500 truncate">
+                      {starProduct.brand || 'Catálogo Oficial'} · {starProduct.category || 'Licores'}
                     </span>
-                    <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md tabular-nums shrink-0">
-                      {starProduct.stockQuantity} und en stock
+                    <span className="font-bold text-emerald-700 tabular-nums shrink-0">
+                      {starProduct.stockQuantity} unidades en almacén
                     </span>
                   </div>
 
-                  <div className="relative h-40 w-full my-3 rounded-xl bg-slate-50 flex items-center justify-center overflow-hidden p-3">
+                  <div className="relative h-40 w-full my-3 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden p-3">
                     <Image
                       src={starImage}
                       alt={starProduct.name}
@@ -204,17 +203,17 @@ export function HeroBanner({
                     />
                   </div>
 
-                  <div className="flex items-end justify-between gap-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-end justify-between gap-3 pt-2.5 border-t border-slate-100">
                     <div className="min-w-0 flex-1">
                       <h2 className="text-sm font-extrabold text-slate-900 line-clamp-1 group-hover:text-catador-blue transition-colors">
                         {starProduct.name}
                       </h2>
-                      <span className="text-[11px] font-bold text-catador-blue inline-flex items-center gap-1 mt-0.5">
-                        Comprar por unidad o caja <ArrowRight className="h-3 w-3" />
+                      <span className="text-[11px] font-bold text-catador-amber inline-flex items-center gap-1 mt-0.5">
+                        Disponible por unidad y caja <ArrowRight className="h-3 w-3" />
                       </span>
                     </div>
                     <div className="text-right shrink-0 tabular-nums">
-                      <p className="text-lg font-black text-slate-900 leading-none">
+                      <p className="text-lg font-black text-catador-blue leading-none">
                         ${starProduct.priceUsd.toFixed(2)}
                       </p>
                       <p className="text-[11px] font-bold text-slate-500 mt-1">

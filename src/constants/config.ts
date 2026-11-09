@@ -33,7 +33,7 @@ export const DEPARTMENTS = [
   { id: '02', name: 'Refrescos', slug: '02', icon: 'CupSoda' },
   { id: '11', name: 'Alimentos & Despensa', slug: '11', icon: 'ShoppingBasket' },
   { id: '05', name: 'Confitería & Snacks', slug: '05', icon: 'Cookie' },
-  { id: '03', name: 'Hielos', slug: '03', icon: 'Sparkles' },
+  { id: '03', name: 'Hielos', slug: '03', icon: 'CupSoda' },
   { id: '08', name: 'Agua', slug: '08', icon: 'CupSoda' },
   { id: '14', name: 'Jugos & Lácteas', slug: '14', icon: 'Sandwich' },
   { id: '07', name: 'Carbón', slug: '07', icon: 'Flame' },

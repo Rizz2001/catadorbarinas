@@ -115,7 +115,7 @@ export function AccountProfileTab({
             <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <h4 className="font-black text-xs text-amber-950 uppercase tracking-wide">
-                ⚠️ Correo Pendiente de Confirmación
+                Correo Pendiente de Confirmación
               </h4>
               <p className="text-xs text-amber-900 leading-relaxed">
                 Tu correo <strong>{userEmail}</strong> aún no ha sido confirmado. Puedes ver el catálogo y configurar tu dirección, pero <strong>no podrás realizar compras ni pedidos</strong> hasta que lo confirmes.

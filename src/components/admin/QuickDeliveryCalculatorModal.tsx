@@ -143,7 +143,7 @@ export function QuickDeliveryCalculatorModal({ isOpen, onClose }: QuickDeliveryC
                     : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                 }`}
               >
-                📍 Por Zona
+                Por Zona
               </button>
               <button
                 type="button"
@@ -154,7 +154,7 @@ export function QuickDeliveryCalculatorModal({ isOpen, onClose }: QuickDeliveryC
                     : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                 }`}
               >
-                📏 Distancia (Km)
+                Distancia (Km)
               </button>
               <button
                 type="button"
@@ -165,7 +165,7 @@ export function QuickDeliveryCalculatorModal({ isOpen, onClose }: QuickDeliveryC
                     : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
                 }`}
               >
-                🛰️ Coordenadas GPS
+                Coordenadas GPS
               </button>
             </div>
           </div>

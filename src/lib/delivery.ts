@@ -271,14 +271,14 @@ export function formatDeliveryQuoteForWhatsApp(params: {
       ? 'Camioneta / Vehículo de Carga (Pedido de Mayor Volumen)'
       : 'Motorizado Express';
 
-  let msg = `🛵 *Cotización de Delivery - Gran Catador* 🍾\n`;
-  msg += `📍 *Destino:* ${zonaOrDireccion} (~${distanceKm} km)\n`;
-  msg += `⚡ *Tipo:* ${tierName}\n`;
-  msg += `🚗 *Transporte:* ${transportLabel}\n`;
+  let msg = `*Cotización de Delivery - Gran Catador*\n`;
+  msg += `*Destino:* ${zonaOrDireccion} (~${distanceKm} km)\n`;
+  msg += `*Tipo:* ${tierName}\n`;
+  msg += `*Transporte:* ${transportLabel}\n`;
   if (totalBoxes && totalBoxes > 0) {
-    msg += `📦 *Carga:* ${totalUnits || Math.ceil(totalBoxes * 12)} und (~${Math.ceil(totalBoxes)} cajas)\n`;
+    msg += `*Carga:* ${totalUnits || Math.ceil(totalBoxes * 12)} und (~${Math.ceil(totalBoxes)} cajas)\n`;
   }
-  msg += `💵 *Monto:* $${shippingUsd.toFixed(2)} USD (Bs. ${vesAmount} BCV)\n`;
-  msg += `⏱️ *Tiempo estimado de entrega:* 25 a 45 minutos tras verificar su pago.`;
+  msg += `*Monto:* $${shippingUsd.toFixed(2)} USD (Bs. ${vesAmount} BCV)\n`;
+  msg += `*Tiempo estimado de entrega:* 25 a 45 minutos tras verificar su pago.`;
   return msg;
 }

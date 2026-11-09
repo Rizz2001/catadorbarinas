@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileText, PackageCheck, Truck, ShieldCheck, Sparkles } from 'lucide-react';
+import { FileText, PackageCheck, Truck, ShieldCheck } from 'lucide-react';
 import { Product } from '@/types';
 import { getUnitsPerPurchaseMode } from '@/lib/inventory';
 import { ProductCard } from './ProductCard';
@@ -155,8 +155,7 @@ export function ProductDetailExtraSection({
       {/* Productos Relacionados */}
       {relatedProducts.length > 0 && (
         <section className="space-y-3.5 sm:space-y-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-catador-amber shrink-0" />
+          <div className="border-l-4 border-catador-amber pl-3">
             <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight truncate">
               Productos Relacionados en {product.category}
             </h2>

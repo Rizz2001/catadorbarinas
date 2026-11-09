@@ -18,7 +18,7 @@ export function AlliedBrandsSection({
   if (!brands || brands.length === 0) return null;
 
   return (
-    <section className="rounded-2xl bg-white border border-slate-200/90 p-3.5 sm:p-7 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
+    <section className="rounded-xl bg-white border border-slate-200 p-3.5 sm:p-6 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200/80 pb-3 sm:pb-4">
         <div className="min-w-0">
           <h2 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">

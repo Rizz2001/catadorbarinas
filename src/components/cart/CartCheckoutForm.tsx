@@ -64,7 +64,7 @@ export function CartCheckoutForm() {
       ) : (
         <div className="space-y-2.5 pt-1">
           <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
-            <p className="font-extrabold">🔒 Registro obligatorio para comprar</p>
+            <p className="font-extrabold">Registro obligatorio para comprar</p>
             <p className="text-[11px] text-amber-800 mt-0.5">
               Para procesar tu pedido y darte seguimiento en tiempo real debes crear tu cuenta o iniciar sesión. Tu carrito se mantendrá guardado.
             </p>

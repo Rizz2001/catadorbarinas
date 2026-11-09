@@ -147,7 +147,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
             <span>Barinas</span>
           </span>
           <span className="text-xs sm:text-sm font-bold text-slate-700 block truncate mt-1">
-            {perfil?.latitud ? '📍 GPS Vinculado' : perfil?.direccion ? 'Dirección lista' : 'Sin dirección'}
+            {perfil?.latitud ? 'GPS Vinculado' : perfil?.direccion ? 'Dirección lista' : 'Sin dirección'}
           </span>
         </div>
       </div>

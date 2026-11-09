@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sliders, Maximize2, Plus, Minus, Save, Sparkles, Loader2 } from 'lucide-react';
+import { Sliders, Maximize2, Plus, Minus, Save, Loader2 } from 'lucide-react';
 
 interface ConfigLogoSlidersProps {
   currentHeight: number;
@@ -32,7 +32,6 @@ export function ConfigLogoSliders({
       {/* Presets Rápidos */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1">
-          <Sparkles className="h-3.5 w-3.5 text-catador-amber" />
           Tamaños Recomendados:
         </span>
         <div className="flex flex-wrap items-center gap-1.5">

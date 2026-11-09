@@ -80,7 +80,7 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
   return (
     <article
       className={cn(
-        'group relative flex flex-col justify-between min-w-0 max-w-full overflow-hidden rounded-xl sm:rounded-2xl bg-white border border-slate-200/90 p-2 sm:p-3.5 transition-colors duration-150 hover:border-catador-blue',
+        'group relative flex flex-col justify-between min-w-0 max-w-full overflow-hidden rounded-xl bg-white border border-slate-200 p-2.5 sm:p-3.5 transition-colors duration-150 hover:border-catador-blue',
         className
       )}
     >

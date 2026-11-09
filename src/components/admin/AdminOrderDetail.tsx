@@ -260,7 +260,7 @@ export function AdminOrderDetail({
 
           {order.direccion_entrega && (
             <p className="text-slate-800 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 font-medium">
-              📍 {order.direccion_entrega}
+              {order.direccion_entrega}
             </p>
           )}
 

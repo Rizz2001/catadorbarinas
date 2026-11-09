@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Send, ImagePlus, Loader2, Bot, Shield, User, Sparkles } from 'lucide-react';
+import { Send, ImagePlus, Loader2, Bot, Shield, User } from 'lucide-react';
 import { useOrderChat } from '@/hooks/useOrderChat';
 import { RemitenteRol } from '@/types';
 import { cn } from '@/lib/utils';
@@ -134,7 +134,7 @@ export function OrderLiveChat({
               return (
                 <div key={m.id} className="flex justify-center my-2">
                   <div className="rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2 text-center text-[11px] text-slate-800 max-w-sm shadow-2xs">
-                    <span className="font-extrabold text-catador-amber mr-1">⚡ Gran Catador:</span>
+                    <span className="font-extrabold text-catador-amber mr-1">Gran Catador:</span>
                     <span>{m.mensaje}</span>
                   </div>
                 </div>
@@ -184,7 +184,6 @@ export function OrderLiveChat({
       {/* Respuestas rápidas */}
       {quickReplies.length > 0 && (
         <div className="px-3 py-2 bg-slate-100/90 border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
-          <Sparkles className="h-3.5 w-3.5 text-catador-amber shrink-0" />
           {quickReplies.map((qr, idx) => (
             <button
               key={idx}

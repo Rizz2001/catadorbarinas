@@ -259,7 +259,7 @@ export function CartDrawer() {
               ) : (
                 <div className="space-y-2 pt-1">
                   <p className="text-[11px] font-bold text-center text-amber-800 bg-amber-50 border border-amber-200/80 rounded-lg py-1.5 px-2">
-                    🔒 Para comprar es obligatorio registrarse o iniciar sesión
+                    Para comprar es obligatorio registrarse o iniciar sesión
                   </p>
                   <div className="grid grid-cols-2 gap-2">
                     <Link

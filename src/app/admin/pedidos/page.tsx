@@ -155,7 +155,7 @@ export default function AdminPedidosCommandCenterPage() {
 
   const adminQuickReplies = [
     '¡Hola! Ya estamos revisando tu comprobante de pago.',
-    'Pago confirmado ✅, ya estamos empacando tu pedido en el Bodegón.',
+    'Pago confirmado, ya estamos empacando tu pedido en el Bodegón.',
     'Por favor verifica el número de referencia o envíanos captura legible por aquí.',
     'Nuestro motorizado ya va saliendo hacia tu ubicación en Barinas.',
     'Tu pedido ya fue entregado. ¡Gracias por confiar en Gran Catador!',
@@ -181,7 +181,7 @@ export default function AdminPedidosCommandCenterPage() {
             className="flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-50 min-h-[36px] px-3 py-1.5 text-xs font-black text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer shadow-2xs"
           >
             <Bike className="h-3.5 w-3.5 text-amber-700" />
-            <span>🛵 Cotizar Delivery</span>
+            <span>Cotizar Delivery</span>
           </button>
 
           <button

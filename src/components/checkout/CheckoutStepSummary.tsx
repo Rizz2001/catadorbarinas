@@ -244,7 +244,7 @@ export function CheckoutStepSummary({
               <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <h4 className="font-black text-xs text-amber-950 uppercase tracking-wide">
-                  🔒 Confirmación de Correo Requerida para Comprar
+                  Confirmación de Correo Requerida para Comprar
                 </h4>
                 <p className="text-xs text-amber-900 leading-relaxed">
                   Para evitar registros no verificados y asegurar el despacho de tu pedido, <strong>debes confirmar tu correo ({deliveryData.email || 'tu email'}) antes de procesar la compra</strong>.

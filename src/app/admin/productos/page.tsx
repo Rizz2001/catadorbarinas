@@ -377,7 +377,7 @@ export default function AdminProductosPage() {
                   </option>
                 ))}
                 <option value="GLOBAL_UPLOADED">
-                  📂 Ver Todas las Fotos Subidas ({images.length})
+                  Ver Todas las Fotos Subidas ({images.length})
                 </option>
               </select>
             </div>

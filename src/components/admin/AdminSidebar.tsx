@@ -106,7 +106,7 @@ export function AdminSidebar() {
             className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-linear-to-r from-amber-500/20 to-catador-blue/30 border border-amber-500/40 text-amber-300 hover:text-white hover:bg-amber-500/30 text-xs font-black transition-all cursor-pointer shadow-xs"
           >
             <Bike className="h-4 w-4 text-amber-400" />
-            <span>🛵 Cotizador de Delivery</span>
+            <span>Cotizador de Delivery</span>
           </button>
         </div>
 

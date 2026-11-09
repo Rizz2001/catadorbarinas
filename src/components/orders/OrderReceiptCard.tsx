@@ -50,7 +50,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
                 : 'bg-amber-50 text-amber-700 border-amber-200'
             )}
           >
-            Pago: {order.estado_pago === 'verificado' ? 'Verificado ✅' : order.estado_pago === 'rechazado' ? 'Requiere Corrección ⚠️' : 'En Verificación ⏳'}
+            Pago: {order.estado_pago === 'verificado' ? 'Verificado' : order.estado_pago === 'rechazado' ? 'Requiere Corrección' : 'En Verificación'}
           </span>
         </div>
       </div>

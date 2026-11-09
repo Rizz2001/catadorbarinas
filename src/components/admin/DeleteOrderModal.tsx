@@ -43,7 +43,7 @@ export function DeleteOrderModal({
             ¿Estás seguro de que deseas eliminar permanentemente este pedido?
           </p>
           <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 space-y-1 text-[11px]">
-            <p className="font-bold">⚠️ Esta acción no se puede deshacer:</p>
+            <p className="font-bold">Esta acción no se puede deshacer:</p>
             <ul className="list-disc list-inside space-y-0.5 text-rose-700">
               <li>Se removerán los artículos y el registro de venta.</li>
               <li>Se borrarán los comprobantes y pagos asociados.</li>

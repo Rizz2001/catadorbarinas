@@ -30,7 +30,7 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
       case 'en_camino':
         return (
           <span className="bg-slate-900 text-white text-xs font-black px-2.5 py-0.5 rounded-full">
-            🛵 En Ruta
+            En Ruta
           </span>
         );
       case 'entregado':

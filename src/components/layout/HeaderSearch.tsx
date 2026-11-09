@@ -10,6 +10,7 @@ import { formatPrices } from '@/lib/currency';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartStore } from '@/store/useCartStore';
+import { notifySearchRecorded } from '@/hooks/useRecentSearches';
 import { supabase } from '@/lib/supabase/client';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { cn } from '@/lib/utils';
@@ -28,23 +29,25 @@ export function HeaderSearch() {
 
   useEffect(() => {
     let active = true;
-    supabase.auth.getUser().then(({ data: { user } }: { data: { user: { id: string; email?: string } | null } }) => {
-      if (!user || !active) return;
-      supabase
-        .from('perfiles')
-        .select('nombre')
-        .eq('id', user.id)
-        .single()
-        .then(({ data: p }: { data: { nombre?: string } | null }) => {
-          if (active) {
-            setUserInfo({
-              id: user.id,
-              email: user.email,
-              name: p?.nombre || user.email?.split('@')[0],
-            });
-          }
-        });
-    });
+    supabase.auth
+      .getUser()
+      .then(({ data: { user } }: { data: { user: { id: string; email?: string } | null } }) => {
+        if (!user || !active) return;
+        supabase
+          .from('perfiles')
+          .select('nombre')
+          .eq('id', user.id)
+          .single()
+          .then(({ data: p }: { data: { nombre?: string } | null }) => {
+            if (active) {
+              setUserInfo({
+                id: user.id,
+                email: user.email,
+                name: p?.nombre || user.email?.split('@')[0],
+              });
+            }
+          });
+      });
     return () => {
       active = false;
     };
@@ -59,7 +62,6 @@ export function HeaderSearch() {
 
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Debounce search effect
   useEffect(() => {
     if (term.trim().length < 2) {
       const resetTimer = setTimeout(() => {
@@ -73,8 +75,9 @@ export function HeaderSearch() {
     const timer = setTimeout(async () => {
       setIsLoading(true);
       try {
+        const cleanTerm = term.trim();
         const params = new URLSearchParams({
-          q: term.trim(),
+          q: cleanTerm,
           limit: '6',
           log: 'true',
         });
@@ -88,6 +91,9 @@ export function HeaderSearch() {
           setResults(data.products || []);
           setTotalMatches(data.totalMatches || 0);
           setIsOpen(true);
+          if ((data.totalMatches || 0) > 0 && cleanTerm.length >= 3) {
+            notifySearchRecorded(cleanTerm);
+          }
         }
       } catch (err) {
         console.error('Error buscando:', err);
@@ -99,7 +105,6 @@ export function HeaderSearch() {
     return () => clearTimeout(timer);
   }, [term, userInfo.id, userInfo.email, userInfo.name]);
 
-  // Click outside y tecla Escape para cerrar
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -121,51 +126,64 @@ export function HeaderSearch() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!term.trim()) return;
+    const clean = term.trim();
+    if (!clean) return;
+    notifySearchRecorded(clean);
     setIsOpen(false);
-    router.push(`/buscar?q=${encodeURIComponent(term.trim())}`);
+    router.push(`/buscar?q=${encodeURIComponent(clean)}`);
   };
 
   return (
     <div ref={containerRef} className="relative flex-1 max-w-2xl">
       <form
         onSubmit={handleSubmit}
-        className="flex items-center rounded-full border-2 border-catador-blue bg-white p-1 pl-4 shadow-xs focus-within:ring-2 focus-within:ring-catador-blue/20"
+        className="flex items-center rounded-lg border border-slate-300 bg-slate-50/70 focus-within:bg-white focus-within:border-catador-blue overflow-hidden transition-colors"
       >
+        <Search className="h-4 w-4 text-slate-400 ml-3.5 shrink-0" />
         <input
           type="text"
           value={term}
           onChange={(e) => setTerm(e.target.value)}
           onFocus={() => term.trim().length >= 2 && setIsOpen(true)}
-          placeholder="Buscar licores, víveres, cervezas, snacks..."
-          className="w-full bg-transparent text-base md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none min-h-[40px]"
+          placeholder="Buscar por licor, marca, cerveza o víveres..."
+          className="w-full bg-transparent px-3 py-2 text-base md:text-xs text-slate-900 placeholder-slate-400 focus:outline-none min-h-[40px]"
         />
 
         {term && (
           <button
             type="button"
-            onClick={() => { setTerm(''); setIsOpen(false); }}
-            className="p-1 text-slate-400 hover:text-slate-600 mr-1"
+            onClick={() => {
+              setTerm('');
+              setIsOpen(false);
+            }}
+            className="p-1.5 text-slate-400 hover:text-slate-700 mr-1 cursor-pointer"
+            aria-label="Limpiar búsqueda"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5" />
           </button>
         )}
 
         <button
           type="submit"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white hover:bg-catador-blue-light transition-colors cursor-pointer"
+          className="flex items-center justify-center gap-1.5 px-4 min-h-[40px] bg-catador-blue hover:bg-catador-blue-light text-white text-xs font-extrabold transition-colors cursor-pointer shrink-0"
           aria-label="Buscar"
         >
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          {isLoading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <span>Buscar</span>
+          )}
         </button>
       </form>
 
       {/* Dropdown de Autocompletado Flotante */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 rounded-2xl bg-white border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-[70vh] flex flex-col">
-          <div className="p-3 border-b border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 bg-slate-50 shrink-0">
+        <div className="absolute top-full left-0 right-0 mt-1.5 rounded-xl bg-white border border-slate-200 shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 max-h-[70vh] flex flex-col">
+          <div className="p-3 border-b border-slate-100 flex items-center justify-between text-xs font-bold text-slate-700 bg-slate-50 shrink-0 tabular-nums">
             <span className="truncate pr-2">Resultados para &quot;{term}&quot;</span>
-            <span className="text-[11px] text-slate-500 font-semibold shrink-0">{totalMatches} encontrados</span>
+            <span className="text-[11px] text-slate-500 font-semibold shrink-0">
+              {totalMatches} encontrados
+            </span>
           </div>
 
           <div className="max-h-72 overflow-y-auto divide-y divide-slate-100 flex-1">
@@ -177,7 +195,8 @@ export function HeaderSearch() {
               results.map((product) => {
                 const prices = formatPrices(product.priceUsd, bcvRate);
                 const rawImg = product.images?.[0];
-                const hasNoImg = !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
+                const hasNoImg =
+                  !rawImg || rawImg === IMAGE_FALLBACKS.product || rawImg.includes('logo');
                 const imgSrc = hasNoImg ? cmsLogo : rawImg;
                 const isItemAdded = addedId === product.id;
 
@@ -185,10 +204,13 @@ export function HeaderSearch() {
                   <Link
                     key={product.id}
                     href={`/producto/${product.id}${product.codGrupo ? `?grupo=${product.codGrupo}` : ''}`}
-                    onClick={() => setIsOpen(false)}
-                    className="p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 hover:bg-slate-50 transition-colors group"
+                    onClick={() => {
+                      notifySearchRecorded(term.trim());
+                      setIsOpen(false);
+                    }}
+                    className="p-2.5 sm:p-3 flex items-center gap-3 hover:bg-slate-50 transition-colors group"
                   >
-                    <div className="relative h-12 w-12 shrink-0 rounded-xl bg-slate-50 border border-slate-100 p-1 overflow-hidden flex items-center justify-center">
+                    <div className="relative h-12 w-12 shrink-0 rounded-lg bg-slate-50 border border-slate-100 p-1 overflow-hidden flex items-center justify-center">
                       <Image
                         src={imgSrc}
                         alt={product.name}
@@ -201,34 +223,30 @@ export function HeaderSearch() {
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-black uppercase text-amber-600/80 tracking-wider truncate">
-                          {product.brand}
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold">
+                        <span className="truncate">{product.brand}</span>
+                        <span>·</span>
+                        <span className={product.inStock ? 'text-emerald-700' : 'text-slate-400'}>
+                          {product.inStock ? `${product.stockQuantity} disp.` : 'Agotado'}
                         </span>
-                        {product.inStock ? (
-                          <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded-full shrink-0">
-                            En Stock
-                          </span>
-                        ) : (
-                          <span className="text-[9px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.2 rounded-full shrink-0">
-                            Agotado
-                          </span>
-                        )}
                       </div>
-                      <h4 className="text-xs font-bold text-slate-900 truncate group-hover:text-catador-blue transition-colors">
+                      <h4 className="text-xs font-extrabold text-slate-900 truncate group-hover:text-catador-blue transition-colors">
                         {product.name}
                       </h4>
-                      <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                        <span className="text-xs font-black text-slate-900">{prices.usdFormatted}</span>
-                        <span className="font-mono text-[10px] font-bold text-slate-600 bg-slate-100 px-1.5 py-0.2 rounded border border-slate-200/60">
+                      <div className="flex flex-wrap items-baseline gap-2 mt-0.5 tabular-nums">
+                        <span className="text-xs font-black text-slate-900">
+                          {prices.usdFormatted}
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-500">
                           {prices.vesFormatted}
                         </span>
                       </div>
                     </div>
 
-                    {/* Botón de Agregar Rápido al Carrito */}
                     {(() => {
-                      const canBuy = (product.inStock || product.allowBackorder) && ((product.stockQuantity ?? 0) > 0 || product.allowBackorder);
+                      const canBuy =
+                        (product.inStock || product.allowBackorder) &&
+                        ((product.stockQuantity ?? 0) > 0 || product.allowBackorder);
                       return (
                         <button
                           type="button"
@@ -241,14 +259,18 @@ export function HeaderSearch() {
                             setAddedId(product.id);
                             setTimeout(() => setAddedId(null), 1200);
                           }}
-                          title={!canBuy ? 'Agotado en inventario' : `Agregar ${product.name} al carrito`}
+                          title={
+                            !canBuy
+                              ? 'Agotado en inventario'
+                              : `Agregar ${product.name} al carrito`
+                          }
                           aria-label={`Agregar ${product.name} al carrito`}
                           className={cn(
-                            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all shadow-2xs',
+                            'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors',
                             !canBuy
                               ? 'bg-slate-100 text-slate-300 cursor-not-allowed'
                               : isItemAdded
-                              ? 'bg-emerald-600 text-white scale-105 cursor-pointer'
+                              ? 'bg-emerald-600 text-white cursor-pointer'
                               : 'bg-slate-100 text-slate-700 hover:bg-catador-blue hover:text-white cursor-pointer'
                           )}
                         >
@@ -271,7 +293,7 @@ export function HeaderSearch() {
               <button
                 type="button"
                 onClick={handleSubmit}
-                className="w-full min-h-[40px] flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors cursor-pointer"
+                className="w-full min-h-[38px] flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors cursor-pointer"
               >
                 Ver todos los {totalMatches} resultados <ArrowRight className="h-3.5 w-3.5" />
               </button>

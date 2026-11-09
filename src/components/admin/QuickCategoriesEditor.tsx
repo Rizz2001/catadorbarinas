@@ -7,7 +7,6 @@ import {
   ShoppingBasket,
   Cookie,
   Sandwich,
-  Sparkles,
   Save,
   CheckCircle2,
   Loader2,
@@ -22,7 +21,6 @@ const AVAILABLE_ICONS = [
   { id: 'ShoppingBasket', label: 'Canasta / Alimentos', icon: ShoppingBasket },
   { id: 'Cookie', label: 'Galleta / Confitería', icon: Cookie },
   { id: 'Sandwich', label: 'Sándwich / Snacks', icon: Sandwich },
-  { id: 'Sparkles', label: 'Destello / Hielo & Agua', icon: Sparkles },
 ];
 
 export function QuickCategoriesEditor() {

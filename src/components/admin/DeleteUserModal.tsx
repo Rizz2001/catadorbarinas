@@ -85,7 +85,7 @@ export function DeleteUserModal({
           </div>
 
           <p className="text-[11px] text-rose-600 font-semibold">
-            ⚠️ Se eliminarán los datos de acceso del usuario y su perfil. Esta acción no se puede deshacer.
+            Se eliminarán los datos de acceso del usuario y su perfil. Esta acción no se puede deshacer.
           </p>
 
           <div className="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">

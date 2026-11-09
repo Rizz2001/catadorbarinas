@@ -265,7 +265,7 @@ export default function AdminUsuariosPage() {
 
                     {u.direccion && (
                       <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                        📍 {u.direccion}
+                        {u.direccion}
                       </p>
                     )}
 

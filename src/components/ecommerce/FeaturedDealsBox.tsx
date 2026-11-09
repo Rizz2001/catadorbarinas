@@ -29,7 +29,7 @@ export function FeaturedDealsBox({
   if (!products || products.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border-2 border-catador-blue bg-white p-3 sm:p-6 min-w-0 max-w-full overflow-hidden">
+    <section className="rounded-xl border-2 border-catador-blue bg-white p-3.5 sm:p-6 min-w-0 max-w-full overflow-hidden">
       {/* Cabecera Editorial de Ofertas */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 pb-3.5 sm:pb-4 mb-3.5 sm:mb-5 border-b border-slate-200/80">
         <div className="border-l-4 border-catador-amber pl-3 min-w-0">
