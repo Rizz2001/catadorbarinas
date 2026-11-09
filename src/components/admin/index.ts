@@ -3,6 +3,8 @@ export * from './AdminOrderDetail';
 export * from './AdminSidebar';
 export * from './BannerPreview';
 export * from './ProductImageCard';
+export * from './MissingPhotoProductCard';
+export * from './PhotoUploadToolbar';
 export * from './BannerImageUploader';
 export * from './PromoCardPreview';
 export * from './QuickCategoriesEditor';
