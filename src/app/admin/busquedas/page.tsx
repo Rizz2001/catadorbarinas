@@ -1,15 +1,23 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { UserCheck, Trash2, RefreshCw, Loader2 } from 'lucide-react';
+import { Trash2, RefreshCw, Loader2, Search } from 'lucide-react';
+import { Switch } from '@astryxdesign/core/Switch';
+import { Button } from '@astryxdesign/core/Button';
+import { Badge } from '@astryxdesign/core/Badge';
+import { AlertDialog } from '@astryxdesign/core/AlertDialog';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { useToast } from '@astryxdesign/core/Toast';
 import { SearchLogEntry } from '@/types';
 import { getSearchLogs, clearSearchLogs } from '@/services/cms.service';
-import { cn } from '@/lib/utils';
 
 export default function AdminBusquedasPage() {
+  const showToast = useToast();
   const [logs, setLogs] = useState<SearchLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [onlyRegistered, setOnlyRegistered] = useState(false);
+  const [confirmClearOpen, setConfirmClearOpen] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   const loadLogs = async () => {
     setLoading(true);
@@ -94,40 +102,34 @@ export default function AdminBusquedasPage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setOnlyRegistered(!onlyRegistered)}
-            className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer',
-              onlyRegistered
-                ? 'bg-catador-blue text-white border-catador-blue'
-                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-            )}
-          >
-            <UserCheck className="h-3.5 w-3.5" />
-            <span>Solo Registrados</span>
-          </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="rounded-xl border border-slate-200 bg-white px-3 py-1.5">
+            <Switch
+              label="Solo Registrados"
+              size="sm"
+              labelPosition="start"
+              value={onlyRegistered}
+              onChange={setOnlyRegistered}
+            />
+          </div>
 
-          <button
-            type="button"
+          <Button
+            label="Actualizar"
+            variant="secondary"
+            size="sm"
+            icon={<RefreshCw className="h-3.5 w-3.5" />}
+            isLoading={loading}
             onClick={() => void loadLogs()}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
-          >
-            <RefreshCw className="h-3.5 w-3.5" /> Actualizar
-          </button>
+          />
 
           {logs.length > 0 && (
-            <button
-              type="button"
-              onClick={async () => {
-                await clearSearchLogs();
-                await loadLogs();
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 hover:bg-rose-100 cursor-pointer"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Limpiar
-            </button>
+            <Button
+              label="Limpiar"
+              variant="destructive"
+              size="sm"
+              icon={<Trash2 className="h-3.5 w-3.5" />}
+              onClick={() => setConfirmClearOpen(true)}
+            />
           )}
         </div>
       </div>
@@ -223,8 +225,13 @@ export default function AdminBusquedasPage() {
             <span>Cargando bitácora...</span>
           </div>
         ) : filteredLogs.length === 0 ? (
-          <div className="p-10 text-center text-xs text-slate-400">
-            No hay registros de búsquedas para el filtro seleccionado.
+          <div className="p-8">
+            <EmptyState
+              isCompact
+              icon={<Search className="h-8 w-8 text-slate-400" />}
+              title="No hay registros de búsquedas"
+              description="No se encontraron términos registrados para el filtro seleccionado."
+            />
           </div>
         ) : (
           <div className="divide-y divide-slate-100 text-xs">
@@ -238,16 +245,10 @@ export default function AdminBusquedasPage() {
                     <span className="font-black text-slate-900 text-sm">
                       &ldquo;{log.termino}&rdquo;
                     </span>
-                    <span
-                      className={cn(
-                        'px-2 py-0.5 rounded-md text-[10px] font-bold',
-                        log.resultados_count > 0
-                          ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                          : 'bg-rose-50 text-rose-800 border border-rose-200'
-                      )}
-                    >
-                      {log.resultados_count} resultados
-                    </span>
+                    <Badge
+                      variant={log.resultados_count > 0 ? 'success' : 'error'}
+                      label={`${log.resultados_count} resultados`}
+                    />
                   </div>
                   <p className="text-[11px] text-slate-500">
                     Cliente:{' '}
@@ -266,6 +267,30 @@ export default function AdminBusquedasPage() {
           </div>
         )}
       </section>
+
+      <AlertDialog
+        isOpen={confirmClearOpen}
+        onOpenChange={(open) => {
+          if (!open && !clearing) setConfirmClearOpen(false);
+        }}
+        title="Vaciar Bitácora de Búsquedas"
+        description="Se eliminará todo el historial de búsquedas registrado. Esta acción no afectará los productos del catálogo."
+        cancelLabel="Cancelar"
+        actionLabel="Vaciar Bitácora"
+        actionVariant="destructive"
+        isActionLoading={clearing}
+        onAction={async () => {
+          setClearing(true);
+          try {
+            await clearSearchLogs();
+            await loadLogs();
+            showToast({ body: 'Bitácora de búsquedas vaciada correctamente.' });
+            setConfirmClearOpen(false);
+          } finally {
+            setClearing(false);
+          }
+        }}
+      />
     </main>
   );
 }

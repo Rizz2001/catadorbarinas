@@ -2,6 +2,8 @@
 
 import React from 'react';
 import { RefreshCw, Coins, AlertCircle } from 'lucide-react';
+import { Button } from '@astryxdesign/core/Button';
+import { Switch } from '@astryxdesign/core/Switch';
 import { StoreConfig } from '@/types';
 import { useBcvStore } from '@/store/useBcvStore';
 
@@ -28,15 +30,14 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
           </h2>
         </div>
 
-        <button
-          type="button"
+        <Button
+          label="Sincronizar DolarApi"
+          variant="secondary"
+          size="sm"
+          icon={<RefreshCw className="h-3.5 w-3.5" />}
+          isLoading={isLoading}
           onClick={() => fetchRate(true)}
-          disabled={isLoading}
-          className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-        >
-          <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin text-catador-amber' : ''}`} />
-          <span>Sincronizar DolarApi</span>
-        </button>
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
@@ -44,7 +45,7 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
           <span className="text-[10px] uppercase font-bold text-catador-blue tracking-wider block">
             Tasa Oficial BCV Actual (DolarApi)
           </span>
-          <div className="text-2xl font-black text-catador-blue">
+          <div className="text-2xl font-black text-catador-blue tabular-nums">
             Bs. {rateInfo.rate.toFixed(2)} / $
           </div>
           <p className="text-[10px] text-slate-500" suppressHydrationWarning>
@@ -54,15 +55,12 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
         </div>
 
         <div className="space-y-3">
-          <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800 text-xs">
-            <input
-              type="checkbox"
-              checked={Boolean(form.bcv_usar_manual)}
-              onChange={(e) => onChange({ bcv_usar_manual: e.target.checked })}
-              className="h-4 w-4 rounded text-catador-blue focus:ring-catador-blue/20"
-            />
-            <span>Forzar Tasa BCV Manual Fija</span>
-          </label>
+          <Switch
+            label="Forzar Tasa BCV Manual Fija"
+            description="Sobrescribe temporalmente la lectura automática de DolarApi"
+            value={Boolean(form.bcv_usar_manual)}
+            onChange={(checked) => onChange({ bcv_usar_manual: checked })}
+          />
 
           {form.bcv_usar_manual && (
             <div className="space-y-1.5 animate-fadeIn">

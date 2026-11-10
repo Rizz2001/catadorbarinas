@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Tag, PackageX, LayoutTemplate } from 'lucide-react';
+import { Switch } from '@astryxdesign/core/Switch';
 import { StoreConfig } from '@/types';
 
 interface ConfigCatalogoSectionProps {
@@ -25,17 +26,15 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
             </p>
           </div>
         </div>
-        <label className="inline-flex items-center gap-2 cursor-pointer shrink-0">
-          <input
-            type="checkbox"
-            checked={Boolean(form.permitir_venta_sin_stock_global)}
-            onChange={(e) => onChange({ permitir_venta_sin_stock_global: e.target.checked })}
-            className="h-4 w-4 rounded border-slate-300 text-catador-blue focus:ring-catador-blue"
+        <div className="shrink-0">
+          <Switch
+            label={form.permitir_venta_sin_stock_global ? 'Activado' : 'Desactivado'}
+            labelPosition="start"
+            size="sm"
+            value={Boolean(form.permitir_venta_sin_stock_global)}
+            onChange={(checked) => onChange({ permitir_venta_sin_stock_global: checked })}
           />
-          <span className="text-xs font-extrabold text-slate-900">
-            {form.permitir_venta_sin_stock_global ? 'Activado' : 'Desactivado'}
-          </span>
-        </label>
+        </div>
       </div>
 
       {/* Personalización de Todas las Secciones del Inicio */}
@@ -65,14 +64,13 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
                 Modifica el texto, cifras y subtítulos de cada tarjeta de la barra superior
               </span>
             </div>
-            <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
-              <input
-                type="checkbox"
-                checked={form.seccion_confianza_activa !== false}
-                onChange={(e) => onChange({ seccion_confianza_activa: e.target.checked })}
-              />
-              <span className="text-[11px] font-bold">Visible</span>
-            </label>
+            <Switch
+              label="Visible"
+              labelPosition="start"
+              size="sm"
+              value={form.seccion_confianza_activa !== false}
+              onChange={(checked) => onChange({ seccion_confianza_activa: checked })}
+            />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
@@ -150,14 +148,13 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="font-black text-slate-900 text-xs">1. Sección Tendencias de la Semana</span>
-            <label className="inline-flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.seccion_tendencias_activa !== false}
-                onChange={(e) => onChange({ seccion_tendencias_activa: e.target.checked })}
-              />
-              <span className="text-[11px] font-bold">Visible</span>
-            </label>
+            <Switch
+              label="Visible"
+              labelPosition="start"
+              size="sm"
+              value={form.seccion_tendencias_activa !== false}
+              onChange={(checked) => onChange({ seccion_tendencias_activa: checked })}
+            />
           </div>
           <input
             type="text"
@@ -179,14 +176,13 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="font-black text-slate-900 text-xs">2. Sección Ofertas Destacadas</span>
-            <label className="inline-flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.seccion_ofertas_activa !== false}
-                onChange={(e) => onChange({ seccion_ofertas_activa: e.target.checked })}
-              />
-              <span className="text-[11px] font-bold">Visible</span>
-            </label>
+            <Switch
+              label="Visible"
+              labelPosition="start"
+              size="sm"
+              value={form.seccion_ofertas_activa !== false}
+              onChange={(checked) => onChange({ seccion_ofertas_activa: checked })}
+            />
           </div>
           <input
             type="text"
@@ -201,14 +197,13 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="font-black text-slate-900 text-xs">3. Sección Empresas Aliadas</span>
-            <label className="inline-flex items-center gap-1.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={form.seccion_aliados_activa !== false}
-                onChange={(e) => onChange({ seccion_aliados_activa: e.target.checked })}
-              />
-              <span className="text-[11px] font-bold">Visible</span>
-            </label>
+            <Switch
+              label="Visible"
+              labelPosition="start"
+              size="sm"
+              value={form.seccion_aliados_activa !== false}
+              onChange={(checked) => onChange({ seccion_aliados_activa: checked })}
+            />
           </div>
           <input
             type="text"

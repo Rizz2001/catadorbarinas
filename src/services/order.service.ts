@@ -50,7 +50,7 @@ export interface CreateOrderPayload {
     imagenUrl?: string;
   }>;
   pago: {
-    metodoPago: 'pago_movil' | 'zelle' | 'efectivo_usd' | 'punto_venta';
+    metodoPago: 'pago_movil' | 'zelle' | 'efectivo_usd' | 'punto_venta' | 'transferencia_bancaria';
     montoUsd: number;
     montoVes: number;
     bancoOrigen?: string;

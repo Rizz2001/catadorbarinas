@@ -10,7 +10,11 @@ import {
   Eye,
   Edit3,
   Loader2,
+  PackageOpen,
 } from 'lucide-react';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductCmsConfig } from '@/types';
 import { getProductCmsConfigs, upsertProductCmsConfig } from '@/services/cms.service';
 import { DEFAULT_GROUPS } from '@/constants/fallback-products';
@@ -21,6 +25,7 @@ import { cn } from '@/lib/utils';
 type FilterTab = 'all' | 'trends' | 'deals' | 'hidden';
 
 export default function AdminCatalogoConfigPage() {
+  const showToast = useToast();
   const [selectedGroup, setSelectedGroup] = useState('01');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterTab, setFilterTab] = useState<FilterTab>('all');
@@ -94,6 +99,7 @@ export default function AdminCatalogoConfigPage() {
           : p
       )
     );
+    showToast({ body: `Regla actualizada para ${product.name}` });
   };
 
   const tabCounts = useMemo(() => {
@@ -168,29 +174,20 @@ export default function AdminCatalogoConfigPage() {
             </select>
           </div>
 
-          <div className="md:col-span-5 flex gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar tabular-nums">
-            {(
-              [
-                { id: 'all', label: `Todos (${tabCounts.all})` },
-                { id: 'trends', label: `1. Tendencias (${tabCounts.trends})` },
-                { id: 'deals', label: `2. Ofertas (${tabCounts.deals})` },
-                { id: 'hidden', label: `Ocultos (${tabCounts.hidden})` },
-              ] as const
-            ).map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setFilterTab(tab.id)}
-                className={cn(
-                  'flex-1 min-h-[42px] py-2 px-3 rounded-xl text-xs font-black transition-colors cursor-pointer shrink-0 text-center',
-                  filterTab === tab.id
-                    ? 'bg-catador-blue text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                )}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="md:col-span-5 overflow-x-auto no-scrollbar tabular-nums flex items-center">
+            <SegmentedControl
+              size="sm"
+              layout="fill"
+              label="Filtrar artículos"
+              value={filterTab}
+              onChange={(val) => setFilterTab(val as FilterTab)}
+              className="w-full"
+            >
+              <SegmentedControlItem value="all" label={`Todos (${tabCounts.all})`} />
+              <SegmentedControlItem value="trends" label={`Tendencias (${tabCounts.trends})`} />
+              <SegmentedControlItem value="deals" label={`Ofertas (${tabCounts.deals})`} />
+              <SegmentedControlItem value="hidden" label={`Ocultos (${tabCounts.hidden})`} />
+            </SegmentedControl>
           </div>
         </div>
       </div>
@@ -200,6 +197,14 @@ export default function AdminCatalogoConfigPage() {
         <div className="p-12 flex items-center justify-center gap-2 text-sm font-bold text-slate-500">
           <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
           <span>Cargando inventario y reglas del CMS...</span>
+        </div>
+      ) : filteredProducts.length === 0 ? (
+        <div className="bg-white rounded-xl border border-slate-200 p-8">
+          <EmptyState
+            icon={<PackageOpen className="h-10 w-10 text-slate-400" />}
+            title="Sin artículos en este filtro"
+            description="Cambia el departamento o selecciona otra pestaña de visualización."
+          />
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-sm">

@@ -67,6 +67,8 @@ export function CheckoutStepSummary({
   const paymentMethodLabel =
     paymentData.metodoPago === 'pago_movil'
       ? 'Pago Móvil en Bolívares (BCV)'
+      : paymentData.metodoPago === 'transferencia_bancaria'
+      ? 'Transferencia Bancaria en Bolívares (BCV)'
       : paymentData.metodoPago === 'zelle'
       ? 'Transferencia Zelle ($ USD)'
       : 'Efectivo en Divisas ($ USD contra entrega)';

@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Save,
-  CheckCircle2,
   Loader2,
   Eye,
   LayoutTemplate,
@@ -12,6 +11,12 @@ import {
   ShoppingBag,
   Grid,
 } from 'lucide-react';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { TabList, Tab } from '@astryxdesign/core/TabList';
+import { Banner as AstryxBanner } from '@astryxdesign/core/Banner';
+import { Switch } from '@astryxdesign/core/Switch';
+import { Button } from '@astryxdesign/core/Button';
+import { useToast } from '@astryxdesign/core/Toast';
 import { Banner } from '@/types';
 import { getBanners, upsertBanner } from '@/services/cms.service';
 import {
@@ -77,6 +82,7 @@ const DEFAULT_BANNER_SLOTS: Record<BannerSlot, Partial<Banner>> = {
 };
 
 export default function AdminBannersPage() {
+  const showToast = useToast();
   const [mainTab, setMainTab] = useState<MainTab>('banners');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -142,12 +148,13 @@ export default function AdminBannersPage() {
       }
 
       setSaved(true);
+      showToast({ body: `Banner "${activeSlot.toUpperCase()}" guardado en la tienda.` });
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      alert(
-        'Error guardando banner: ' +
-          (err instanceof Error ? err.message : 'Intenta nuevamente')
-      );
+      showToast({
+        body: 'Error guardando banner: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
     } finally {
       setSaving(false);
     }
@@ -179,68 +186,65 @@ export default function AdminBannersPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-1 bg-slate-200/70 p-1 rounded-xl self-start">
-          <button
-            type="button"
-            onClick={() => setMainTab('banners')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
-              mainTab === 'banners'
-                ? 'bg-white text-slate-900 border border-slate-200/80'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <LayoutTemplate className="h-3.5 w-3.5" />
-            <span>Banners &amp; Promociones</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMainTab('quick_categories')}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-extrabold transition-all cursor-pointer ${
-              mainTab === 'quick_categories'
-                ? 'bg-white text-slate-900 border border-slate-200/80'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Grid className="h-3.5 w-3.5" />
-            <span>Categorías Rápidas (6 Accesos)</span>
-          </button>
-        </div>
+        <SegmentedControl
+          size="md"
+          label="Sección de edición de portada"
+          value={mainTab}
+          onChange={(val) => setMainTab(val as MainTab)}
+        >
+          <SegmentedControlItem
+            value="banners"
+            label="Banners & Promociones"
+            icon={<LayoutTemplate className="h-3.5 w-3.5" />}
+          />
+          <SegmentedControlItem
+            value="quick_categories"
+            label="Categorías Rápidas (6)"
+            icon={<Grid className="h-3.5 w-3.5" />}
+          />
+        </SegmentedControl>
       </div>
 
       {mainTab === 'quick_categories' ? (
         <QuickCategoriesEditor />
       ) : (
         <>
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none bg-slate-100 p-1.5 rounded-xl">
-            {[
-              { id: 'hero' as const, label: 'Hero Principal Superior', icon: LayoutTemplate },
-              { id: 'promo_1' as const, label: 'Promo 1: Whiskies Escoceses', icon: Wine },
-              { id: 'promo_2' as const, label: 'Promo 2: Cervezas & Refrescos', icon: Tag },
-              { id: 'promo_3' as const, label: 'Promo 3: Víveres & Despensa', icon: ShoppingBag },
-            ].map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                type="button"
-                onClick={() => setActiveSlot(id)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
-                  activeSlot === id
-                    ? 'bg-white text-catador-blue ring-1 ring-slate-200'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                <span>{label}</span>
-              </button>
-            ))}
-          </div>
+          <TabList
+            value={activeSlot}
+            onChange={(val) => setActiveSlot(val as BannerSlot)}
+            overflow="scroll"
+            hasDivider
+          >
+            <Tab
+              value="hero"
+              label="Hero Principal Superior"
+              icon={<LayoutTemplate className="h-3.5 w-3.5" />}
+            />
+            <Tab
+              value="promo_1"
+              label="Promo 1: Whiskies Escoceses"
+              icon={<Wine className="h-3.5 w-3.5" />}
+            />
+            <Tab
+              value="promo_2"
+              label="Promo 2: Cervezas & Refrescos"
+              icon={<Tag className="h-3.5 w-3.5" />}
+            />
+            <Tab
+              value="promo_3"
+              label="Promo 3: Víveres & Despensa"
+              icon={<ShoppingBag className="h-3.5 w-3.5" />}
+            />
+          </TabList>
 
           {saved && (
-            <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800 font-bold">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span>
-                Banner guardado con éxito. Los cambios ya son visibles en la tienda en tiempo real.
-              </span>
-            </div>
+            <AstryxBanner
+              status="success"
+              title="Banner guardado con éxito"
+              description="Los cambios ya son visibles en la tienda en tiempo real."
+              isDismissable
+              onDismiss={() => setSaved(false)}
+            />
           )}
 
           <section className="space-y-2">
@@ -379,29 +383,21 @@ export default function AdminBannersPage() {
               </>
             )}
 
-            <div className="pt-2 flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer font-bold text-slate-800">
-                <input
-                  type="checkbox"
-                  checked={Boolean(currentBanner.activo)}
-                  onChange={(e) => updateCurrent({ activo: e.target.checked })}
-                  className="h-4 w-4 rounded text-catador-blue focus:ring-catador-blue/20"
-                />
-                <span>Banner Activo en la Tienda</span>
-              </label>
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <Switch
+                label="Banner Activo en la Tienda"
+                value={Boolean(currentBanner.activo)}
+                onChange={(checked) => updateCurrent({ activo: checked })}
+              />
 
-              <button
+              <Button
                 type="submit"
-                disabled={saving}
-                className="flex items-center gap-2 rounded-lg bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 px-6 py-2.5 font-extrabold text-white text-xs transition-all active:scale-[0.99] cursor-pointer"
-              >
-                {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="h-4 w-4" />
-                )}
-                <span>Guardar Banner ({activeSlot})</span>
-              </button>
+                label={`Guardar Banner (${activeSlot})`}
+                variant="primary"
+                size="lg"
+                icon={<Save className="h-4 w-4" />}
+                isLoading={saving}
+              />
             </div>
           </form>
         </>

@@ -8,7 +8,7 @@ export type Json =
 
 export type EstadoPedido = 'recibido' | 'preparando' | 'en_camino' | 'entregado' | 'cancelado';
 export type EstadoPago = 'pendiente' | 'verificado' | 'rechazado';
-export type MetodoPago = 'pago_movil' | 'zelle' | 'efectivo_usd' | 'punto_venta';
+export type MetodoPago = 'pago_movil' | 'zelle' | 'efectivo_usd' | 'punto_venta' | 'transferencia_bancaria';
 export type TipoMensaje = 'texto' | 'imagen' | 'evento_estado' | 'solicitud_pago';
 export type RemitenteRol = 'cliente' | 'admin' | 'sistema';
 

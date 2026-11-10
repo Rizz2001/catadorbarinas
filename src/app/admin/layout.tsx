@@ -1,7 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 import { createClientForServer } from '@/lib/supabase/server';
-import { AdminSidebar } from '@/components/admin';
+import { AdminSidebar, AdminThemeProvider } from '@/components/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,9 +38,11 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 text-slate-900 pb-20 md:pb-0">
-      <AdminSidebar />
-      <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
-    </div>
+    <AdminThemeProvider>
+      <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 text-slate-900 pb-20 md:pb-0">
+        <AdminSidebar />
+        <div className="flex-1 min-w-0 overflow-y-auto">{children}</div>
+      </div>
+    </AdminThemeProvider>
   );
 }

@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Save, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Button } from '@astryxdesign/core/Button';
+import { useToast } from '@astryxdesign/core/Toast';
 import { StoreConfig } from '@/types';
 import { useStoreConfigStore, DEFAULT_STORE_CONFIG } from '@/store/useStoreConfigStore';
 import {
@@ -14,6 +17,7 @@ import {
 
 export default function AdminConfiguracionPage() {
   const { config, fetchConfig, updateConfig, isLoading } = useStoreConfigStore();
+  const showToast = useToast();
   const [form, setForm] = useState<StoreConfig>(DEFAULT_STORE_CONFIG);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -49,9 +53,12 @@ export default function AdminConfiguracionPage() {
       setSaving(true);
       await updateConfig(form);
       setSaved(true);
+      showToast({ body: 'Configuración guardada y sincronizada en la tienda.' });
       setTimeout(() => setSaved(false), 3500);
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Error guardando configuración');
+      const msg = err instanceof Error ? err.message : 'Error guardando configuración';
+      setErrorMsg(msg);
+      showToast({ body: msg, type: 'error' });
     } finally {
       setSaving(false);
     }
@@ -69,17 +76,23 @@ export default function AdminConfiguracionPage() {
       </div>
 
       {saved && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 font-bold">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Configuración guardada exitosamente. Los cambios ya están activos en la tienda.</span>
-        </div>
+        <Banner
+          status="success"
+          title="Configuración guardada exitosamente"
+          description="Los cambios ya están activos en toda la tienda."
+          isDismissable
+          onDismiss={() => setSaved(false)}
+        />
       )}
 
       {errorMsg && (
-        <div className="flex items-center gap-2 rounded-xl bg-rose-50 border border-rose-200 p-3.5 text-xs text-rose-800 font-bold">
-          <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
-          <span>{errorMsg}</span>
-        </div>
+        <Banner
+          status="error"
+          title="No se pudo guardar la configuración"
+          description={errorMsg}
+          isDismissable
+          onDismiss={() => setErrorMsg(null)}
+        />
       )}
 
       {isLoading && !form.id ? (
@@ -100,14 +113,14 @@ export default function AdminConfiguracionPage() {
           <ConfigBcvSection form={form} onChange={handleChange} />
 
           <div className="pt-2">
-            <button
+            <Button
               type="submit"
-              disabled={saving}
-              className="flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 px-6 py-3 font-extrabold text-white text-xs transition-colors cursor-pointer"
-            >
-              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-              <span>{saving ? 'Guardando...' : 'Guardar Toda la Configuración'}</span>
-            </button>
+              label={saving ? 'Guardando...' : 'Guardar Toda la Configuración'}
+              variant="primary"
+              size="lg"
+              icon={<Save className="h-4 w-4" />}
+              isLoading={saving}
+            />
           </div>
         </form>
       )}

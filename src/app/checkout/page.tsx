@@ -175,6 +175,10 @@ export default function CheckoutPage() {
       setErrorMessage('Por favor ingresa el Banco Emisor y los últimos dígitos de referencia del Pago Móvil.');
       return;
     }
+    if (paymentData.metodoPago === 'transferencia_bancaria' && (!paymentData.bancoOrigen.trim() || !paymentData.referencia.trim())) {
+      setErrorMessage('Por favor ingresa el Banco Emisor y los dígitos de referencia del comprobante de transferencia.');
+      return;
+    }
     if (paymentData.metodoPago === 'zelle' && (!paymentData.bancoOrigen.trim() || !paymentData.referencia.trim())) {
       setErrorMessage('Por favor ingresa el titular de la cuenta y la referencia de confirmación Zelle.');
       return;

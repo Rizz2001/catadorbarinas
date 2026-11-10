@@ -1,6 +1,7 @@
 export * from './AdminOrderQueue';
 export * from './AdminOrderDetail';
 export * from './AdminSidebar';
+export * from './AdminThemeProvider';
 export * from './BannerPreview';
 export * from './ProductImageCard';
 export * from './MissingPhotoProductCard';

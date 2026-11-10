@@ -151,6 +151,12 @@ export interface StoreConfig {
   pago_movil_cedula: string;
   zelle_email: string;
   zelle_titular: string;
+  transferencia_activa?: boolean;
+  transferencia_banco?: string | null;
+  transferencia_cuenta?: string | null;
+  transferencia_titular?: string | null;
+  transferencia_cedula?: string | null;
+  transferencia_tipo_cuenta?: string | null;
   bcv_tasa_manual?: number | null;
   bcv_usar_manual: boolean;
   logo_url?: string | null;

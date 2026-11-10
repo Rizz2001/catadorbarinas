@@ -7,9 +7,14 @@ import {
   Loader2,
   Camera,
   FileImage,
-  Filter,
   FolderOpen,
 } from 'lucide-react';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { Switch } from '@astryxdesign/core/Switch';
+import { Banner } from '@astryxdesign/core/Banner';
+import { AlertDialog } from '@astryxdesign/core/AlertDialog';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductImageMapping } from '@/types';
 import {
   getProductImages,
@@ -28,6 +33,7 @@ import { cn } from '@/lib/utils';
 type PhotoStatusTab = 'missing' | 'assigned' | 'all';
 
 export default function AdminProductosPage() {
+  const showToast = useToast();
   const [selectedGroup, setSelectedGroup] = useState<string>('01');
   const [selectedSubgroup, setSelectedSubgroup] = useState<string>('todos');
   const [statusTab, setStatusTab] = useState<PhotoStatusTab>('missing');
@@ -42,6 +48,7 @@ export default function AdminProductosPage() {
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [deletingCode, setDeletingCode] = useState<string | null>(null);
+  const [confirmDeleteCode, setConfirmDeleteCode] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -204,12 +211,13 @@ export default function AdminProductosPage() {
         ),
       ]);
       setSuccessMsg(`¡Fotografía agregada a "${product.name}" (Código: ${product.id})!`);
+      showToast({ body: `Foto asignada a ${product.name}` });
       setTimeout(() => setSuccessMsg(null), 4000);
     } catch (err) {
-      alert(
-        'Error subiendo fotografía: ' +
-          (err instanceof Error ? err.message : 'Intenta nuevamente')
-      );
+      showToast({
+        body: 'Error subiendo fotografía: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
     } finally {
       setUploadingProductCode(null);
     }
@@ -231,12 +239,13 @@ export default function AdminProductosPage() {
         ),
       ]);
       setSuccessMsg(`Fotografía actualizada para el código ${codigo}.`);
+      showToast({ body: `Fotografía actualizada (#${codigo})` });
       setTimeout(() => setSuccessMsg(null), 3500);
     } catch (err) {
-      alert(
-        'Error actualizando imagen: ' +
-          (err instanceof Error ? err.message : 'Intenta nuevamente')
-      );
+      showToast({
+        body: 'Error actualizando imagen: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
     } finally {
       setUploadingProductCode(null);
     }
@@ -269,6 +278,7 @@ export default function AdminProductosPage() {
     setUploading(false);
     setUploadProgress(null);
     setSuccessMsg(`¡${count} fotografía(s) vinculadas con éxito al catálogo!`);
+    showToast({ body: `${count} fotografía(s) vinculadas correctamente.` });
     setTimeout(() => setSuccessMsg(null), 4000);
     void loadData();
   };
@@ -281,27 +291,36 @@ export default function AdminProductosPage() {
       );
       await uploadProductWebpImage(file, code, name || matchedProd?.name || undefined);
       setSuccessMsg(`Fotografía vinculada correctamente al código ${code}`);
+      showToast({ body: `Fotografía vinculada al código ${code}` });
       setTimeout(() => setSuccessMsg(null), 3500);
       void loadData();
     } catch (err) {
-      alert(
-        'Error subiendo imagen: ' + (err instanceof Error ? err.message : 'Intenta nuevamente')
-      );
+      showToast({
+        body: 'Error subiendo imagen: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
     } finally {
       setUploading(false);
     }
   };
 
   const handleDelete = async (codigo: string) => {
-    if (!confirm(`¿Eliminar la fotografía asociada al código ${codigo}?`)) return;
+    setConfirmDeleteCode(codigo);
+  };
+
+  const executeConfirmDelete = async () => {
+    if (!confirmDeleteCode) return;
     try {
-      setDeletingCode(codigo);
-      await deleteProductWebpImage(codigo);
-      setImages((prev) => prev.filter((i) => i.codigo_articulo !== codigo));
+      setDeletingCode(confirmDeleteCode);
+      await deleteProductWebpImage(confirmDeleteCode);
+      setImages((prev) => prev.filter((i) => i.codigo_articulo !== confirmDeleteCode));
+      showToast({ body: `Fotografía #${confirmDeleteCode} eliminada.` });
+      setConfirmDeleteCode(null);
     } catch (err) {
-      alert(
-        'Error eliminando imagen: ' + (err instanceof Error ? err.message : 'Intenta nuevamente')
-      );
+      showToast({
+        body: 'Error eliminando imagen: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
     } finally {
       setDeletingCode(null);
     }
@@ -339,10 +358,12 @@ export default function AdminProductosPage() {
       </div>
 
       {successMsg && (
-        <div className="flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-xs text-emerald-800 font-bold">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>{successMsg}</span>
-        </div>
+        <Banner
+          status="success"
+          title={successMsg}
+          isDismissable
+          onDismiss={() => setSuccessMsg(null)}
+        />
       )}
 
       {/* Barra de subida masiva y manual */}
@@ -401,24 +422,21 @@ export default function AdminProductosPage() {
           </div>
 
           {/* Filtro rápido de Stock */}
-          <div className="md:col-span-3">
-            <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
+          <div className="md:col-span-3 flex flex-col justify-center">
+            <span className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
               3. Filtro de Inventario
-            </label>
-            <button
-              type="button"
-              disabled={selectedGroup === 'GLOBAL_UPLOADED'}
-              onClick={() => setOnlyInStock((prev) => !prev)}
-              className={cn(
-                'w-full min-h-[40px] rounded-xl px-3 py-2 text-xs font-extrabold border flex items-center justify-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50',
-                onlyInStock
-                  ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
-              )}
-            >
-              <Filter className="h-3.5 w-3.5" />
-              <span>{onlyInStock ? 'Mostrando Solo con Stock' : 'Filtrar Solo con Stock'}</span>
-            </button>
+            </span>
+            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 min-h-[40px] flex items-center">
+              <Switch
+                label="Solo con stock"
+                size="sm"
+                labelPosition="start"
+                labelSpacing="spread"
+                isDisabled={selectedGroup === 'GLOBAL_UPLOADED'}
+                value={onlyInStock}
+                onChange={setOnlyInStock}
+              />
+            </div>
           </div>
         </div>
 
@@ -458,47 +476,25 @@ export default function AdminProductosPage() {
         {/* Pestañas: Faltan por Foto / Con Fotografía / Todos + Barra de Cobertura */}
         {selectedGroup !== 'GLOBAL_UPLOADED' && (
           <div className="pt-2 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-2 tabular-nums">
-              <button
-                type="button"
-                onClick={() => setStatusTab('missing')}
-                className={cn(
-                  'min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer border',
-                  statusTab === 'missing'
-                    ? 'bg-amber-500 text-white border-amber-500 shadow-xs'
-                    : 'bg-amber-50/70 text-amber-900 border-amber-200 hover:bg-amber-100'
-                )}
+            <div className="overflow-x-auto no-scrollbar tabular-nums">
+              <SegmentedControl
+                size="md"
+                label="Estado fotográfico de productos"
+                value={statusTab}
+                onChange={(val) => setStatusTab(val as PhotoStatusTab)}
               >
-                <Camera className="h-4 w-4" />
-                <span>Faltan por Fotografía ({stats.missing})</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setStatusTab('assigned')}
-                className={cn(
-                  'min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer border',
-                  statusTab === 'assigned'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                    : 'bg-emerald-50/70 text-emerald-900 border-emerald-200 hover:bg-emerald-100'
-                )}
-              >
-                <CheckCircle2 className="h-4 w-4" />
-                <span>Con Fotografía ({stats.assigned})</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setStatusTab('all')}
-                className={cn(
-                  'min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border',
-                  statusTab === 'all'
-                    ? 'bg-catador-blue text-white border-catador-blue shadow-xs'
-                    : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
-                )}
-              >
-                <span>Todos ({stats.total})</span>
-              </button>
+                <SegmentedControlItem
+                  value="missing"
+                  icon={<Camera className="h-3.5 w-3.5" />}
+                  label={`Faltan por Foto (${stats.missing})`}
+                />
+                <SegmentedControlItem
+                  value="assigned"
+                  icon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                  label={`Con Foto (${stats.assigned})`}
+                />
+                <SegmentedControlItem value="all" label={`Todos (${stats.total})`} />
+              </SegmentedControl>
             </div>
 
             {/* Resumen de cobertura de la categoría */}
@@ -546,16 +542,16 @@ export default function AdminProductosPage() {
           ))}
         </div>
       ) : displayedProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center space-y-2">
-          <Camera className="h-10 w-10 mx-auto text-slate-300 stroke-1" />
-          <p className="font-bold text-slate-800 text-sm">
-            {statusTab === 'missing'
-              ? '¡Excelente! No hay productos pendientes por fotografía con este filtro'
-              : 'No se encontraron productos con fotografía en esta selección'}
-          </p>
-          <p className="text-xs text-slate-500">
-            Prueba cambiando de categoría, subcategoría o desactivando el filtro de stock.
-          </p>
+        <div className="rounded-2xl border border-slate-200 bg-white p-10">
+          <EmptyState
+            icon={<Camera className="h-10 w-10 text-slate-400" />}
+            title={
+              statusTab === 'missing'
+                ? '¡Excelente! No hay productos pendientes por fotografía con este filtro'
+                : 'No se encontraron productos con fotografía en esta selección'
+            }
+            description="Prueba cambiando de categoría, subcategoría o desactivando el filtro de stock."
+          />
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -593,6 +589,20 @@ export default function AdminProductosPage() {
           })}
         </div>
       )}
+
+      <AlertDialog
+        isOpen={Boolean(confirmDeleteCode)}
+        onOpenChange={(open) => {
+          if (!open && !deletingCode) setConfirmDeleteCode(null);
+        }}
+        title={`Eliminar fotografía #${confirmDeleteCode || ''}`}
+        description="El artículo volverá a mostrarse con la imagen genérica hasta que subas una nueva fotografía."
+        cancelLabel="Cancelar"
+        actionLabel="Eliminar Fotografía"
+        actionVariant="destructive"
+        isActionLoading={Boolean(deletingCode)}
+        onAction={() => void executeConfirmDelete()}
+      />
     </main>
   );
 }

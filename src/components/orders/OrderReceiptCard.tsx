@@ -15,6 +15,7 @@ interface OrderReceiptCardProps {
 export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
   const paymentLabels: Record<string, string> = {
     pago_movil: 'Pago Móvil (Bs. BCV)',
+    transferencia_bancaria: 'Transferencia Bancaria (Bs. BCV)',
     zelle: 'Zelle ($ USD)',
     efectivo_usd: 'Efectivo Divisas ($ USD)',
     punto_venta: 'Punto de Venta',

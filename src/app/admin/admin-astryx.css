@@ -1,0 +1,30 @@
+/* Estilos exclusivos del Panel CMS (/admin/*) con Meta Astryx.
+ * No se cargan en las rutas públicas de la tienda. */
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+
+:root:not([data-theme="dark"]) {
+  color-scheme: light;
+}
+
+/* Override de tokens semánticos hacia la identidad oficial de El Catador */
+[data-astryx-theme="neutral"] {
+  --color-accent: #00227B;
+  --color-text-accent: #00227B;
+  --color-icon-accent: #00227B;
+  --color-on-accent: #FFFFFF;
+  --color-accent-muted: #DBEAFE;
+  --color-info: #00227B;
+  --color-text-info: #00227B;
+  --color-info-muted: #EFF6FF;
+  --color-background-surface: #FFFFFF;
+  --color-background-body: #F8FAFC;
+  --color-background-card: #FFFFFF;
+  --color-background-popover: #FFFFFF;
+  --color-background-muted: #F1F5F9;
+  --color-border: #E2E8F0;
+  --color-border-emphasized: #CBD5E1;
+  --radius-button: 10px;
+  --radius-control: 10px;
+  --radius-container: 16px;
+}
+

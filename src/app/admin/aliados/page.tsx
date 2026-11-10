@@ -1,7 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, HelpCircle, Loader2, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Save, HelpCircle, Loader2, Award } from 'lucide-react';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Button } from '@astryxdesign/core/Button';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { useToast } from '@astryxdesign/core/Toast';
 import { AlliedBrand, FaqItem } from '@/types';
 import {
   getAlliedBrands,
@@ -12,9 +17,9 @@ import {
   deleteFaqItem,
   uploadBannerImage,
 } from '@/services/cms.service';
-import { cn } from '@/lib/utils';
 
 export default function AdminAliadosFaqPage() {
+  const showToast = useToast();
   const [activeTab, setActiveTab] = useState<'brands' | 'faq'>('brands');
   const [brands, setBrands] = useState<AlliedBrand[]>([]);
   const [faqs, setFaqs] = useState<FaqItem[]>([]);
@@ -58,8 +63,9 @@ export default function AdminAliadosFaqPage() {
     };
   }, []);
 
-  const showToast = (msg: string) => {
+  const showToastBanner = (msg: string) => {
     setSavedToast(msg);
+    showToast({ body: msg });
     setTimeout(() => setSavedToast(null), 3000);
   };
 
@@ -77,7 +83,7 @@ export default function AdminAliadosFaqPage() {
     });
     setBrandName('');
     setBrandLogo('');
-    showToast('Empresa aliada agregada correctamente');
+    showToastBanner('Empresa aliada agregada correctamente');
     await loadAll();
   };
 
@@ -93,7 +99,7 @@ export default function AdminAliadosFaqPage() {
     });
     setFaqQuestion('');
     setFaqAnswer('');
-    showToast('Pregunta frecuente publicada');
+    showToastBanner('Pregunta frecuente publicada');
     await loadAll();
   };
 
@@ -112,35 +118,24 @@ export default function AdminAliadosFaqPage() {
           </p>
         </div>
 
-        <div className="flex gap-1 bg-slate-200/70 p-1 rounded-xl self-start">
-          <button
-            type="button"
-            onClick={() => setActiveTab('brands')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer tabular-nums',
-              activeTab === 'brands' ? 'bg-white text-slate-900 border border-slate-200/80' : 'text-slate-600 hover:text-slate-900'
-            )}
-          >
-            Empresas Aliadas ({brands.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('faq')}
-            className={cn(
-              'px-3.5 py-2 rounded-lg text-xs font-extrabold transition-all cursor-pointer tabular-nums',
-              activeTab === 'faq' ? 'bg-white text-slate-900 border border-slate-200/80' : 'text-slate-600 hover:text-slate-900'
-            )}
-          >
-            Preguntas Frecuentes ({faqs.length})
-          </button>
-        </div>
+        <SegmentedControl
+          size="md"
+          label="Sección de Aliados y Soporte"
+          value={activeTab}
+          onChange={(val) => setActiveTab(val as 'brands' | 'faq')}
+        >
+          <SegmentedControlItem value="brands" label={`Empresas Aliadas (${brands.length})`} />
+          <SegmentedControlItem value="faq" label={`Preguntas Frecuentes (${faqs.length})`} />
+        </SegmentedControl>
       </div>
 
       {savedToast && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-          <span>{savedToast}</span>
-        </div>
+        <Banner
+          status="success"
+          title={savedToast}
+          isDismissable
+          onDismiss={() => setSavedToast(null)}
+        />
       )}
 
       {loading ? (
@@ -205,16 +200,25 @@ export default function AdminAliadosFaqPage() {
                 </label>
               </div>
             </div>
-            <button
+            <Button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-catador-blue text-white font-black cursor-pointer"
-            >
-              <Save className="h-4 w-4" /> Guardar Aliado Comercial
-            </button>
+              label="Guardar Aliado Comercial"
+              variant="primary"
+              icon={<Save className="h-4 w-4" />}
+            />
           </form>
 
           {/* Listado de Empresas Aliadas */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {brands.length === 0 ? (
+            <div className="rounded-2xl bg-white border border-slate-200 p-8">
+              <EmptyState
+                icon={<Award className="h-8 w-8 text-slate-400" />}
+                title="Aún no hay empresas aliadas registradas"
+                description="Agrega marcas comerciales usando el formulario superior (se muestran en portada al tener 6 o más)."
+              />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {brands.map((b) => (
               <div
                 key={b.id}
@@ -246,7 +250,8 @@ export default function AdminAliadosFaqPage() {
                 </button>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-6 text-xs">
@@ -282,12 +287,12 @@ export default function AdminAliadosFaqPage() {
               placeholder="Respuesta detallada para el cliente..."
               className="w-full rounded-xl border border-slate-200 p-2.5 text-slate-900"
             />
-            <button
+            <Button
               type="submit"
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-catador-blue text-white font-black cursor-pointer"
-            >
-              <Save className="h-4 w-4" /> Publicar Pregunta
-            </button>
+              label="Publicar Pregunta"
+              variant="primary"
+              icon={<Save className="h-4 w-4" />}
+            />
           </form>
 
           <div className="space-y-2.5">

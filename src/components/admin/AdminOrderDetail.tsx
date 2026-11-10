@@ -17,6 +17,9 @@ import {
   Truck,
   ArrowLeft,
 } from 'lucide-react';
+import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
+import { Layout, LayoutContent } from '@astryxdesign/core/Layout';
+import { Badge } from '@astryxdesign/core/Badge';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
 import { getDeliveryTierInfo } from '@/lib/delivery';
@@ -287,9 +290,24 @@ export function AdminOrderDetail({
         {order.pago && (
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-2.5">
             <div className="flex items-center justify-between flex-wrap gap-2">
-              <span className="font-extrabold text-slate-900 text-xs">
-                Método: <strong className="text-catador-blue">{order.pago.metodo_pago.toUpperCase()}</strong> • Estado: <strong className={order.estado_pago === 'verificado' ? 'text-emerald-700' : 'text-amber-700'}>{order.estado_pago.toUpperCase()}</strong>
-              </span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-extrabold text-slate-900 text-xs">
+                  Método:{' '}
+                  <strong className="text-catador-blue">
+                    {order.pago.metodo_pago.replaceAll('_', ' ').toUpperCase()}
+                  </strong>
+                </span>
+                <Badge
+                  variant={
+                    order.estado_pago === 'verificado'
+                      ? 'success'
+                      : order.estado_pago === 'rechazado'
+                      ? 'error'
+                      : 'warning'
+                  }
+                  label={order.estado_pago.toUpperCase()}
+                />
+              </div>
               {order.pago.referencia && (
                 <div className="flex items-center gap-1 tabular-nums">
                   <span className="font-mono font-bold text-slate-800 bg-white px-2.5 py-1 rounded-lg border text-xs">
@@ -388,15 +406,39 @@ export function AdminOrderDetail({
           </div>
         </div>
 
-        {showProofModal && order.pago?.comprobante_url && (
-          <div
-            onClick={() => setShowProofModal(false)}
-            className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4 cursor-pointer"
+        {order.pago?.comprobante_url && (
+          <Dialog
+            isOpen={showProofModal}
+            onOpenChange={(open) => setShowProofModal(open)}
+            width={720}
+            purpose="info"
           >
-            <div className="relative max-w-2xl w-full aspect-4/3 bg-white rounded-2xl overflow-hidden p-2 shadow-2xl">
-              <Image src={order.pago.comprobante_url} alt="Comprobante" fill className="object-contain" />
-            </div>
-          </div>
+            <Layout
+              height="auto"
+              header={
+                <DialogHeader
+                  title={`Comprobante — Orden #${order.numero_orden}`}
+                  subtitle={
+                    order.pago.referencia ? `Referencia #${order.pago.referencia}` : undefined
+                  }
+                  onOpenChange={(open) => setShowProofModal(open)}
+                  hasDivider
+                />
+              }
+              content={
+                <LayoutContent>
+                  <div className="relative w-full aspect-4/3 bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+                    <Image
+                      src={order.pago.comprobante_url}
+                      alt="Comprobante de pago ampliado"
+                      fill
+                      className="object-contain p-2"
+                    />
+                  </div>
+                </LayoutContent>
+              }
+            />
+          </Dialog>
         )}
 
         <DeleteOrderModal

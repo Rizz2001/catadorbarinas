@@ -1,7 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Clock, MessageSquare, MapPin } from 'lucide-react';
+import { Clock, MessageSquare, MapPin, Inbox } from 'lucide-react';
+import { Badge } from '@astryxdesign/core/Badge';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { PedidoConDetalles, EstadoPedido } from '@/types';
 import { formatUsd } from '@/lib/currency';
 import { cn } from '@/lib/utils';
@@ -34,44 +37,20 @@ export function AdminOrderQueue({
     return `${hours}h`;
   };
 
-  const getStatusBadge = (st: EstadoPedido) => {
+  const renderStatusBadge = (st: EstadoPedido) => {
     switch (st) {
       case 'recibido':
-        return (
-          <span className="bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black px-2.5 py-0.5 rounded-md">
-            Recibido
-          </span>
-        );
+        return <Badge variant="warning" label="Recibido" />;
       case 'preparando':
-        return (
-          <span className="bg-blue-100 text-catador-blue border border-blue-300 text-xs font-black px-2.5 py-0.5 rounded-md">
-            En Bodegón
-          </span>
-        );
+        return <Badge variant="info" label="En Bodegón" />;
       case 'en_camino':
-        return (
-          <span className="bg-slate-900 text-white text-xs font-black px-2.5 py-0.5 rounded-md">
-            En Ruta
-          </span>
-        );
+        return <Badge variant="blue" label="En Ruta" />;
       case 'entregado':
-        return (
-          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black px-2.5 py-0.5 rounded-md">
-            Entregado
-          </span>
-        );
+        return <Badge variant="success" label="Entregado" />;
       case 'cancelado':
-        return (
-          <span className="bg-rose-100 text-rose-900 border border-rose-300 text-xs font-black px-2.5 py-0.5 rounded-md">
-            Cancelado
-          </span>
-        );
+        return <Badge variant="error" label="Cancelado" />;
       default:
-        return (
-          <span className="bg-slate-100 text-slate-800 text-xs font-bold px-2.5 py-0.5 rounded-md">
-            {st}
-          </span>
-        );
+        return <Badge variant="neutral" label={st} />;
     }
   };
 
@@ -111,36 +90,39 @@ export function AdminOrderQueue({
           className="w-full min-h-[44px] rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/20"
         />
 
-        <div className="flex gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar tabular-nums">
-          {tabs.map((tab) => {
-            const count =
-              tab.key === 'todos'
-                ? orders.length
-                : orders.filter((o) => o.estado_pedido === tab.key).length;
-            const isActive = statusFilter === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setStatusFilter(tab.key)}
-                className={cn(
-                  'px-3.5 py-2 min-h-[38px] rounded-lg font-bold shrink-0 transition-colors cursor-pointer text-xs',
-                  isActive
-                    ? 'bg-catador-blue text-white shadow-sm'
-                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                )}
-              >
-                {tab.label} ({count})
-              </button>
-            );
-          })}
+        <div className="overflow-x-auto pb-0.5 no-scrollbar tabular-nums">
+          <SegmentedControl
+            size="sm"
+            label="Filtrar órdenes por estado"
+            value={statusFilter}
+            onChange={(val) => setStatusFilter(val as FilterTab)}
+          >
+            {tabs.map((tab) => {
+              const count =
+                tab.key === 'todos'
+                  ? orders.length
+                  : orders.filter((o) => o.estado_pedido === tab.key).length;
+              return (
+                <SegmentedControlItem
+                  key={tab.key}
+                  value={tab.key}
+                  label={`${tab.label} (${count})`}
+                />
+              );
+            })}
+          </SegmentedControl>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center text-sm font-semibold text-slate-400">
-            Sin órdenes en este estado.
+          <div className="p-6">
+            <EmptyState
+              isCompact
+              icon={<Inbox className="h-8 w-8 text-slate-400" />}
+              title="Sin órdenes en este estado"
+              description="Cambia el filtro superior o limpia la búsqueda para ver otras órdenes."
+            />
           </div>
         ) : (
           filtered.map((order) => {
@@ -169,7 +151,7 @@ export function AdminOrderQueue({
                         <span>{order.mensajes_no_leidos}</span>
                       </span>
                     )}
-                    {getStatusBadge(order.estado_pedido)}
+                    {renderStatusBadge(order.estado_pedido)}
                   </div>
                 </div>
 

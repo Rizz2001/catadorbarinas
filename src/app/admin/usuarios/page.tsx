@@ -1,13 +1,17 @@
 'use client';
 
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { Search, Loader2, Edit3, Trash2, Ban, CheckCircle2, AlertCircle, MailCheck } from 'lucide-react';
+import { Search, Loader2, Edit3, Trash2, Ban, CheckCircle2, AlertCircle, MailCheck, Users } from 'lucide-react';
+import { Badge } from '@astryxdesign/core/Badge';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { useToast } from '@astryxdesign/core/Toast';
 import { Database } from '@/types/supabase';
 import { EditUserModal, DeleteUserModal } from '@/components/admin';
 
 type PerfilRow = Database['public']['Tables']['perfiles']['Row'];
 
 export default function AdminUsuariosPage() {
+  const showToast = useToast();
   const [users, setUsers] = useState<PerfilRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,6 +56,7 @@ export default function AdminUsuariosPage() {
         setUsers((prev) =>
           prev.map((u) => (u.id === targetUserId ? { ...u, rol: newRole as PerfilRow['rol'] } : u))
         );
+        showToast({ body: `Rol actualizado a "${newRole}".` });
       }
     } catch (err) {
       console.error('Error actualizando rol:', err);
@@ -78,9 +83,17 @@ export default function AdminUsuariosPage() {
         setUsers((prev) =>
           prev.map((u) => (u.id === user.id ? { ...u, suspendido: nextState } : u))
         );
+        showToast({
+          body: nextState
+            ? `Usuario "${user.nombre}" suspendido.`
+            : `Usuario "${user.nombre}" reactivado.`,
+        });
       } else {
         const data = await res.json();
-        alert(data.error || 'No se pudo cambiar el estado de suspensión');
+        showToast({
+          body: data.error || 'No se pudo cambiar el estado de suspensión',
+          type: 'error',
+        });
       }
     } catch (err) {
       console.error('Error suspendiendo usuario:', err);
@@ -203,8 +216,12 @@ export default function AdminUsuariosPage() {
             <span>Cargando lista de usuarios...</span>
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="p-12 text-center text-xs text-slate-400">
-            No se encontraron usuarios coincidentes.
+          <div className="p-10">
+            <EmptyState
+              icon={<Users className="h-9 w-9 text-slate-400" />}
+              title="No se encontraron usuarios coincidentes"
+              description="Intenta buscar con otro nombre, cédula o número telefónico."
+            />
           </div>
         ) : (
           <>
@@ -235,25 +252,22 @@ export default function AdminUsuariosPage() {
                         </div>
                       </div>
 
-                      <div className="shrink-0 flex items-center gap-1.5">
-                        {u.correo_confirmado ? (
-                          <span className="rounded-md bg-emerald-50 text-emerald-800 border border-emerald-300 px-2 py-0.5 text-[10px] font-black inline-flex items-center gap-1">
-                            <MailCheck className="h-3 w-3" /> Verificado
-                          </span>
-                        ) : (
-                          <span className="rounded-md bg-amber-50 text-amber-800 border border-amber-300 px-2 py-0.5 text-[10px] font-black inline-flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" /> Sin Confirmar
-                          </span>
-                        )}
-                        {u.suspendido ? (
-                          <span className="rounded-md bg-rose-100 text-rose-800 border border-rose-300 px-2 py-0.5 text-xs font-black uppercase">
-                            Suspendido
-                          </span>
-                        ) : (
-                          <span className="rounded-md bg-emerald-100 text-emerald-800 border border-emerald-300 px-2 py-0.5 text-xs font-black">
-                            Activo
-                          </span>
-                        )}
+                      <div className="shrink-0 flex items-center gap-1.5 flex-wrap justify-end">
+                        <Badge
+                          variant={u.correo_confirmado ? 'success' : 'warning'}
+                          icon={
+                            u.correo_confirmado ? (
+                              <MailCheck className="h-3 w-3" />
+                            ) : (
+                              <AlertCircle className="h-3 w-3" />
+                            )
+                          }
+                          label={u.correo_confirmado ? 'Verificado' : 'Sin Confirmar'}
+                        />
+                        <Badge
+                          variant={u.suspendido ? 'error' : 'info'}
+                          label={u.suspendido ? 'Suspendido' : 'Activo'}
+                        />
                       </div>
                     </div>
 
@@ -367,15 +381,17 @@ export default function AdminUsuariosPage() {
                         <td className="p-3.5">{u.telefono || 'No registrado'}</td>
                         <td className="p-3.5">
                           <div className="flex flex-col gap-1 items-start">
-                            {u.suspendido ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 border border-rose-200 px-2 py-0.5 text-[10px] font-black text-rose-800 uppercase">
-                                <Ban className="h-3 w-3" /> Suspendido
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                                <CheckCircle2 className="h-3 w-3 text-emerald-600" /> Activo
-                              </span>
-                            )}
+                            <Badge
+                              variant={u.suspendido ? 'error' : 'success'}
+                              icon={
+                                u.suspendido ? (
+                                  <Ban className="h-3 w-3" />
+                                ) : (
+                                  <CheckCircle2 className="h-3 w-3" />
+                                )
+                              }
+                              label={u.suspendido ? 'Suspendido' : 'Activo'}
+                            />
                             {u.correo_confirmado ? (
                               <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
                                 <MailCheck className="h-3 w-3 text-emerald-600" /> Correo verificado
