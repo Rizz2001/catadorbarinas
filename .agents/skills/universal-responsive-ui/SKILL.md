@@ -91,8 +91,13 @@ La visualización de precios duales (**Dólares $ USD** y **Bolívares Bs. BCV**
 - **Escritorio (`>= 1024px`):** Grilla completa de 5 columnas con producto estrella central ocupando doble fila (`col-span-1 row-span-2`).
 
 ### D. Formularios de Checkout y Pasarelas de Pago
-- El selector de métodos (Pago Móvil, Zelle, Efectivo) se distribuye en `grid-cols-1 sm:grid-cols-3 gap-2.5`.
-- Los datos bancarios (Banco, Teléfono, Cédula) se dividen en tarjetas con botón de copiar rápido táctil con feedback visual inmediato.
+- El selector de métodos (**Pago Móvil, Transferencia Bancaria, Zelle y Efectivo USD**) se distribuye en `grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5`.
+- Los datos bancarios oficiales configurados desde CMS (Banco, Número de cuenta de 20 dígitos, Teléfono, Titular y Cédula/RIF) se muestran en tarjetas claras con **botón de copiado rápido en 1 clic** y feedback visual inmediato.
+
+### E. Panel Administrativo CMS (`/admin/*`)
+- **Navegación Adaptativa (`AdminSidebar`):** Barra superior compacta + drawer lateral deslizable en móvil (`< 768px`) y sidebar fijo en escritorio (`>= 768px`).
+- **Modales y Diálogos (`Dialog` / `AlertDialog` de Meta Astryx):** Ajuste automático al `viewport` dinámico (`maxHeight` / gutter táctil), foco accesible y botones apilables en móvil dentro de `LayoutFooter`.
+- **Pestañas y Listados:** Tiras `SegmentedControl` / `TabList` contenidas en contenedores `overflow-x-auto no-scrollbar`, y vistas duales tarjeta-móvil / tabla-escritorio en listados de usuarios y cola de órdenes.
 
 ---
 

@@ -84,7 +84,29 @@ Para evitar ambigüedad visual entre botones de navegación y acciones de compra
   - *Nivel 1 (Departamentos):* Pestañas principales con cuerpo (`bg-white border border-slate-200`, activo en `bg-catador-blue text-white`).
   - *Nivel 2 (Subcategorías):* Subnivel visualmente más ligero (pestañas tipográficas limpias con línea inferior activa `border-b-2 border-catador-amber text-catador-blue font-black`, sin cajas pesadas que compitan con el Nivel 1).
 
-### 5. Footer de Alto Contraste y Sin Espacio Muerto (`Footer`)
-- **Sin Alertas Falsas en Naranja:** Prohibido mostrar textos como "Pedidos Gratis Temporalmente Restringidos" en naranja sobre oscuro que parezcan errores del sistema. Si hay un aviso de horario o despacho, usar un banner informativo limpio con copy positivo (`Despacho a domicilio calculado por GPS en Barinas`).
+### 5. Footer de Alto Contraste, Datos Oficiales y Sin Espacio Muerto (`Footer`)
+- **Identidad y Sede Única Oficial:** Usar el nombre comercial **`EL CATADOR.`**, favicon oficial (`/icon-catador.png`) y dirección unificada **`C.C. Ciudad Catador Local N1`** (prohibido dejar referencias heredadas como "Av. 23 de Enero" o "Cuatricentenaria").
+- **Sin Alertas Falsas ni Promesas No Vigentes:** Prohibido mostrar textos como "Pedidos Gratis Temporalmente Restringidos" o "Pedidos gratis a partir de $30" que no correspondan a la configuración activa en el CMS. Usar exclusivamente información gestionada desde `configuracion_tienda`.
 - **Contraste y Espaciado:** Títulos de columna en blanco puro (`text-white text-sm sm:text-base font-black mb-4`), enlaces en `text-slate-300 hover:text-white text-[13px] sm:text-sm`, y separación amplia entre bloques (`gap-10 lg:gap-12`).
 - **Columna Izquierda Equilibrada:** Distribuir la información de sede (Logo, Razón Social + RIF, tarjeta compacta de dirección física y teléfono/horario) sin dejar huecos vacíos.
+
+---
+
+## 5. Buscador, Cero Etiquetas IA y Franja de Búsquedas (`HeaderMain`)
+
+- **Política Cero Etiquetas IA:** Prohibido mostrar badges, textos o sugerencias con siglas "IA" en cualquier parte de la tienda pública.
+- **Franja Bajo el Buscador (`POPULAR:` / `RECIENTES:`):**
+  - Cuando el usuario no tiene historial de búsquedas reciente, mostrar la franja **`POPULAR:`** (en negrita azul `#00227B`) con los accesos directos oficiales: `Buchanan's`, `Santa Teresa 1796`, `Polar Pilsen`, `Corona` y `Harina P.A.N.`.
+  - Al registrar búsquedas reales del usuario, conmutar automáticamente a **`RECIENTES:`** permitiendo eliminar términos individuales (`X`) o vaciar el historial (`Limpiar`) para volver a **`POPULAR:`**.
+
+---
+
+## 6. Estándar Visual del Panel CMS (`/admin/*` con Meta Astryx)
+
+- **Aislamiento Estricto:** Todo el panel administrativo bajo `/admin/*` utiliza **Meta Astryx** (`@astryxdesign/core` + `@astryxdesign/theme-neutral`) envuelto en `AdminThemeProvider` (`Theme` + `LayerProvider`), sin inyectar ni alterar estilos de la tienda pública.
+- **Personalización de Marca en CMS:** Los tokens de `[data-astryx-theme="neutral"]` se sobrescriben en `src/app/admin/admin-astryx.css` para mantener el acento institucional `#00227B`, fondos limpios `#F8FAFC` / `#FFFFFF` y tipografía `Figtree`.
+- **Componentes Obligatorios en CMS:**
+  - **Confirmaciones Destructivas:** Usar `AlertDialog` (nunca `window.confirm()` ni `alert()` nativos del navegador).
+  - **Modales de Edición / Operación:** Usar `Dialog` + `Layout` + `DialogHeader` + `LayoutContent` + `LayoutFooter` (`EditUserModal`, `ProductConfigModal`, `QuickDeliveryCalculatorModal`, visor de comprobantes).
+  - **Pestañas y Filtros:** Usar `SegmentedControl` / `SegmentedControlItem` o `TabList` / `Tab` con scroll horizontal.
+  - **Interruptores y Estados:** Usar `Switch` para booleanos, `Badge` para estados de pedidos/usuarios, `Banner` + `useToast()` para retroalimentación inmediata y `EmptyState` cuando no existan registros.

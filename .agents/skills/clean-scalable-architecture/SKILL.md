@@ -13,10 +13,13 @@ Guía arquitectónica y de ingeniería de software obligatoria para **Gran Catad
 ---
 
 ## 1. Stack Tecnológico & Convenciones
-- **Framework:** Next.js 14/15 con App Router estricto (`src/app/`).
+- **Framework:** Next.js 16+ con App Router y Turbopack estricto (`src/app/`), React 19+.
 - **Lenguaje:** TypeScript estricto. **Prohibido el uso de `any`**. Toda respuesta de backend y estado debe poseer contratos claros de interfaz en `src/types/`.
-- **Estilos:** Tailwind CSS con variables semánticas de marca, `clsx` y `tailwind-merge` mediante la utilidad `cn(...)` en `src/lib/utils.ts`.
-- **Estado Global:** Zustand con persistencia en `localStorage` (`useCartStore`, `useBcvStore`, `useUiStore` en `src/store/`).
+- **Estilos Híbridos (Tienda vs. CMS):**
+  - **Tienda Pública:** Tailwind CSS v4 puro en `src/app/globals.css` con tokens semánticos de marca (`#00227B`, `#E07A1F`), `clsx` y `tailwind-merge` mediante `cn(...)` en `src/lib/utils.ts`.
+  - **Panel CMS (`/admin/*`):** **Meta Astryx** (`@astryxdesign/core` + `@astryxdesign/theme-neutral`) aislado estrictamente dentro de `src/app/admin/layout.tsx` vía `AdminThemeProvider` y `src/app/admin/admin-astryx.css` (`@scope`), respetando el orden `@layer reset, theme, base, astryx-base, astryx-theme, components, utilities;` declarado en `src/app/globals.css` para que nunca colisione ni filtre CSS hacia la tienda pública.
+- **Regla Cero Hardcodeo (100% Configurable desde CMS):** Todo dato operativo y de marca (nombre comercial `EL CATADOR.`, sede `C.C. Ciudad Catador Local N1`, tasas BCV, tarifas delivery GPS, cuentas receptoras de Pago Móvil, Transferencias Bancarias y Zelle, secciones y textos legales/footer) reside en Supabase (`configuracion_tienda`) y se consume vía `useStoreConfigStore`.
+- **Estado Global:** Zustand con persistencia en `localStorage` (`useCartStore`, `useBcvStore`, `useUiStore`, `useStoreConfigStore` en `src/store/`).
 - **Iconografía:** `lucide-react`.
 
 ---
@@ -53,5 +56,5 @@ Guía arquitectónica y de ingeniería de software obligatoria para **Gran Catad
 En cada modificación, actualización o refactorización:
 1. **Eliminación Inmediata de Huérfanos:** Eliminar cualquier archivo, función, tipo o hook que quede sin uso tras un cambio.
 2. **Cero Código Comentado:** No dejar bloques de código muerto o comentado (`// old code`). Git resguarda el historial.
-3. **Limpieza de Imports y Depuración:** Remover `imports` no leídos, variables no usadas y cualquier `console.log()` temporal de depuración.
-4. **Verificación Continua de Tipos:** Ejecutar `npx tsc --noEmit` garantizando 0 errores de compilación.
+3. **Limpieza de Imports y Depuración:** Remover `imports` no leídos, variables no usadas y cualquier `console.log()` temporal de depuración (`npx tsc --noEmit --noUnusedLocals --noUnusedParameters` en los archivos modificados).
+4. **Verificación Continua de Tipos y Compilación:** Ejecutar `npx next typegen`, `npx tsc --noEmit` y `npm run lint` con **0 errores**, y `npm run build` tras cambios estructurales o de dependencias.

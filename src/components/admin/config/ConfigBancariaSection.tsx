@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Smartphone, CreditCard, Building2 } from 'lucide-react';
 import { Switch } from '@astryxdesign/core/Switch';
 import { StoreConfig } from '@/types';

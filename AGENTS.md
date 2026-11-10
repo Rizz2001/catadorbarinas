@@ -21,19 +21,22 @@ Este archivo rige de forma estricta todo el desarrollo en este repositorio.
 
 ## 2. Sistema de Archivos y Responsabilidades
 - `src/app/`: Rutas, layouts y páginas (`page.tsx`, `layout.tsx`). Prohibido colocar lógica de negocio o componentes complejos aquí.
-- `src/components/ui/`: Primitivas atómicas puras sin lógica comercial (`Button`, `Badge`, `Skeleton`).
+- `src/app/admin/` & `src/components/admin/`: Panel operativo CMS aislado visualmente mediante **Meta Astryx** (`@astryxdesign/core` + `@astryxdesign/theme-neutral`, `AdminThemeProvider`, `admin-astryx.css`).
+- `src/components/ui/`: Primitivas atómicas puras sin lógica comercial para la tienda pública (`Button`, `Badge`, `Skeleton`) sobre Tailwind CSS v4.
 - `src/components/layout/`: Estructura global (`Header`, `Footer`, `BottomNav`, `CartDrawer`).
 - `src/components/ecommerce/`: Dominio comercial (`ProductCard`, `FeaturedDealsBox`, `CartItemRow`).
 - `src/services/` & `src/adapters/`: Data fetching desacoplado con adaptadores que transforman a `src/types/`.
-- `src/hooks/`: Lógica interactiva aislada (`useCountdown`, `useDebounce`).
-- `src/store/`: Estado Zustand (`useCartStore`, `useBcvStore`, `useUiStore`).
-- `src/lib/` & `src/constants/`: Utilidades (`currency.ts`, `utils.ts`) y configuración (`config.ts`).
+- `src/hooks/`: Lógica interactiva aislada (`useCountdown`, `useDebounce`, `useRecentSearches`).
+- `src/store/`: Estado Zustand (`useCartStore`, `useBcvStore`, `useUiStore`, `useStoreConfigStore`).
+- `src/lib/` & `src/constants/`: Utilidades (`currency.ts`, `utils.ts`, `delivery.ts`) y configuración (`config.ts`).
 
-## 3. Política de Cero Código Muerto & Calidad
-- Eliminar huérfanos inmediatamente.
+## 3. Política de Cero Código Muerto, CMS-First & Calidad
+- Eliminar huérfanos inmediatamente (`npx tsc --noEmit --noUnusedLocals --noUnusedParameters` limpio en módulos modificados).
 - Prohibido código comentado (`// old code`).
 - Cero imports sin usar y cero `console.log()` de depuración.
-- Validación obligatoria con `npx tsc --noEmit` con 0 errores.
+- Validación obligatoria con `npx next typegen`, `npx tsc --noEmit` y `npm run lint` con **0 errores** (y `npm run build` tras cambios estructurales).
+- **100% Configurable vía CMS (`configuracion_tienda`):** Identidad oficial (**`EL CATADOR.`**, sede unificada **`C.C. Ciudad Catador Local N1`**), Tasa BCV, tarifas GPS, métodos de pago (**Pago Móvil, Transferencia Bancaria, Zelle y Efectivo USD**) y bloques de portada administrables desde `/admin`.
+- **Cero Etiquetas IA:** Prohibido mostrar badges o menciones a "IA" en la tienda pública; franja del buscador con `POPULAR:` (`Buchanan's`, `Santa Teresa 1796`, `Polar Pilsen`, `Corona`, `Harina P.A.N.`) y `RECIENTES:` reales del usuario.
 - Bimonetarismo permanente: todo precio debe renderizar en USD ($) y VES (Bs. BCV).
 
 ## 4. Estándares de Conversión UX y Jerarquía Visual (7 Reglas de Oro)

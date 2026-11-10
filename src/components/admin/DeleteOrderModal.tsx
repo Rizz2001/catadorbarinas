@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 
 interface DeleteOrderModalProps {
