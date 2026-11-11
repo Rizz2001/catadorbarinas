@@ -343,30 +343,22 @@ export default function CheckoutPage() {
   };
 
   return (
-    <main className="container mx-auto px-4 py-6 md:py-8 space-y-5 max-w-4xl">
-      <div className="flex items-center justify-between border-b border-slate-200 pb-3">
-        <div>
-          <h1 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">
-            {currentStep === 4 ? 'Sala de Atención en Vivo' : 'Checkout Paso a Paso'}
-          </h1>
-          <p className="text-xs text-slate-500">
-            {currentStep === 1 && 'Paso 1 de 4: Completa tus datos y ubicación de entrega'}
-            {currentStep === 2 && 'Paso 2 de 4: Selecciona tu método de pago bimonetario'}
-            {currentStep === 3 && 'Paso 3 de 4: Verifica el resumen de tu orden'}
-            {currentStep === 4 && 'Paso 4 de 4: Coordina tu pedido en tiempo real con el administrador'}
-          </p>
-        </div>
+    <main className="container mx-auto px-3 sm:px-4 py-4 md:py-8 pb-24 md:pb-8 space-y-4 sm:space-y-5 max-w-3xl">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+          {currentStep === 4 ? 'Sala de Atención en Vivo' : 'Finalizar Compra'}
+        </h1>
         {currentStep < 4 && (
           <Link
             href="/carrito"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-catador-blue hover:underline shrink-0"
           >
-            <ArrowLeft className="h-3.5 w-3.5" /> Carrito
+            <ArrowLeft className="h-3.5 w-3.5" /> Volver al carrito
           </Link>
         )}
       </div>
 
-      {/* Barra de Progreso de los 4 Pasos */}
+      {/* Barra de Progreso Compacta */}
       <CheckoutWizardStepper
         currentStep={currentStep}
         orderCreated={Boolean(createdOrder)}
@@ -377,7 +369,7 @@ export default function CheckoutPage() {
       />
 
       {errorMessage && (
-        <div className="flex items-center gap-2 p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 animate-in fade-in">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 border border-red-100 text-xs font-semibold text-red-700 animate-in fade-in">
           <AlertCircle className="h-4 w-4 shrink-0 text-red-500" />
           <span>{errorMessage}</span>
         </div>
@@ -385,13 +377,11 @@ export default function CheckoutPage() {
 
       {/* PASO 1: DATOS DEL CLIENTE Y ENTREGA */}
       {currentStep === 1 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-5">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h2 className="text-sm sm:text-base font-extrabold text-slate-900">
-              1. Datos del Cliente y Ubicación de Entrega
-            </h2>
-            <span className="text-xs font-bold text-catador-blue">
-              Subtotal: {formatUsd(baseTotals.subtotalUsd)}
+        <section className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
+            <h2 className="text-sm font-black text-slate-900">Datos y Entrega</h2>
+            <span className="text-xs font-bold text-slate-500 tabular-nums">
+              Subtotal: <strong className="text-slate-900">{formatUsd(baseTotals.subtotalUsd)}</strong>
             </span>
           </div>
 
@@ -402,13 +392,13 @@ export default function CheckoutPage() {
             bcvRate={bcvRate}
           />
 
-          <div className="pt-3 border-t border-slate-100 flex justify-end">
+          <div className="pt-2 flex justify-end">
             <button
               type="button"
               onClick={handleNextFromStep1}
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light px-6 py-3.5 text-sm font-extrabold text-white shadow-md transition-all cursor-pointer"
+              className="w-full sm:w-auto min-h-[46px] inline-flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-6 py-3 text-sm font-extrabold text-white shadow-sm transition-all cursor-pointer"
             >
-              <span>Siguiente: Método de Pago</span>
+              <span>Continuar al Pago</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -417,14 +407,12 @@ export default function CheckoutPage() {
 
       {/* PASO 2: MÉTODO DE PAGO Y PAGO */}
       {currentStep === 2 && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-2xs space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-            <h2 className="text-sm sm:text-base font-extrabold text-slate-900">
-              2. Método de Pago y Registro de Pago
-            </h2>
-            <div className="rounded-xl bg-blue-50 border border-blue-100 px-3 py-1.5 text-xs font-extrabold text-catador-blue">
-              Total con Delivery: {formatUsd(finalTotalUsd)} • {formatVes(finalTotalVes)}
-            </div>
+        <section className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6 shadow-sm space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-2.5">
+            <h2 className="text-sm font-black text-slate-900">Método de Pago</h2>
+            <span className="text-xs font-bold text-catador-blue tabular-nums">
+              {formatUsd(finalTotalUsd)} · {formatVes(finalTotalVes)}
+            </span>
           </div>
 
           <CheckoutPaymentForm
@@ -435,22 +423,22 @@ export default function CheckoutPage() {
             onChange={(updated) => setPaymentData((prev) => ({ ...prev, ...updated }))}
           />
 
-          <div className="pt-3 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-center justify-between gap-3">
+          <div className="pt-2 flex flex-col-reverse sm:flex-row items-center justify-between gap-2.5">
             <button
               type="button"
               onClick={() => setCurrentStep(1)}
-              className="w-full sm:w-auto min-h-[46px] inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 px-5 py-3 text-xs font-extrabold text-slate-700 transition-colors cursor-pointer"
+              className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-2 rounded-full border border-gray-200 bg-white hover:bg-slate-50 px-5 py-2.5 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>Atrás: Datos del Cliente</span>
+              <span>Atrás</span>
             </button>
 
             <button
               type="button"
               onClick={handleNextFromStep2}
-              className="w-full sm:w-auto min-h-[48px] inline-flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light px-6 py-3.5 text-sm font-extrabold text-white shadow-md transition-all cursor-pointer"
+              className="w-full sm:w-auto min-h-[46px] inline-flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-6 py-3 text-sm font-extrabold text-white shadow-sm transition-all cursor-pointer"
             >
-              <span>Siguiente: Resumen de la Orden</span>
+              <span>Revisar Orden</span>
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
@@ -466,7 +454,6 @@ export default function CheckoutPage() {
           subtotalUsd={baseTotals.subtotalUsd}
           subtotalVes={baseTotals.subtotalVes}
           shippingUsd={shippingUsd}
-          shippingVes={shippingVes}
           totalUsd={finalTotalUsd}
           totalVes={finalTotalVes}
           bcvRate={bcvRate}

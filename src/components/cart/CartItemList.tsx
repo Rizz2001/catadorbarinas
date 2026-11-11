@@ -55,28 +55,28 @@ export function CartItemList() {
   }
 
   return (
-    <div className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden">
-      <div className="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between gap-2">
+    <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+      <div className="p-3.5 sm:p-5 border-b border-gray-100 flex items-center justify-between gap-2">
         <h2 className="text-[15px] sm:text-base font-black text-slate-900 tabular-nums">
           Artículos en tu Carrito ({items.reduce((acc, i) => acc + i.quantity, 0)})
         </h2>
         <button
           type="button"
           onClick={clearCart}
-          className="min-h-[36px] px-2 text-xs font-bold text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors cursor-pointer"
+          className="min-h-[36px] px-2 text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors cursor-pointer"
         >
           <Trash2 className="h-3.5 w-3.5" /> Vaciar
         </button>
       </div>
 
       {lastStockWarning && (
-        <div className="mx-3.5 sm:mx-4 mt-3 p-3 rounded-xl bg-catador-amber-soft border border-catador-amber-oak/70 flex items-center gap-2 text-xs font-bold text-[#8B3E03]">
+        <div className="mx-3.5 sm:mx-4 mt-3 p-3 rounded-xl bg-catador-amber-soft/70 flex items-center gap-2 text-xs font-semibold text-[#8B3E03]">
           <AlertTriangle className="h-4 w-4 text-catador-amber shrink-0" />
           <span>{lastStockWarning}</span>
         </div>
       )}
 
-      <div className="divide-y divide-slate-100 p-3.5 sm:p-5 space-y-3.5 sm:space-y-4">
+      <div className="divide-y divide-gray-100 p-3.5 sm:p-5 space-y-3.5 sm:space-y-4">
         {items.map((item) => (
           <CartPageItemRow
             key={`${item.product.id}-${item.purchaseMode || 'unidad'}`}
@@ -91,7 +91,7 @@ export function CartItemList() {
         ))}
       </div>
 
-      <div className="p-4 bg-[#F7F8FA] border-t border-slate-100">
+      <div className="p-4 bg-slate-50/70 border-t border-gray-100">
         <Link href="/catalogo" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-catador-blue hover:text-catador-blue-dark transition-colors">
           <ArrowLeft className="h-3.5 w-3.5" /> Seguir Comprando
         </Link>

@@ -58,7 +58,7 @@ export function CartPageItemRow({
   return (
     <div className="pt-3.5 sm:pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
       <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
-        <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-white border border-slate-100 shadow-xs p-1.5 overflow-hidden">
+        <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-slate-50/70 p-1.5 overflow-hidden">
           <Image src={itemImg} alt={product.name} fill sizes="80px" className={cn('object-contain', isNoImg && 'p-2 opacity-80')} />
         </div>
         <div className="min-w-0 flex-1">
@@ -67,7 +67,7 @@ export function CartPageItemRow({
               {product.brand}
             </span>
             {supportsBothModes ? (
-              <div className="inline-flex rounded-full bg-[#F7F8FA] p-0.5 border border-slate-200">
+              <div className="inline-flex rounded-full bg-slate-100 p-0.5">
                 <button
                   type="button"
                   onClick={() => onSwitchMode(product.id, mode, 'unidad')}

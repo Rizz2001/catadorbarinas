@@ -38,11 +38,11 @@ export function CheckoutPaymentDetails({
     const tel = storeConfig?.pago_movil_telefono || '0414-5738890';
 
     return (
-      <div className="rounded-2xl border border-slate-200 bg-[#F7F8FA] p-3.5 sm:p-4 space-y-4">
+      <div className="rounded-xl border border-gray-100 bg-slate-50/70 p-3.5 sm:p-4 space-y-3.5">
         <CopyableFieldsBox
-          title="Datos Oficiales para Pago Móvil"
+          title="Pago Móvil"
           gridClass="grid-cols-1 sm:grid-cols-3"
-          amountLabel={`Monto exacto a transferir: ${formatVes(totalVes)}`}
+          amountLabel={formatVes(totalVes)}
           copiedField={copiedField}
           onCopy={onCopy}
           fields={[
@@ -54,10 +54,10 @@ export function CheckoutPaymentDetails({
         <ReferenceAndReceiptFields
           bancoLabel="Banco Emisor *"
           bancoPlaceholder="Ej: Banesco, Mercantil, Venezuela"
-          refLabel="Número de Referencia (Últimos 6 dígitos) *"
+          refLabel="Referencia (Últimos 6 dígitos) *"
           refPlaceholder="Ej: 549120"
           refMaxLength={8}
-          uploadLabel="Comprobante de Pago Móvil (Capture) *"
+          uploadLabel="Comprobante (Capture) *"
           paymentData={paymentData}
           onChange={onChange}
           onFileChange={onFileChange}
@@ -73,27 +73,27 @@ export function CheckoutPaymentDetails({
     const rif = storeConfig?.transferencia_cedula || 'V-22582611';
 
     return (
-      <div className="rounded-2xl border border-slate-200 bg-[#F7F8FA] p-3.5 sm:p-4 space-y-4">
+      <div className="rounded-xl border border-gray-100 bg-slate-50/70 p-3.5 sm:p-4 space-y-3.5">
         <CopyableFieldsBox
-          title="Datos Oficiales para Transferencia Bancaria"
+          title="Transferencia Bancaria"
           gridClass="grid-cols-1 sm:grid-cols-2"
-          amountLabel={`Monto exacto a transferir: ${formatVes(totalVes)}`}
+          amountLabel={formatVes(totalVes)}
           copiedField={copiedField}
           onCopy={onCopy}
           fields={[
             { id: 'tf_banco', label: 'Banco Receptor', value: banco, copyValue: storeConfig?.transferencia_banco || 'Banco Mercantil' },
             { id: 'tf_tipo', label: 'Tipo de Cuenta', value: storeConfig?.transferencia_tipo_cuenta || 'Cuenta Corriente' },
-            { id: 'tf_cuenta', label: 'Número de Cuenta (20 dígitos)', value: cuenta, copyValue: cuenta, monoLarge: true, colSpanFull: true },
-            { id: 'tf_titular', label: 'Titular de la Cuenta', value: titular, copyValue: titular },
+            { id: 'tf_cuenta', label: 'Número de Cuenta', value: cuenta, copyValue: cuenta, monoLarge: true, colSpanFull: true },
+            { id: 'tf_titular', label: 'Titular', value: titular, copyValue: titular },
             { id: 'tf_rif', label: 'RIF / Cédula', value: rif, copyValue: rif },
           ]}
         />
         <ReferenceAndReceiptFields
-          bancoLabel="Banco Emisor / Origen *"
-          bancoPlaceholder="Ej: Mercantil, Banesco, Venezuela, Provincial..."
-          refLabel="Número de Referencia o Comprobante *"
-          refPlaceholder="Ej: 00482910 o últimos dígitos"
-          uploadLabel="Comprobante de Transferencia (Capture) *"
+          bancoLabel="Banco Emisor *"
+          bancoPlaceholder="Ej: Mercantil, Banesco, Venezuela..."
+          refLabel="Referencia o Comprobante *"
+          refPlaceholder="Ej: 00482910"
+          uploadLabel="Comprobante (Capture) *"
           paymentData={paymentData}
           onChange={onChange}
           onFileChange={onFileChange}
@@ -107,21 +107,21 @@ export function CheckoutPaymentDetails({
     const zelleTitular = storeConfig?.zelle_titular || 'Gran Catador LLC';
 
     return (
-      <div className="rounded-2xl border border-slate-200 bg-[#F7F8FA] p-3.5 sm:p-4 space-y-4">
+      <div className="rounded-xl border border-gray-100 bg-slate-50/70 p-3.5 sm:p-4 space-y-3.5">
         <CopyableFieldsBox
-          title="Datos Oficiales Zelle"
+          title="Datos Zelle"
           gridClass="grid-cols-1"
-          amountLabel={`Monto exacto a transferir: ${formatUsd(totalUsd)}`}
+          amountLabel={formatUsd(totalUsd)}
           copiedField={copiedField}
           onCopy={onCopy}
           fields={[
-            { id: 'zelle', label: `Correo Zelle · Titular: ${zelleTitular}`, value: zelleEmail, copyValue: zelleEmail },
+            { id: 'zelle', label: `Correo · Titular: ${zelleTitular}`, value: zelleEmail, copyValue: zelleEmail },
           ]}
         />
         <ReferenceAndReceiptFields
           bancoLabel="Nombre del Titular Emisor *"
           bancoPlaceholder="Nombre completo en cuenta Zelle"
-          refLabel="Referencia o Confirmación Zelle *"
+          refLabel="Confirmación Zelle *"
           refPlaceholder="Ej: ZL-894120"
           uploadLabel="Comprobante Zelle (Capture) *"
           paymentData={paymentData}
@@ -133,10 +133,10 @@ export function CheckoutPaymentDetails({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-[#F7F8FA] p-3.5 sm:p-4 space-y-4">
+    <div className="rounded-xl border border-gray-100 bg-slate-50/70 p-3.5 sm:p-4 space-y-3.5">
       <div>
-        <label className="block text-xs font-extrabold text-slate-700 mb-2">
-          ¿Con qué billete en divisas ($ USD) pagarás al recibir?
+        <label className="block text-xs font-semibold text-slate-600 mb-2">
+          ¿Con qué billete ($ USD) pagarás al recibir?
         </label>
         <div className="grid grid-cols-2 xs:grid-cols-4 gap-2">
           {[20, 50, 100].map((bill) => (
@@ -145,10 +145,10 @@ export function CheckoutPaymentDetails({
               type="button"
               onClick={() => onBillSelect(bill)}
               className={cn(
-                'p-2.5 min-h-[44px] rounded-full border text-center font-black text-xs transition-all cursor-pointer tabular-nums',
+                'p-2 min-h-[40px] rounded-lg border text-center font-bold text-xs transition-colors cursor-pointer tabular-nums',
                 paymentData.billetePagoUsd === bill
                   ? 'border-catador-blue bg-catador-blue text-white'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                  : 'border-gray-200 bg-white text-slate-700 hover:bg-slate-50'
               )}
             >
               ${bill}
@@ -158,25 +158,25 @@ export function CheckoutPaymentDetails({
             type="button"
             onClick={() => onBillSelect(Math.ceil(totalUsd))}
             className={cn(
-              'p-2.5 min-h-[44px] rounded-full border text-center font-bold text-xs transition-all cursor-pointer',
+              'p-2 min-h-[40px] rounded-lg border text-center font-bold text-xs transition-colors cursor-pointer',
               paymentData.billetePagoUsd === Math.ceil(totalUsd)
                 ? 'border-catador-blue bg-catador-blue text-white'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                : 'border-gray-200 bg-white text-slate-700 hover:bg-slate-50'
             )}
           >
-            Monto Exacto
+            Exacto
           </button>
         </div>
       </div>
 
-      <div className="rounded-xl bg-white border border-slate-200 p-3 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-xs tabular-nums">
+      <div className="rounded-lg bg-white border border-gray-100 p-3 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-xs tabular-nums">
         <div>
-          <span className="text-slate-600 block text-[11px]">Total a pagar:</span>
-          <span className="font-extrabold text-slate-900">{formatUsd(totalUsd)}</span>
+          <span className="text-slate-500 block text-[11px]">Total a pagar</span>
+          <span className="font-bold text-slate-900">{formatUsd(totalUsd)}</span>
         </div>
         <div className="xs:text-right">
-          <span className="text-slate-600 block text-[11px]">Vuelto que llevará el repartidor:</span>
-          <span className="font-black text-emerald-600 text-sm font-mono">
+          <span className="text-slate-500 block text-[11px]">Vuelto que llevará el repartidor</span>
+          <span className="font-bold text-emerald-600 text-sm">
             {formatUsd(paymentData.vueltoCalculadoUsd)} ({formatVes(paymentData.vueltoCalculadoUsd * bcvRate)})
           </span>
         </div>

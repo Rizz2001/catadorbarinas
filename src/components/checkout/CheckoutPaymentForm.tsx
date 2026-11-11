@@ -66,10 +66,10 @@ export function CheckoutPaymentForm({
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div
         className={cn(
-          'grid grid-cols-2 gap-2 sm:gap-2.5',
+          'grid grid-cols-2 gap-2',
           visiblePaymentOptions.length === 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-4'
         )}
       >
@@ -79,13 +79,13 @@ export function CheckoutPaymentForm({
             type="button"
             onClick={() => onChange({ metodoPago: id })}
             className={cn(
-              'flex flex-col items-center justify-center p-3 min-h-[58px] rounded-2xl border text-center transition-all cursor-pointer',
+              'flex flex-col items-center justify-center p-2.5 min-h-[54px] rounded-xl border text-center transition-colors cursor-pointer',
               paymentData.metodoPago === id
-                ? 'border-catador-blue bg-blue-50/50 text-catador-blue ring-2 ring-catador-blue/15'
-                : 'border-slate-200 bg-white text-slate-600 hover:bg-[#F7F8FA]'
+                ? 'border-catador-blue bg-catador-blue/5 text-catador-blue'
+                : 'border-gray-200 bg-white text-slate-500 hover:bg-slate-50'
             )}
           >
-            <Icon className="h-5 w-5 mb-1 shrink-0" />
+            <Icon className="h-4 w-4 mb-1 shrink-0" />
             <div>
               <span className="text-xs font-bold text-slate-900 block leading-tight">{label}</span>
               <span className="text-[11px] text-slate-500 block leading-tight mt-0.5">{sub}</span>

@@ -45,8 +45,12 @@ export function CartPriceSummaryRows({
         {discountUsd > 0 && (
           <div className="flex items-center justify-between gap-2 text-emerald-600">
             <span>Ahorro aplicado</span>
-            <span className="font-semibold">-{formatUsd(discountUsd)}</span>
-            <span className="sr-only">(-{formatVes(discountVes)})</span>
+            <span className="font-semibold">
+              -{formatUsd(discountUsd)}
+              <span className="text-xs text-emerald-600/75 ml-1.5 font-normal">
+                (-{formatVes(discountVes)})
+              </span>
+            </span>
           </div>
         )}
 

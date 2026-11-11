@@ -83,7 +83,7 @@ export function CartDrawerItemRow({
 
         <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
           {supportsBothModes ? (
-            <div className="inline-flex rounded-full bg-[#F7F8FA] p-0.5 border border-slate-200">
+            <div className="inline-flex rounded-full bg-slate-100 p-0.5">
               <button
                 type="button"
                 onClick={() => onSwitchMode(product.id, mode, 'unidad')}

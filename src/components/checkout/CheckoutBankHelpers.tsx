@@ -4,6 +4,7 @@ import type { ChangeEvent } from 'react';
 import { Copy, Check, UploadCloud } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { PaymentDataState } from './CheckoutPaymentForm';
+import { CHECKOUT_INPUT_CLASS, CHECKOUT_LABEL_CLASS } from './checkoutStyles';
 
 export interface BankFieldRow {
   id: string;
@@ -30,16 +31,19 @@ export function CopyableFieldsBox({
   onCopy: (text: string, fieldId: string) => void;
 }) {
   return (
-    <div className="rounded-xl bg-white p-3.5 border border-slate-200/90 space-y-2.5 text-xs">
-      <span className="font-extrabold text-catador-blue uppercase tracking-wider text-[11px] block">
-        {title}
-      </span>
+    <div className="space-y-2.5 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+          {title}
+        </span>
+        <span className="font-bold text-catador-blue tabular-nums">{amountLabel}</span>
+      </div>
       <div className={cn('grid gap-2 text-slate-700', gridClass)}>
         {fields.map((field) => (
           <div
             key={field.id}
             className={cn(
-              'flex items-center justify-between p-2.5 rounded-xl bg-[#F7F8FA] border border-slate-200/80 gap-2',
+              'flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-gray-100 gap-2',
               field.colSpanFull && 'sm:col-span-2'
             )}
           >
@@ -47,9 +51,9 @@ export function CopyableFieldsBox({
               <div className="text-[11px] text-slate-500">{field.label}</div>
               <div
                 className={cn(
-                  'font-bold text-slate-900',
+                  'font-semibold text-slate-900',
                   field.monoLarge
-                    ? 'font-mono font-black text-sm text-catador-blue tracking-wider select-all break-all'
+                    ? 'font-mono font-bold text-sm text-catador-blue tracking-wider select-all break-all'
                     : 'truncate'
                 )}
               >
@@ -60,7 +64,7 @@ export function CopyableFieldsBox({
               <button
                 type="button"
                 onClick={() => onCopy(field.copyValue!, field.id)}
-                className="p-1.5 text-slate-500 hover:text-catador-blue cursor-pointer shrink-0 rounded-full hover:bg-white transition-colors"
+                className="p-1.5 text-slate-400 hover:text-catador-blue cursor-pointer shrink-0 rounded-lg hover:bg-slate-50 transition-colors"
                 aria-label={`Copiar ${field.label}`}
               >
                 {copiedField === field.id ? (
@@ -72,9 +76,6 @@ export function CopyableFieldsBox({
             )}
           </div>
         ))}
-      </div>
-      <div className="text-right text-xs font-extrabold text-catador-blue font-mono tabular-nums pt-0.5">
-        {amountLabel}
       </div>
     </div>
   );
@@ -103,20 +104,20 @@ export function ReferenceAndReceiptFields({
 }) {
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="block font-extrabold text-slate-700 mb-1.5">{bancoLabel}</label>
+          <label className={CHECKOUT_LABEL_CLASS}>{bancoLabel}</label>
           <input
             type="text"
             required
             placeholder={bancoPlaceholder}
             value={paymentData.bancoOrigen}
             onChange={(e) => onChange({ bancoOrigen: e.target.value })}
-            className="w-full min-h-[44px] rounded-full border border-slate-200 px-4 py-2 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue"
+            className={CHECKOUT_INPUT_CLASS}
           />
         </div>
         <div>
-          <label className="block font-extrabold text-slate-700 mb-1.5">{refLabel}</label>
+          <label className={CHECKOUT_LABEL_CLASS}>{refLabel}</label>
           <input
             type="text"
             required
@@ -124,27 +125,27 @@ export function ReferenceAndReceiptFields({
             placeholder={refPlaceholder}
             value={paymentData.referencia}
             onChange={(e) => onChange({ referencia: e.target.value })}
-            className="w-full min-h-[44px] rounded-full border border-slate-200 px-4 py-2 text-base md:text-xs bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue font-mono"
+            className={cn(CHECKOUT_INPUT_CLASS, 'font-mono')}
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-xs font-extrabold text-slate-700 mb-1.5">{uploadLabel}</label>
-        <div className="relative border-2 border-dashed border-slate-200 rounded-2xl p-3.5 text-center bg-white hover:bg-slate-50 transition-colors cursor-pointer">
+        <label className={CHECKOUT_LABEL_CLASS}>{uploadLabel}</label>
+        <div className="relative border border-dashed border-gray-300 rounded-xl p-3 text-center bg-white hover:bg-slate-50 transition-colors cursor-pointer">
           <input
             type="file"
             accept="image/*"
             onChange={onFileChange}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
           />
-          <UploadCloud className="h-6 w-6 text-catador-blue mx-auto mb-1" />
+          <UploadCloud className="h-5 w-5 text-catador-blue mx-auto mb-1" />
           <p className="text-xs font-semibold text-slate-700 truncate">
             {paymentData.comprobanteFile
               ? paymentData.comprobanteFile.name
-              : 'Haz clic o arrastra tu comprobante aquí'}
+              : 'Subir captura del comprobante'}
           </p>
-          <p className="text-[11px] text-slate-400">PNG, JPG o JPEG (Máximo 5MB)</p>
+          <p className="text-[11px] text-slate-400">PNG o JPG (Máx. 5MB)</p>
         </div>
       </div>
     </>
