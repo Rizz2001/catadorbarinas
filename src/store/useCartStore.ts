@@ -1,10 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CartItem, CartTotals, Product, PurchaseMode } from '@/types';
-import { convertUsdToVes, DEFAULT_BCV_RATE } from '@/lib/currency';
+import { calculateCartTotals, DEFAULT_BCV_RATE } from '@/lib/currency';
 import {
   getDefaultPurchaseMode,
-  getEffectivePriceUsd,
   getMaxAllowedQuantity,
   getUnitsPerPurchaseMode,
   validateStockAddition,
@@ -277,46 +276,7 @@ export const useCartStore = create<CartState>()(
       },
 
       getTotals: (bcvRate = DEFAULT_BCV_RATE): CartTotals => {
-        const { items } = get();
-
-        let subtotalUsd = 0;
-        let discountUsd = 0;
-        let itemCount = 0;
-
-        items.forEach(({ product, quantity, purchaseMode }) => {
-          const mode = purchaseMode || 'unidad';
-          const effectivePrice = getEffectivePriceUsd(product, mode);
-          subtotalUsd += effectivePrice * quantity;
-          itemCount += quantity;
-
-          const units = getUnitsPerPurchaseMode(product, mode);
-          const regularTotalPerItem =
-            (product.originalPriceUsd || product.priceUsd) * units;
-
-          if (regularTotalPerItem > effectivePrice) {
-            discountUsd += (regularTotalPerItem - effectivePrice) * quantity;
-          }
-        });
-
-        const shippingUsd = subtotalUsd >= 30 || subtotalUsd === 0 ? 0 : 2.0;
-        const totalUsd = subtotalUsd + shippingUsd;
-
-        const subtotalVes = convertUsdToVes(subtotalUsd, bcvRate);
-        const discountVes = convertUsdToVes(discountUsd, bcvRate);
-        const shippingVes = convertUsdToVes(shippingUsd, bcvRate);
-        const totalVes = convertUsdToVes(totalUsd, bcvRate);
-
-        return {
-          subtotalUsd: Number(subtotalUsd.toFixed(2)),
-          subtotalVes,
-          discountUsd: Number(discountUsd.toFixed(2)),
-          discountVes,
-          shippingUsd: Number(shippingUsd.toFixed(2)),
-          shippingVes,
-          totalUsd: Number(totalUsd.toFixed(2)),
-          totalVes,
-          itemCount,
-        };
+        return calculateCartTotals(get().items, bcvRate);
       },
     }),
     {

@@ -29,7 +29,19 @@ export function createClient() {
   return clientInstance;
 }
 
+type BrowserSupabaseClient = ReturnType<typeof createBrowserClient>;
+
 /**
- * Instancia singleton para uso directo en Client Components
+ * Instancia singleton perezosa para uso directo en Client Components.
+ * Evita evaluar `createBrowserClient` durante el escaneo estático de rutas en `next build`.
  */
-export const supabase = createClient();
+export const supabase: BrowserSupabaseClient = new Proxy(
+  {} as BrowserSupabaseClient,
+  {
+    get(_target, prop) {
+      const client = createClient();
+      const value = Reflect.get(client, prop, client);
+      return typeof value === 'function' ? value.bind(client) : value;
+    },
+  }
+);

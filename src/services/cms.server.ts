@@ -21,9 +21,9 @@ export function invalidateServerCmsCache() {
 /**
  * Obtiene los banners activos directamente en Server Components (Cache 60s)
  */
-export async function getBannersServer(): Promise<Banner[]> {
+export async function getAllBannersServer(onlyActive = false): Promise<Banner[]> {
   const now = Date.now();
-  if (cachedBanners && cachedBanners.expiresAt > now) {
+  if (!onlyActive && cachedBanners && cachedBanners.expiresAt > now) {
     return cachedBanners.data;
   }
 
@@ -32,7 +32,6 @@ export async function getBannersServer(): Promise<Banner[]> {
     const { data, error } = await supabase
       .from('banners')
       .select('*')
-      .eq('activo', true)
       .order('orden', { ascending: true });
 
     if (error) {
@@ -41,7 +40,7 @@ export async function getBannersServer(): Promise<Banner[]> {
     }
     const banners = (data || []) as Banner[];
     cachedBanners = { data: banners, expiresAt: now + 60000 };
-    return banners;
+    return onlyActive ? banners.filter((b) => b.activo !== false) : banners;
   } catch (err) {
     console.error('Error cargando banners en servidor:', err);
     return [];

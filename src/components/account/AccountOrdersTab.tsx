@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Package, Clock, ArrowRight, Truck, MapPin } from 'lucide-react';
+import { Package, Clock, ChevronRight, Truck, MapPin } from 'lucide-react';
 import { PedidoConDetalles, EstadoPedido } from '@/types';
 import { formatUsd, formatVes } from '@/lib/currency';
 import { IMAGE_FALLBACKS } from '@/constants/config';
@@ -17,31 +16,31 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
     switch (st) {
       case 'recibido':
         return (
-          <span className="bg-amber-100 text-amber-900 border border-amber-300 text-xs font-black px-2.5 py-0.5 rounded-full">
+          <span className="bg-catador-amber-soft text-[#8B3E03] border border-catador-amber-oak/70 text-xs font-black px-2.5 py-0.5 rounded-full">
             Recibido
           </span>
         );
       case 'preparando':
         return (
-          <span className="bg-blue-100 text-catador-blue border border-blue-300 text-xs font-black px-2.5 py-0.5 rounded-full">
+          <span className="bg-blue-50 text-catador-blue border border-blue-200 text-xs font-black px-2.5 py-0.5 rounded-full">
             En Bodegón
           </span>
         );
       case 'en_camino':
         return (
-          <span className="bg-slate-900 text-white text-xs font-black px-2.5 py-0.5 rounded-full">
-            En Ruta
+          <span className="bg-catador-blue text-white text-xs font-black px-2.5 py-0.5 rounded-full">
+            En Camino
           </span>
         );
       case 'entregado':
         return (
-          <span className="bg-emerald-100 text-emerald-900 border border-emerald-300 text-xs font-black px-2.5 py-0.5 rounded-full">
+          <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black px-2.5 py-0.5 rounded-full">
             Entregado
           </span>
         );
       case 'cancelado':
         return (
-          <span className="bg-rose-100 text-rose-900 border border-rose-300 text-xs font-black px-2.5 py-0.5 rounded-full">
+          <span className="bg-rose-50 text-rose-800 border border-rose-200 text-xs font-black px-2.5 py-0.5 rounded-full">
             Cancelado
           </span>
         );
@@ -56,23 +55,23 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
 
   if (orders.length === 0) {
     return (
-      <section className="rounded-2xl border border-slate-200 bg-white p-10 sm:p-14 text-center space-y-3.5 shadow-sm">
-        <div className="h-16 w-16 mx-auto rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-400">
+      <section className="rounded-2xl border border-slate-200 bg-white p-10 sm:p-14 text-center space-y-3.5">
+        <div className="h-16 w-16 mx-auto rounded-full bg-[#F7F8FA] border border-slate-200 flex items-center justify-center text-slate-400">
           <Package className="h-8 w-8 stroke-1" />
         </div>
         <div className="space-y-1">
           <h3 className="text-base font-black text-slate-900">Aún no tienes pedidos registrados</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Cuando realices compras de licores o víveres en Gran Catador, aquí podrás rastrear el estado del motorizado y chatear con el bodegón en tiempo real.
+          <p className="text-[13px] text-slate-600 max-w-sm mx-auto">
+            Cuando realices compras en EL CATADOR., aquí podrás rastrear el estado en vivo y chatear con nuestro equipo.
           </p>
         </div>
         <div className="pt-2">
           <Link
             href="/catalogo"
-            className="inline-flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light text-white font-extrabold text-xs px-5 py-3 min-h-[44px] shadow-sm transition-colors"
+            className="inline-flex items-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark text-white font-extrabold text-xs px-6 py-3 min-h-[44px] transition-colors"
           >
-            <span>Explorar Catálogo y Ofertas</span>
-            <ArrowRight className="h-4 w-4" />
+            <span>Explorar Catálogo</span>
+            <ChevronRight className="h-4 w-4" />
           </Link>
         </div>
       </section>
@@ -83,9 +82,9 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
     <section className="space-y-3.5">
       <div className="flex items-center justify-between pb-1">
         <h2 className="text-base font-black text-slate-900 tracking-tight">
-          Historial de Pedidos y Envíos ({orders.length})
+          Historial de Pedidos ({orders.length})
         </h2>
-        <span className="text-xs font-bold text-slate-500">Actualización en tiempo real</span>
+        <span className="text-xs font-bold text-slate-500">En tiempo real</span>
       </div>
 
       <div className="space-y-3">
@@ -95,16 +94,15 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
           return (
             <div
               key={order.id}
-              className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm hover:border-catador-blue/40 transition-colors space-y-3"
+              className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 hover:border-catador-blue/60 transition-colors space-y-3"
             >
-              {/* Cabecera de la Tarjeta */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2.5 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-black text-sm text-slate-900 tabular-nums">
                     #{order.numero_orden}
                   </span>
                   {getStatusBadge(order.estado_pedido)}
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 flex items-center gap-1">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F7F8FA] border border-slate-200 text-slate-700 flex items-center gap-1">
                     {order.tipo_entrega === 'delivery' ? (
                       <>
                         <Truck className="h-3 w-3 text-catador-amber" />
@@ -119,7 +117,7 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-xs text-slate-500 tabular-nums">
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 tabular-nums">
                   <Clock className="h-3.5 w-3.5 text-slate-400" />
                   <span>
                     {new Date(order.created_at).toLocaleDateString('es-VE', {
@@ -133,25 +131,24 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
                 </div>
               </div>
 
-              {/* Vista de Miniaturas de Artículos */}
               <div className="flex items-center gap-3 overflow-x-auto py-1 no-scrollbar">
                 <div className="flex items-center -space-x-2 shrink-0">
                   {order.items.slice(0, 4).map((it) => (
                     <div
                       key={it.id}
-                      className="relative h-11 w-11 rounded-xl bg-slate-50 border-2 border-white overflow-hidden shadow-xs shrink-0"
+                      className="relative h-11 w-11 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0"
                     >
                       <Image
                         src={it.imagen_url || IMAGE_FALLBACKS.product}
-                        alt={it.nombre_articulo}
+                        alt={itemNameSafe(it.nombre_articulo)}
                         fill
                         sizes="44px"
-                        className="object-contain p-0.5"
+                        className="object-contain p-1"
                       />
                     </div>
                   ))}
                   {order.items.length > 4 && (
-                    <div className="relative h-11 w-11 rounded-xl bg-slate-800 text-white font-black text-xs border-2 border-white flex items-center justify-center shadow-xs shrink-0">
+                    <div className="relative h-11 w-11 rounded-xl bg-catador-blue-dark text-white font-black text-xs border-2 border-white flex items-center justify-center shrink-0">
                       +{order.items.length - 4}
                     </div>
                   )}
@@ -161,29 +158,28 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
                   <p className="text-xs font-bold text-slate-800 truncate">
                     {order.items.map((i) => `${i.cantidad}x ${i.nombre_articulo}`).join(', ')}
                   </p>
-                  <p className="text-[11px] text-slate-500 font-medium">
-                    {itemCount} {itemCount === 1 ? 'unidad' : 'unidades'} en total
+                  <p className="text-xs text-slate-500 font-medium tabular-nums">
+                    {itemCount} {itemCount === 1 ? 'artículo' : 'artículos'}
                   </p>
                 </div>
               </div>
 
-              {/* Pie de Tarjeta con Precios y Botón de Tracking */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2 border-t border-slate-100">
                 <div className="tabular-nums">
-                  <span className="text-base font-black text-catador-blue">
+                  <span className="text-base font-black text-slate-900">
                     {formatUsd(order.total_usd)}
                   </span>
-                  <span className="text-xs font-bold text-slate-500 ml-2">
+                  <span className="text-xs font-bold text-slate-600 ml-2">
                     ({formatVes(order.total_ves)})
                   </span>
                 </div>
 
                 <Link
                   href={`/pedidos/${order.id}`}
-                  className="flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 min-h-[44px] text-xs font-black transition-colors shadow-xs"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full bg-catador-blue hover:bg-catador-blue-dark text-white px-5 py-2.5 min-h-[42px] text-xs font-extrabold transition-colors"
                 >
-                  <span>Sala de Tracking & Chat en Vivo</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <span>Seguir en Vivo</span>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -194,3 +190,6 @@ export function AccountOrdersTab({ orders }: AccountOrdersTabProps) {
   );
 }
 
+function itemNameSafe(name?: string | null): string {
+  return name || 'Producto EL CATADOR.';
+}

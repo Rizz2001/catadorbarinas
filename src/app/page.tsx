@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   HeroBanner,
   TrustValueBar,
@@ -8,18 +7,14 @@ import {
   LiveCatalogSection,
   AlliedBrandsSection,
 } from '@/components/ecommerce';
-import {
-  deriveFeaturedDeals,
-  deriveWeeklyTrends,
-  deriveStarProduct,
-} from '@/services/productService';
+import { deriveStarProduct } from '@/services/productService';
 import {
   fetchGruposInv,
   fetchSubgruposInv,
-  fetchArticulosSmartVentas,
+  fetchHomeCuratedSections,
 } from '@/services/foxdata.service';
 import {
-  getBannersServer,
+  getAllBannersServer,
   getQuickCategoriesServer,
   getStoreConfigServer,
   getAlliedBrandsServer,
@@ -30,28 +25,30 @@ export const revalidate = 60;
 
 export default async function HomePage() {
   const [
-    allProducts,
+    curatedHome,
     groups,
     initialSubgroups,
-    banners,
+    allBanners,
     quickCategories,
     storeConfig,
     alliedBrands,
   ] = await Promise.all([
-    fetchArticulosSmartVentas('01'),
+    fetchHomeCuratedSections(),
     fetchGruposInv(),
     fetchSubgruposInv('01'),
-    getBannersServer(),
+    getAllBannersServer(false),
     getQuickCategoriesServer(),
     getStoreConfigServer(),
     getAlliedBrandsServer(),
   ]);
 
-  const featuredDeals = deriveFeaturedDeals(allProducts);
-  const weeklyTrends = deriveWeeklyTrends(allProducts);
+  const banners = allBanners.filter((b) => b.activo !== false);
+  const allProducts = curatedHome.allPool;
+  const featuredDeals = curatedHome.dealsProducts;
+  const weeklyTrends = curatedHome.trendsProducts;
   const starProduct = deriveStarProduct(allProducts);
   const leanInitialProducts = allProducts.slice(0, 40);
-  const heroBanner = banners.find((b) => b.tipo === 'hero') || null;
+  const heroBanner = allBanners.find((b) => b.tipo === 'hero') || null;
 
   // Armamos la lista de 3 a 5 productos destacados/ofertas para el carrusel del Hero
   const heroCarouselCandidates = [
@@ -74,8 +71,8 @@ export default async function HomePage() {
     .slice(0, 5);
 
   return (
-    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-10 overflow-x-clip">
-      {/* 1. Hero Banner Principal y Departamentos Rápidos */}
+    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-7 space-y-6 sm:space-y-8 overflow-x-clip">
+      {/* 1. Hero Banner Principal + 4 Bento Cards + Píldoras de Categorías Rápidas */}
       <HeroBanner
         initialBanner={heroBanner}
         initialQuickCategories={quickCategories}
@@ -83,26 +80,7 @@ export default async function HomePage() {
         heroProducts={heroProducts}
       />
 
-      {/* 2. Banda Arquitectónica de Garantías y Métricas */}
-      <TrustValueBar
-        initialMetrics={storeConfig?.metricas_confianza}
-        active={storeConfig?.seccion_confianza_activa}
-      />
-
-      {/* 3. Colecciones Destacadas del Bodegón (Editables en CMS) */}
-      <PromoBannersGrid banners={banners} />
-
-      {/* 4. Ofertas Destacadas del Día con Contador Regresivo Tabular */}
-      {storeConfig?.seccion_ofertas_activa !== false && (
-        <div id="ofertas">
-          <FeaturedDealsBox
-            products={featuredDeals}
-            customTitle={storeConfig?.seccion_ofertas_titulo}
-          />
-        </div>
-      )}
-
-      {/* 5. Tendencias de la Semana */}
+      {/* 2. Selección del Catador · Por Unidad o Caja (Contenedor Blanco Opción C) */}
       {storeConfig?.seccion_tendencias_activa !== false && (
         <WeeklyTrendsBento
           products={weeklyTrends}
@@ -111,6 +89,25 @@ export default async function HomePage() {
           customSubtitle={storeConfig?.seccion_tendencias_subtitulo}
         />
       )}
+
+      {/* 3. Ofertas Destacadas del Día con Contador Regresivo Tabular */}
+      {storeConfig?.seccion_ofertas_activa !== false && (
+        <div id="ofertas" className="scroll-mt-44">
+          <FeaturedDealsBox
+            products={featuredDeals}
+            customTitle={storeConfig?.seccion_ofertas_titulo}
+          />
+        </div>
+      )}
+
+      {/* 4. Colecciones Destacadas del Bodegón (Editables en CMS) */}
+      <PromoBannersGrid banners={banners} />
+
+      {/* 5. Banda Arquitectónica de Garantías y Métricas */}
+      <TrustValueBar
+        initialMetrics={storeConfig?.metricas_confianza}
+        active={storeConfig?.seccion_confianza_activa}
+      />
 
       {/* 6. Empresas y Marcas Aliadas Comerciales */}
       {storeConfig?.seccion_aliados_activa !== false && (

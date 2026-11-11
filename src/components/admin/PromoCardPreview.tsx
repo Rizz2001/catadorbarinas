@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Banner } from '@/types';
 
 interface PromoCardPreviewProps {
@@ -16,29 +15,36 @@ export function PromoCardPreview({ banner }: PromoCardPreviewProps) {
   return (
     <div className="max-w-md mx-auto">
       <div
-        className="relative overflow-hidden rounded-xl p-6 border border-slate-800/40 flex flex-col justify-end group min-h-[190px]"
+        className="relative overflow-hidden rounded-2xl p-6 border border-slate-200 flex flex-col justify-between min-h-[200px]"
         style={{
-          backgroundImage: `linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.58) 60%, rgba(15, 23, 42, 0.25) 100%), url(${bgImage})`,
+          backgroundImage: `linear-gradient(to top, rgba(0, 23, 84, 0.94) 0%, rgba(0, 23, 84, 0.6) 60%, rgba(0, 23, 84, 0.25) 100%), url(${bgImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div className="space-y-1.5">
-          {banner.badge_texto && banner.badge_texto.trim() !== '' && (
-            <span className="inline-block text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
+        <div className="flex items-start justify-between gap-2">
+          {banner.badge_texto && banner.badge_texto.trim() !== '' ? (
+            <span className="inline-block rounded-full bg-[#FEF3C7] border border-[#EB9C53]/70 px-2.5 py-0.5 text-xs font-extrabold text-[#8B3E03]">
               {banner.badge_texto.replace(/^[★✨\s]+/, '')}
             </span>
+          ) : (
+            <span />
           )}
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0F172A] text-white">
+            <ChevronRight className="h-4 w-4" />
+          </span>
+        </div>
+
+        <div className="space-y-1.5 pt-4">
           <h3 className="text-lg font-black text-white leading-tight tracking-tight">
             {banner.titulo || 'Título de la Promoción'}
           </h3>
           <p className="text-xs text-slate-200 line-clamp-2 leading-relaxed">
             {banner.subtitulo || 'Descripción informativa de los productos incluidos en la oferta.'}
           </p>
-          <div className="pt-1.5 inline-flex items-center gap-1.5 text-xs font-extrabold text-amber-300">
-            <span>{banner.boton_texto || 'Ver selección'}</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </div>
+          <span className="inline-block pt-1 text-xs font-extrabold text-[#EB9C53]">
+            {banner.boton_texto || 'Ver selección'}
+          </span>
         </div>
       </div>
     </div>

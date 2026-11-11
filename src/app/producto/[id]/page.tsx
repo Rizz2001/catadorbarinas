@@ -1,8 +1,7 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ChevronRight, ArrowLeft } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { fetchArticulosSmartVentas, fetchProductById } from '@/services/foxdata.service';
 import { ProductDetailView } from '@/components/ecommerce';
 import { formatUsd } from '@/lib/currency';
@@ -114,16 +113,6 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
         <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
         <span className="font-bold text-slate-800 truncate">{product.name}</span>
       </nav>
-
-      {/* Botón Volver */}
-      <div>
-        <Link
-          href={product.codGrupo ? `/catalogo/${product.codGrupo}` : '/catalogo'}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light transition-colors"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver a {product.category}
-        </Link>
-      </div>
 
       {/* Ficha Completa del Producto + Relacionados */}
       <ProductDetailView product={product} relatedProducts={relatedProducts} />

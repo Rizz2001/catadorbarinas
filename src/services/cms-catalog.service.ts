@@ -75,16 +75,6 @@ export async function upsertProductCmsConfig(
   return data as ProductCmsConfig;
 }
 
-export async function deleteProductCmsConfig(codArticulo: string): Promise<void> {
-  cachedProductConfigMap = null;
-  const { error } = await supabase
-    .from('productos_config_cms')
-    .delete()
-    .eq('cod_articulo', codArticulo.trim());
-
-  if (error) throw error;
-}
-
 // ============================================================================
 // MARCAS Y EMPRESAS ALIADAS COMERCIALES
 // ============================================================================

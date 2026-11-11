@@ -5,40 +5,50 @@
 @custom-variant xs (@media (min-width: 480px));
 
 @theme {
-  --color-catador-blue: #00227B;
-  --color-catador-blue-light: #0A38A8;
+  /* Paleta Opción C (Bodegón Moderno Navy & Oro) + Acentos del Logotipo EL CATADOR. */
+  --color-catador-blue: #0F172A;
+  --color-catador-blue-vivid: #0016C2;
+  --color-catador-blue-light: #1E293B;
   --color-catador-blue-dark: #001754;
+  --color-catador-navy: #0F172A;
 
+  /* Ámbar Roble del Barril y Oro Cava */
   --color-catador-amber: #E07A1F;
-  --color-catador-amber-dark: #C85A08;
+  --color-catador-amber-oak: #EB9C53;
+  --color-catador-amber-dark: #B6683E;
+  --color-catador-amber-soft: #FEF3C7;
   --color-catador-amber-light: #FFF7ED;
 
   --color-catador-discount: #EF4444;
   --color-catador-discount-bg: #FEF2F2;
 
-  --color-catador-bg: #F8FAFC;
+  /* Lienzo y Superficies Opción C */
+  --color-catador-bg: #F7F8FA;
   --color-catador-card: #FFFFFF;
   --color-catador-border: #E2E8F0;
 }
 
 :root {
-  --primary-catador: #00227B;
-  --primary-light: #0A38A8;
+  --primary-catador: #0F172A;
+  --primary-vivid: #0016C2;
+  --primary-light: #1E293B;
   --primary-dark: #001754;
 
   --accent-amber: #E07A1F;
-  --accent-amber-dark: #C85A08;
+  --accent-oak: #EB9C53;
+  --accent-amber-dark: #B6683E;
+  --accent-amber-soft: #FEF3C7;
   --accent-amber-light: #FFF7ED;
 
   --alert-discount: #EF4444;
   --alert-discount-bg: #FEF2F2;
 
-  --surface-bg: #F8FAFC;
+  --surface-bg: #F7F8FA;
   --surface-card: #FFFFFF;
   --surface-border: #E2E8F0;
 
   --foreground: #0F172A;
-  --background: #F8FAFC;
+  --background: #F7F8FA;
 }
 
 html,

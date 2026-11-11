@@ -29,15 +29,27 @@ import {
 type MainTab = 'banners' | 'quick_categories';
 type BannerSlot = 'hero' | 'promo_1' | 'promo_2' | 'promo_3';
 
+const HERO_COLOR_PRESETS = [
+  { label: 'Midnight Navy', hex: '#081229' },
+  { label: 'Azul Catador', hex: '#001754' },
+  { label: 'Slate Oscuro', hex: '#0F172A' },
+  { label: 'Negro Carbón', hex: '#111827' },
+  { label: 'Roble Añejo', hex: '#2B160B' },
+];
+
 const DEFAULT_BANNER_SLOTS: Record<BannerSlot, Partial<Banner>> = {
   hero: {
     tipo: 'hero',
-    titulo: 'Licores Importados y Víveres al Precio Oficial en Barinas',
+    titulo: 'CAVAS, LICORES & BODEGÓN ·',
+    titulo_destacado: 'ENTREGA INMEDIATA EN BARINAS',
     subtitulo:
-      'Catálogo completo con precios duales en Dólares ($ USD) y Bolívares (Bs. BCV). Despachos rápidos en toda la ciudad de Barinas.',
-    badge_texto: '',
+      'Compra por unidad o caja cerrada con inventario real en nuestra sede (C.C. Ciudad Catador Local N1) y precios bimonetarios en $ USD y Bs. BCV.',
+    badge_texto: 'BODEGÓN MODERNO · C.C. CIUDAD CATADOR LOCAL N1',
     boton_texto: 'Ver Ofertas del Día',
-    boton_url: '/catalogo',
+    boton_url: '/#ofertas',
+    boton_secundario_texto: 'Explorar Catálogo',
+    boton_secundario_url: '/catalogo',
+    color_fondo: '#081229',
     promo_titulo: '',
     promo_precio: 0,
     promo_badge: '',
@@ -271,29 +283,90 @@ export default function AdminBannersPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Título Principal *
+                  {activeSlot === 'hero' ? 'Título Principal Línea 1 (Blanco) *' : 'Título Principal *'}
                 </label>
                 <input
                   type="text"
                   required
                   value={currentBanner.titulo || ''}
                   onChange={(e) => updateCurrent({ titulo: e.target.value })}
+                  placeholder={activeSlot === 'hero' ? 'CAVAS, LICORES & BODEGÓN ·' : ''}
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  Texto Superior / Sub-etiqueta (Opcional)
-                </label>
-                <input
-                  type="text"
-                  value={currentBanner.badge_texto || ''}
-                  onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
-                  placeholder="ej. DISTRIBUIDORA Y BODEGÓN OFICIAL"
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                />
-              </div>
+              {activeSlot === 'hero' ? (
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Título Destacado Línea 2 (Dorado Ámbar)
+                  </label>
+                  <input
+                    type="text"
+                    value={currentBanner.titulo_destacado || ''}
+                    onChange={(e) => updateCurrent({ titulo_destacado: e.target.value })}
+                    placeholder="ej. ENTREGA INMEDIATA EN BARINAS"
+                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Texto Superior / Pill Dorado (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={currentBanner.badge_texto || ''}
+                    onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
+                    placeholder="ej. SELECCIÓN PREMIUM"
+                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                  />
+                </div>
+              )}
+
+              {activeSlot === 'hero' && (
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Pill Superior Dorado (Cintillo Arriba del Título)
+                  </label>
+                  <input
+                    type="text"
+                    value={currentBanner.badge_texto || ''}
+                    onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
+                    placeholder="ej. BODEGÓN MODERNO · C.C. CIUDAD CATADOR LOCAL N1"
+                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                  />
+                </div>
+              )}
+
+              {activeSlot === 'hero' && (
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">
+                    Color de Fondo del Hero
+                  </label>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <input
+                      type="color"
+                      value={currentBanner.color_fondo || '#081229'}
+                      onChange={(e) => updateCurrent({ color_fondo: e.target.value })}
+                      className="h-9 w-11 rounded-lg border border-slate-200 cursor-pointer bg-white p-0.5"
+                    />
+                    {HERO_COLOR_PRESETS.map((preset) => (
+                      <button
+                        key={preset.hex}
+                        type="button"
+                        onClick={() => updateCurrent({ color_fondo: preset.hex })}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 cursor-pointer"
+                      >
+                        <span
+                          className="h-3 w-3 rounded-full border border-black/10"
+                          style={{ backgroundColor: preset.hex }}
+                        />
+                        <span>{preset.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="md:col-span-2">
                 <label className="block font-bold text-slate-700 mb-1">
@@ -309,35 +382,69 @@ export default function AdminBannersPage() {
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Texto del Botón
+                  {activeSlot === 'hero' ? 'Texto Botón Primario (Dorado)' : 'Texto del Botón'}
                 </label>
                 <input
                   type="text"
                   value={currentBanner.boton_texto || ''}
                   onChange={(e) => updateCurrent({ boton_texto: e.target.value })}
-                  placeholder="ej. Ver selección"
+                  placeholder="ej. Ver Ofertas del Día"
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
                 />
               </div>
 
               <div>
                 <label className="block font-bold text-slate-700 mb-1">
-                  Enlace del Botón
+                  {activeSlot === 'hero' ? 'Enlace Botón Primario' : 'Enlace del Botón'}
                 </label>
                 <input
                   type="text"
                   value={currentBanner.boton_url || ''}
                   onChange={(e) => updateCurrent({ boton_url: e.target.value })}
-                  placeholder="ej. /catalogo/01/01"
+                  placeholder="ej. /#ofertas"
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
                 />
               </div>
+
+              {activeSlot === 'hero' && (
+                <>
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Texto Botón Secundario (Opcional · Dejar vacío para ocultar)
+                    </label>
+                    <input
+                      type="text"
+                      value={currentBanner.boton_secundario_texto ?? ''}
+                      onChange={(e) =>
+                        updateCurrent({ boton_secundario_texto: e.target.value })
+                      }
+                      placeholder="ej. Explorar Catálogo"
+                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-700 mb-1">
+                      Enlace Botón Secundario
+                    </label>
+                    <input
+                      type="text"
+                      value={currentBanner.boton_secundario_url ?? ''}
+                      onChange={(e) =>
+                        updateCurrent({ boton_secundario_url: e.target.value })
+                      }
+                      placeholder="ej. /catalogo"
+                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {activeSlot === 'hero' && (
               <>
                 <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider border-b border-slate-100 pb-2 pt-2">
-                  Caja Promocional Destacada (Lado Derecho del Hero)
+                  Píldora Promocional Destacada del Hero
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

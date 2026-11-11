@@ -1,16 +1,8 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  ShieldCheck,
-  MapPin,
-  CreditCard,
-  Lock,
-  UserPlus,
-  LogIn,
-} from 'lucide-react';
+import { ArrowRight, UserPlus, LogIn } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { supabase } from '@/lib/supabase';
 
@@ -21,10 +13,16 @@ export function CartCheckoutForm() {
   useEffect(() => {
     let active = true;
     async function checkAuth() {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (active) setIsAuthenticated(Boolean(user));
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (active) setIsAuthenticated(Boolean(user));
+      } catch {
+        if (active) setIsAuthenticated(false);
+      }
     }
-    checkAuth();
+    void checkAuth();
     return () => {
       active = false;
     };
@@ -33,63 +31,44 @@ export function CartCheckoutForm() {
   if (items.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-2xs p-5 space-y-4">
-      <h3 className="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">
-        Checkout 100% en Línea
-      </h3>
-
-      <div className="space-y-2.5 text-xs text-slate-600">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-catador-blue shrink-0" />
-          <span>Entrega a Domicilio en Barinas o Retiro en Bodegón</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CreditCard className="h-4 w-4 text-catador-amber shrink-0" />
-          <span>Pago Móvil en Bs. BCV, Zelle o Efectivo Divisas</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
-          <span>Seguimiento y Chat en Vivo con el Administrador</span>
-        </div>
-      </div>
-
+    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3">
       {isAuthenticated ? (
-        <Link
-          href="/checkout"
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light p-3.5 text-sm font-extrabold text-white shadow-md transition-all active:scale-[0.99]"
-        >
-          <span>Proceder al Pago en Línea</span>
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <>
+          <Link
+            href="/checkout"
+            className="w-full min-h-[48px] flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark p-3.5 text-sm font-extrabold text-white transition-all active:scale-[0.99]"
+          >
+            <span>Ir a pagar</span>
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          <p className="text-[11px] text-slate-500 text-center font-medium">
+            Pago Móvil · Zelle · Transferencia · Efectivo USD
+          </p>
+        </>
       ) : (
-        <div className="space-y-2.5 pt-1">
-          <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
-            <p className="font-extrabold">Registro obligatorio para comprar</p>
-            <p className="text-[11px] text-amber-800 mt-0.5">
-              Para procesar tu pedido y darte seguimiento en tiempo real debes crear tu cuenta o iniciar sesión. Tu carrito se mantendrá guardado.
+        <div className="space-y-2.5">
+          <div className="rounded-xl bg-catador-amber-soft border border-catador-amber-oak/60 p-3 text-xs text-[#8B3E03]">
+            <p className="font-extrabold">Inicia sesión para finalizar tu pedido</p>
+            <p className="text-[11px] mt-0.5">
+              Tu carrito y dirección se mantendrán guardados automáticamente.
             </p>
           </div>
           <Link
             href="/registro?redirect=/checkout"
-            className="w-full flex items-center justify-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light p-3 text-xs font-extrabold text-white shadow-md transition-all"
+            className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-4 py-2.5 text-xs font-extrabold text-white transition-all"
           >
             <UserPlus className="h-4 w-4" />
             <span>Crear mi Cuenta y Comprar</span>
           </Link>
           <Link
             href="/login?redirect=/checkout"
-            className="w-full flex items-center justify-center gap-2 rounded-xl border border-catador-blue bg-white hover:bg-blue-50 p-2.5 text-xs font-extrabold text-catador-blue transition-all"
+            className="w-full min-h-[44px] flex items-center justify-center gap-2 rounded-full border border-catador-blue bg-white hover:bg-slate-50 px-4 py-2.5 text-xs font-extrabold text-catador-blue transition-all"
           >
             <LogIn className="h-4 w-4" />
-            <span>Ya tengo cuenta • Iniciar Sesión</span>
+            <span>Ya tengo cuenta · Iniciar Sesión</span>
           </Link>
         </div>
       )}
-
-      <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-400">
-        <Lock className="h-3 w-3" />
-        <span>Pago seguro dentro de la plataforma</span>
-      </div>
     </div>
   );
 }

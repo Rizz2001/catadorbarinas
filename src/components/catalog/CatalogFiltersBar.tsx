@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ArrowUpDown, Share2, Check, PackageCheck, DollarSign } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowUpDown, Share2, Check, PackageCheck, DollarSign, Percent, Package } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type SortOption = 'default' | 'price_asc' | 'price_desc' | 'name_asc';
@@ -12,6 +12,10 @@ interface CatalogFiltersBarProps {
   displayedCount: number;
   onlyInStock: boolean;
   onToggleInStock: (val: boolean) => void;
+  onlyDeals?: boolean;
+  onToggleDeals?: (val: boolean) => void;
+  onlyBoxes?: boolean;
+  onToggleBoxes?: (val: boolean) => void;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
   priceRange?: PriceRangeFilter;
@@ -24,6 +28,10 @@ export function CatalogFiltersBar({
   displayedCount,
   onlyInStock,
   onToggleInStock,
+  onlyDeals = false,
+  onToggleDeals,
+  onlyBoxes = false,
+  onToggleBoxes,
   sortBy,
   onSortChange,
   priceRange = 'all',
@@ -34,7 +42,7 @@ export function CatalogFiltersBar({
 
   const handleShareCategory = () => {
     const url = typeof window !== 'undefined' ? window.location.href : '';
-    const text = `🛒 *Catálogo ${categoryTitle} - Gran Catador Barinas*\nRevisa los productos disponibles y precios en dólares y bolívares aquí:\n${url}`;
+    const text = `🛒 *Catálogo ${categoryTitle} - EL CATADOR. Barinas*\nRevisa los productos disponibles y precios en dólares y bolívares aquí:\n${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -47,65 +55,68 @@ export function CatalogFiltersBar({
   };
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 bg-white p-2.5 sm:p-3.5 rounded-xl border border-slate-200/80 shadow-2xs min-w-0 max-w-full overflow-hidden">
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-bold text-slate-700 tabular-nums truncate">
-          Mostrando {displayedCount} de {totalCount} productos
-        </span>
-
-        {/* Acciones rápidas en móvil en la fila superior */}
-        <div className="flex lg:hidden items-center gap-1.5 shrink-0">
+    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-wrap items-center gap-2">
+        {onToggleDeals && (
           <button
             type="button"
-            onClick={() => onToggleInStock(!onlyInStock)}
+            onClick={() => onToggleDeals(!onlyDeals)}
             className={cn(
-              'flex items-center gap-1 px-2.5 py-1.5 min-h-[34px] rounded-lg text-[11px] font-semibold border transition-all cursor-pointer',
-              onlyInStock
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200'
-                : 'bg-slate-50 text-slate-600 border-slate-200'
+              'inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-full text-xs font-extrabold border transition-all cursor-pointer',
+              onlyDeals
+                ? 'bg-[#FEF3C7] text-[#8B3E03] border-[#EB9C53]'
+                : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
             )}
           >
-            <PackageCheck className="h-3.5 w-3.5 shrink-0" />
-            <span>En Stock</span>
+            <Percent className="h-3.5 w-3.5 shrink-0" />
+            <span>Solo Ofertas</span>
           </button>
+        )}
 
+        {onToggleBoxes && (
           <button
             type="button"
-            onClick={handleShareCategory}
-            title="Compartir esta categoría por WhatsApp"
-            aria-label="Compartir categoría por WhatsApp"
-            className="flex items-center justify-center h-[34px] w-[34px] rounded-lg bg-emerald-600 text-white shadow-2xs cursor-pointer"
+            onClick={() => onToggleBoxes(!onlyBoxes)}
+            className={cn(
+              'inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-full text-xs font-extrabold border transition-all cursor-pointer',
+              onlyBoxes
+                ? 'bg-[#0F172A] text-white border-[#0F172A]'
+                : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
+            )}
           >
-            <Share2 className="h-3.5 w-3.5 shrink-0" />
+            <Package className="h-3.5 w-3.5 shrink-0" />
+            <span>Disponible por Caja</span>
           </button>
-        </div>
-      </div>
+        )}
 
-      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 min-w-0">
-        {/* Toggle Solo en Stock (Desktop) */}
         <button
           type="button"
           onClick={() => onToggleInStock(!onlyInStock)}
           className={cn(
-            'hidden lg:flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg text-xs font-semibold border transition-all cursor-pointer',
+            'inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-full text-xs font-extrabold border transition-all cursor-pointer',
             onlyInStock
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-200'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+              : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
           )}
         >
           <PackageCheck className="h-3.5 w-3.5 shrink-0" />
-          <span>Solo en Stock</span>
+          <span>En Stock</span>
         </button>
 
-        {/* Filtro por Rango de Precio USD */}
+        <span className="text-[13px] font-bold text-slate-600 tabular-nums ml-1">
+          {displayedCount} de {totalCount} productos
+        </span>
+      </div>
+
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 min-w-0">
         {onPriceRangeChange && (
-          <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2 sm:px-2.5 py-1 min-h-[38px] rounded-lg min-w-0">
-            <DollarSign className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+          <div className="flex items-center gap-1.5 border border-slate-200 bg-[#F7F8FA] px-3 py-1 min-h-[40px] rounded-full min-w-0">
+            <DollarSign className="h-3.5 w-3.5 text-[#D99B38] shrink-0" />
             <select
               value={priceRange}
               onChange={(e) => onPriceRangeChange(e.target.value as PriceRangeFilter)}
               aria-label="Filtrar por rango de precios"
-              className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+              className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
             >
               <option value="all">Todos los precios</option>
               <option value="under_5">Menos de $5.00</option>
@@ -116,39 +127,37 @@ export function CatalogFiltersBar({
           </div>
         )}
 
-        {/* Selector de Orden */}
-        <div className="flex items-center gap-1 border border-slate-200 bg-slate-50 px-2 sm:px-2.5 py-1 min-h-[38px] rounded-lg min-w-0">
-          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+        <div className="flex items-center gap-1.5 border border-slate-200 bg-[#F7F8FA] px-3 py-1 min-h-[40px] rounded-full min-w-0">
+          <ArrowUpDown className="h-3.5 w-3.5 text-slate-500 shrink-0" />
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
             aria-label="Ordenar productos"
-            className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-semibold text-slate-700 focus:outline-none cursor-pointer"
+            className="w-full min-w-0 truncate bg-transparent text-base md:text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
           >
-            <option value="default">Disponibilidad</option>
+            <option value="default">Más relevantes</option>
             <option value="price_asc">Menor Precio ($)</option>
             <option value="price_desc">Mayor Precio ($)</option>
             <option value="name_asc">Nombre (A-Z)</option>
           </select>
         </div>
 
-        {/* Compartir Categoría (Desktop) */}
         <button
           type="button"
           onClick={handleShareCategory}
           title="Compartir esta categoría por WhatsApp"
-          className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs transition-colors cursor-pointer"
+          className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 min-h-[40px] rounded-full bg-[#0F172A] hover:bg-[#001754] text-white text-xs font-extrabold transition-colors cursor-pointer"
         >
-          <Share2 className="h-3.5 w-3.5 shrink-0" />
+          <Share2 className="h-3.5 w-3.5 shrink-0 text-[#EB9C53]" />
           <span>Compartir</span>
         </button>
 
         <button
           type="button"
           onClick={handleCopyLink}
-          className="hidden sm:flex items-center justify-center px-3 py-1.5 min-h-[38px] rounded-lg border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"
+          className="hidden sm:flex items-center justify-center px-3.5 py-1.5 min-h-[40px] rounded-full border border-slate-200 bg-white hover:border-[#0F172A] text-xs font-bold text-slate-700 transition-colors cursor-pointer"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : 'Copiar URL'}
+          {copied ? <Check className="h-3.5 w-3.5 text-[#D99B38]" /> : 'Copiar URL'}
         </button>
       </div>
     </div>

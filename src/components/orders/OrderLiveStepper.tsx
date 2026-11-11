@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { CheckCircle2, Clock, PackageCheck, Bike, CheckCheck } from 'lucide-react';
 import { EstadoPedido } from '@/types';
 import { cn } from '@/lib/utils';

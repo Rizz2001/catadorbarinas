@@ -14,7 +14,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: '#00227B',
+  themeColor: '#001754',
 };
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -91,7 +91,7 @@ export default function RootLayout({
 
   return (
     <html lang="es" className="h-full antialiased scroll-smooth">
-      <body className="min-h-full flex flex-col bg-slate-50 text-slate-900 overflow-x-clip">
+      <body className="min-h-full flex flex-col bg-[#F7F8FA] text-slate-900 overflow-x-clip">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(storeJsonLd) }}

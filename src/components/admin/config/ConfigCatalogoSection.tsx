@@ -289,63 +289,6 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
               className="w-full rounded-lg border border-slate-200 bg-white p-2 text-xs text-slate-900"
             />
           </div>
-
-          {/* Bloques de Garantías Superiores del Footer */}
-          <div className="pt-2 border-t border-slate-200/80">
-            <span className="font-bold text-slate-800 text-[11px] block mb-2">
-              Banda Superior de Garantías del Footer (4 Columnas):
-            </span>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
-              {([0, 1, 2, 3] as const).map((idx) => {
-                const current = (form.footer_garantias && form.footer_garantias[idx]) || {
-                  figura: idx === 0 ? 'Despacho en Barinas' : idx === 1 ? '100% Original' : idx === 2 ? 'Bs. BCV / $ USD' : 'Sala en Vivo',
-                  titulo: idx === 0 ? 'Delivery en Barinas' : idx === 1 ? 'Precinto Oficial' : idx === 2 ? 'Pagos Bimonetarios' : 'Atención Directa',
-                  subtitulo: '',
-                };
-
-                const updateFooterGarantia = (field: 'figura' | 'titulo' | 'subtitulo', val: string) => {
-                  const list = [...(form.footer_garantias || [
-                    { figura: 'Despacho en Barinas', titulo: 'Delivery en Barinas', subtitulo: 'Cotización automática por GPS y volumen' },
-                    { figura: '100% Original', titulo: 'Precinto Oficial', subtitulo: 'Licores importados y despensa garantizada' },
-                    { figura: 'Bs. BCV / $ USD', titulo: 'Pagos Bimonetarios', subtitulo: 'Pago Móvil, Zelle y Efectivo Divisas' },
-                    { figura: 'Sala en Vivo', titulo: 'Atención Directa', subtitulo: 'Chat en tiempo real en cada pedido' },
-                  ])];
-                  while (list.length < 4) list.push({ figura: '', titulo: '', subtitulo: '' });
-                  list[idx] = { ...list[idx], [field]: val };
-                  onChange({ footer_garantias: list });
-                };
-
-                return (
-                  <div key={idx} className="bg-white p-2.5 rounded-lg border border-slate-200 space-y-1.5">
-                    <span className="text-[10px] font-black text-catador-amber uppercase block">
-                      Columna #{idx + 1}
-                    </span>
-                    <input
-                      type="text"
-                      value={current.figura}
-                      onChange={(e) => updateFooterGarantia('figura', e.target.value)}
-                      placeholder="Cifra / Destacado"
-                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[11px] font-bold"
-                    />
-                    <input
-                      type="text"
-                      value={current.titulo}
-                      onChange={(e) => updateFooterGarantia('titulo', e.target.value)}
-                      placeholder="Título"
-                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[11px] font-bold"
-                    />
-                    <input
-                      type="text"
-                      value={current.subtitulo}
-                      onChange={(e) => updateFooterGarantia('subtitulo', e.target.value)}
-                      placeholder="Subtítulo"
-                      className="w-full rounded border border-slate-200 bg-slate-50 p-1 text-[10px]"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
     </section>

@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { Cookie, ShieldCheck, Check } from 'lucide-react';
 
 const COOKIE_STORAGE_KEY = 'gran_catador_cookie_consent_v1';
 
 export function CookieConsentBanner() {
-  const isMounted = React.useSyncExternalStore(
+  const isMounted = useSyncExternalStore(
     () => () => {},
     () => true,
     () => false
@@ -29,49 +29,48 @@ export function CookieConsentBanner() {
   };
 
   return (
-    <div className="fixed bottom-16 md:bottom-4 left-3 right-3 md:left-auto md:right-6 md:max-w-lg z-40 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="rounded-2xl bg-slate-900/95 backdrop-blur-md border border-slate-700/80 p-4 sm:p-5 text-white shadow-2xl space-y-3">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-catador-amber/20 text-amber-400 border border-amber-400/30">
-            <Cookie className="h-5 w-5" />
+    <div className="fixed bottom-20 md:bottom-5 left-2.5 right-2.5 md:left-auto md:right-6 md:max-w-md z-40 animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="rounded-2xl bg-[#081229]/95 backdrop-blur-md border border-white/15 p-3.5 sm:p-4 text-white shadow-xl space-y-2.5">
+        <div className="flex items-start gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D99B38]/20 text-[#EB9C53] border border-[#EB9C53]/40">
+            <Cookie className="h-4 w-4" />
           </div>
-          <div className="space-y-1 text-xs leading-relaxed text-slate-200">
-            <h4 className="font-black text-white flex items-center gap-1.5 text-xs sm:text-sm">
-              <span>Confirmación de Cookies y Mayoría de Edad (+18)</span>
-              <ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" />
+          <div className="space-y-0.5 text-xs leading-snug text-slate-200">
+            <h4 className="font-black text-white flex items-center gap-1.5 text-xs sm:text-[13px]">
+              <span>Mayoría de Edad (+18) y Cookies</span>
+              <ShieldCheck className="h-3.5 w-3.5 text-[#EB9C53] shrink-0" />
             </h4>
             <p className="text-[11px] sm:text-xs text-slate-300">
-              Utilizamos cookies para recordar tu carrito, favoritos y cotización de delivery en Barinas. Al continuar, confirmas que eres <strong>mayor de 18 años</strong> y aceptas nuestras{' '}
-              <Link href="/privacidad" className="text-amber-300 underline hover:text-amber-200">
-                Políticas de Privacidad
+              Al continuar confirmas ser <strong>mayor de 18 años</strong> y aceptas nuestras{' '}
+              <Link href="/privacidad" className="text-[#EB9C53] underline hover:text-white">
+                Políticas
               </Link>{' '}
               y{' '}
-              <Link href="/terminos" className="text-amber-300 underline hover:text-amber-200">
-                Términos de Uso
+              <Link href="/terminos" className="text-[#EB9C53] underline hover:text-white">
+                Términos
               </Link>
               .
             </p>
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 pt-1">
+        <div className="flex items-center justify-end gap-2">
           <Link
             href="/privacidad"
-            className="px-3.5 py-2 rounded-xl border border-slate-700 text-[11px] font-bold text-slate-300 hover:bg-slate-800 transition-colors"
+            className="px-3 py-1.5 rounded-full border border-white/20 text-xs font-bold text-slate-200 hover:bg-white/10 transition-colors"
           >
-            Ver Políticas
+            Políticas
           </Link>
           <button
             type="button"
             onClick={handleAccept}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-catador-amber hover:bg-catador-amber-dark text-white text-xs font-black shadow-md transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#D99B38] hover:bg-[#C88A28] text-white text-xs font-black shadow-xs transition-all cursor-pointer"
           >
-            <Check className="h-4 w-4 stroke-[3]" />
-            <span>Soy +18 y Acepto Cookies</span>
+            <Check className="h-3.5 w-3.5 stroke-[3]" />
+            <span>Soy +18 y Acepto</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-

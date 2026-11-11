@@ -6,6 +6,7 @@ import { ShoppingBag, ArrowLeft, ArrowRight, AlertCircle } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
+import { useDeliveryStore } from '@/store/useDeliveryStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { convertUsdToVes, formatUsd, formatVes } from '@/lib/currency';
 import { calculateSmartDeliveryQuote } from '@/lib/delivery';
@@ -39,17 +40,20 @@ export default function CheckoutPage() {
   const [checkoutResending, setCheckoutResending] = useState<boolean>(false);
   const [checkoutResendMsg, setCheckoutResendMsg] = useState<string | null>(null);
 
-  const [deliveryData, setDeliveryData] = useState<DeliveryDataState>({
-    nombre: '',
-    cedula: '',
-    telefono: '',
-    email: '',
-    tipoEntrega: 'delivery',
-    direccion: '',
-    zonaBarinas: 'Alto Barinas Norte',
-    notas: '',
-    latitud: null,
-    longitud: null,
+  const [deliveryData, setDeliveryData] = useState<DeliveryDataState>(() => {
+    const saved = useDeliveryStore.getState();
+    return {
+      nombre: '',
+      cedula: '',
+      telefono: '',
+      email: '',
+      tipoEntrega: saved.deliveryType || 'delivery',
+      direccion: saved.direccion || '',
+      zonaBarinas: saved.zonaBarinas || 'Alto Barinas Norte',
+      notas: '',
+      latitud: saved.latitud ?? null,
+      longitud: saved.longitud ?? null,
+    };
   });
 
   React.useEffect(() => {
@@ -69,15 +73,31 @@ export default function CheckoutPage() {
         const confirmed = perfil?.rol === 'admin' || perfil?.correo_confirmado === true;
         setIsEmailConfirmed(Boolean(confirmed));
 
+        const deliveryStore = useDeliveryStore.getState();
+        deliveryStore.hydrateFromProfile({
+          userId: user.id,
+          direccion: perfil?.direccion || null,
+          latitud: typeof perfil?.latitud === 'number' ? perfil.latitud : null,
+          longitud: typeof perfil?.longitud === 'number' ? perfil.longitud : null,
+        });
+        const updatedStore = useDeliveryStore.getState();
+
         setDeliveryData((prev) => ({
           ...prev,
           nombre: perfil?.nombre || prev.nombre,
           cedula: perfil?.cedula || prev.cedula,
           telefono: perfil?.telefono || prev.telefono,
-          direccion: perfil?.direccion || prev.direccion,
+          direccion: prev.direccion.trim() || updatedStore.direccion || perfil?.direccion || '',
+          zonaBarinas: updatedStore.zonaBarinas || prev.zonaBarinas,
           email: user.email || prev.email,
-          latitud: typeof perfil?.latitud === 'number' ? perfil.latitud : prev.latitud,
-          longitud: typeof perfil?.longitud === 'number' ? perfil.longitud : prev.longitud,
+          latitud:
+            prev.latitud ??
+            updatedStore.latitud ??
+            (typeof perfil?.latitud === 'number' ? perfil.latitud : null),
+          longitud:
+            prev.longitud ??
+            updatedStore.longitud ??
+            (typeof perfil?.longitud === 'number' ? perfil.longitud : null),
         }));
       }
       setAuthChecking(false);
@@ -289,6 +309,25 @@ export default function CheckoutPage() {
       if (!res.ok) throw new Error(data.error || 'Error al guardar el pedido en el servidor');
 
       if (data.success && data.order) {
+        if (deliveryData.tipoEntrega === 'delivery' && deliveryData.direccion.trim()) {
+          useDeliveryStore.getState().applyProfileSavedLocation({
+            userId,
+            direccion: deliveryData.direccion,
+            latitud: deliveryData.latitud ?? null,
+            longitud: deliveryData.longitud ?? null,
+          });
+          if (userId) {
+            void supabase
+              .from('perfiles')
+              .update({
+                direccion: deliveryData.direccion.trim(),
+                latitud: deliveryData.latitud ?? null,
+                longitud: deliveryData.longitud ?? null,
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', userId);
+          }
+        }
         setCreatedOrder(data.order as PedidoConDetalles);
         setCurrentStep(4);
         clearCart();

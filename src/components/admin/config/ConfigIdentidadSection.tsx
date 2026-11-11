@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Store, Building, FileText, Phone, MapPin, Clock } from 'lucide-react';
 import { StoreConfig } from '@/types';
 import { ConfigLogoUploader } from './ConfigLogoUploader';

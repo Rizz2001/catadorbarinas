@@ -1,5 +1,3 @@
-import { Product } from '@/types';
-
 /**
  * Grupos oficiales reales sincronizados con la API de FoxData / SmartVentas (SmartVentas = 1)
  */
@@ -143,10 +141,4 @@ export function resolveCategoryMetadata(codGrupo?: string, codSubgrupo?: string)
   const searchKeywords = `${groupName} ${subName} ${synonyms}`.trim();
 
   return { categoryLabel, searchKeywords };
-}
-
-export const FALLBACK_PRODUCTS: Product[] = [];
-
-export function getFallbackProductsByGroup(): Product[] {
-  return [];
 }

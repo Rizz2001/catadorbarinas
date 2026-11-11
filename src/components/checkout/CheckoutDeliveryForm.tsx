@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Store, MapPin, Navigation, Bike, Truck, Loader2, ExternalLink } from 'lucide-react';
 import { DeliveryQuoteResult } from '@/types';
 import { BARINAS_ZONE_COORDS } from '@/lib/delivery';
@@ -180,7 +180,7 @@ export function CheckoutDeliveryForm({
                   <>
                     <Navigation className="h-3.5 w-3.5" />
                     <span>
-                      {deliveryData.latitud ? 'Actualizar mi GPS' : 'Elegir mi ubicación actual (GPS)'}
+                      {deliveryData.latitud ? 'Recotizar delivery (GPS)' : 'Cotizar delivery'}
                     </span>
                   </>
                 )}

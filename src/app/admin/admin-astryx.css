@@ -6,7 +6,7 @@
   color-scheme: light;
 }
 
-/* Override de tokens semánticos hacia la identidad oficial de El Catador */
+/* Override de tokens semánticos hacia la identidad oficial del logotipo EL CATADOR. */
 [data-astryx-theme="neutral"] {
   --color-accent: #00227B;
   --color-text-accent: #00227B;
@@ -17,14 +17,14 @@
   --color-text-info: #00227B;
   --color-info-muted: #EFF6FF;
   --color-background-surface: #FFFFFF;
-  --color-background-body: #F8FAFC;
+  --color-background-body: #F7F8FA;
   --color-background-card: #FFFFFF;
   --color-background-popover: #FFFFFF;
   --color-background-muted: #F1F5F9;
   --color-border: #E2E8F0;
   --color-border-emphasized: #CBD5E1;
-  --radius-button: 10px;
-  --radius-control: 10px;
+  --radius-button: 12px;
+  --radius-control: 12px;
   --radius-container: 16px;
 }
 

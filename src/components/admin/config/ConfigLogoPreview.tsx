@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 
 interface ConfigLogoPreviewProps {
@@ -37,27 +36,56 @@ export function ConfigLogoPreview({
             </span>
           </div>
 
-          <div className="min-h-22 bg-slate-50/90 rounded-lg border border-dashed border-slate-200 flex items-center px-4 py-2 overflow-hidden">
-            <div
-              className="relative transition-all duration-200 flex items-center shrink-0"
-              style={{
-                height: `${currentHeight}px`,
-                width: `${currentWidth}px`,
-                maxWidth: '100%',
-              }}
-            >
-              <Image
-                src={currentLogo}
-                alt="Vista previa del logo en Header"
-                fill
-                sizes="360px"
-                className="object-contain object-left"
-              />
-            </div>
+          <div className="min-h-22 bg-[#F7F8FA] rounded-lg border border-dashed border-slate-200 flex items-center gap-3 px-4 py-2 overflow-hidden">
+            {currentLogo === '/logo-catador.svg' ? (
+              <div
+                className="relative transition-all duration-200 flex items-center shrink-0"
+                style={{
+                  height: `${Math.min(56, Math.max(36, currentHeight))}px`,
+                  width: `${Math.min(230, Math.max(135, currentWidth))}px`,
+                  maxWidth: '100%',
+                }}
+              >
+                <Image
+                  src={currentLogo}
+                  alt="Vista previa del logo en Header"
+                  fill
+                  sizes="230px"
+                  className="object-contain object-left"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5 shrink-0">
+                <div
+                  className="relative rounded-xl bg-white border border-slate-200/80 p-1 shadow-2xs overflow-hidden transition-all duration-200"
+                  style={{
+                    height: `${Math.min(56, Math.max(36, currentHeight))}px`,
+                    width: `${Math.round(Math.min(56, Math.max(36, currentHeight)) * 1.15)}px`,
+                  }}
+                >
+                  <Image
+                    src={currentLogo}
+                    alt="Vista previa del logo en Header"
+                    fill
+                    sizes="64px"
+                    className="object-contain"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-base font-black tracking-tight text-[#0F172A] leading-none">
+                    El Catador
+                  </span>
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#B6683E] mt-1">
+                    Bodegón & Supermercado
+                  </span>
+                </div>
+              </div>
+            )}
             {/* Elementos simulados de navegación a la derecha */}
-            <div className="hidden sm:flex items-center gap-2 ml-auto opacity-30 select-none pointer-events-none">
-              <div className="h-8 w-32 rounded-lg bg-slate-300"></div>
-              <div className="h-8 w-8 rounded-lg bg-slate-300"></div>
+            <div className="hidden sm:flex items-center gap-2 ml-auto select-none pointer-events-none">
+              <div className="h-8 w-28 rounded-full bg-white border border-slate-200" />
+              <div className="h-8 w-20 rounded-full bg-[#D99B38]/90" />
+              <div className="h-8 w-8 rounded-full bg-[#0F172A]" />
             </div>
           </div>
         </div>

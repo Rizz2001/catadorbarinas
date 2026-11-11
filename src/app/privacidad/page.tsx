@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ShieldCheck, Lock, Cookie, MapPin, ArrowLeft } from 'lucide-react';
@@ -61,7 +60,7 @@ export default function PrivacidadPage() {
             2. Uso de Ubicación GPS para Cotización de Delivery
           </h2>
           <p>
-            Cuando utilizas el botón <strong>«Elegir mi ubicación actual (GPS)»</strong> en el Checkout, tu navegador solicita permiso explícito para compartir tus coordenadas puntuales únicamente con el fin de:
+            Cuando utilizas el botón <strong>«Cotizar delivery»</strong> en tu perfil, carrito o Checkout, tu navegador solicita permiso explícito para compartir tus coordenadas puntuales únicamente con el fin de:
           </p>
           <ul className="list-disc pl-5 space-y-1">
             <li>Calcular con precisión la distancia en kilómetros desde nuestra sede en Barinas hasta tu punto de entrega.</li>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import { RefreshCw, ArrowLeft, Volume2, VolumeX, Bike } from 'lucide-react';
 import { supabase } from '@/lib/supabase';

@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
-import { Trash2, Plus, Minus, Package } from 'lucide-react';
+import { X, Plus, Minus, Package } from 'lucide-react';
 import { CartItem, PurchaseMode } from '@/types';
 import { formatPrices } from '@/lib/currency';
 import {
@@ -54,43 +53,45 @@ export function CartDrawerItemRow({
 
   return (
     <div className="py-3.5 flex gap-3 items-start">
-      <div className="relative h-16 w-16 shrink-0 rounded-xl bg-slate-50 border border-slate-200 overflow-hidden p-1">
+      <div className="relative h-16 w-16 shrink-0 rounded-xl bg-white border border-slate-200 overflow-hidden p-1.5">
         <Image
           src={itemImg}
           alt={product.name}
           fill
           sizes="64px"
-          className={cn('object-contain', isNoImg ? 'p-2 opacity-80' : '')}
+          className={cn(
+            'object-contain mix-blend-multiply contrast-[1.08] brightness-[1.05]',
+            isNoImg ? 'p-2 opacity-80' : ''
+          )}
         />
       </div>
 
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <h4 className="text-xs font-bold text-slate-900 line-clamp-2 leading-snug">
+          <h4 className="text-[13px] font-extrabold text-slate-900 line-clamp-2 leading-snug">
             {product.name}
           </h4>
           <button
             type="button"
             onClick={() => onRemoveItem(product.id, mode)}
             aria-label={`Eliminar ${product.name}`}
-            className="h-7 w-7 shrink-0 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg cursor-pointer transition-colors"
+            className="h-8 w-8 shrink-0 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full cursor-pointer transition-colors"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Selector rápido Unidad / Caja en 1 toque */}
         <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
           {supportsBothModes ? (
-            <div className="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200/80">
+            <div className="inline-flex rounded-full bg-[#F7F8FA] p-0.5 border border-slate-200">
               <button
                 type="button"
                 onClick={() => onSwitchMode(product.id, mode, 'unidad')}
                 className={cn(
-                  'px-2 py-0.5 rounded-md text-[10px] font-extrabold transition-all cursor-pointer',
+                  'px-2.5 py-0.5 rounded-full text-[11px] font-extrabold transition-all cursor-pointer',
                   mode === 'unidad'
-                    ? 'bg-white text-catador-blue shadow-2xs'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-catador-blue text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 )}
               >
                 Unidad
@@ -100,24 +101,24 @@ export function CartDrawerItemRow({
                 disabled={!product.allowBackorder && getMaxAllowedQuantity(product, 'caja', otherItems) <= 0}
                 onClick={() => onSwitchMode(product.id, mode, 'caja')}
                 className={cn(
-                  'px-2 py-0.5 rounded-md text-[10px] font-extrabold flex items-center gap-1 transition-all',
+                  'px-2.5 py-0.5 rounded-full text-[11px] font-extrabold flex items-center gap-1 transition-all',
                   mode === 'caja'
-                    ? 'bg-amber-500 text-white shadow-2xs'
+                    ? 'bg-catador-amber-soft text-[#8B3E03] border border-catador-amber-oak/60'
                     : !product.allowBackorder && getMaxAllowedQuantity(product, 'caja', otherItems) <= 0
                     ? 'text-slate-300 opacity-40 cursor-not-allowed'
-                    : 'text-slate-500 hover:text-slate-800 cursor-pointer'
+                    : 'text-slate-600 hover:text-slate-900 cursor-pointer'
                 )}
               >
-                <Package className="h-2.5 w-2.5" />
+                <Package className="h-3 w-3" />
                 Caja x{unitsPerBox}
               </button>
             </div>
           ) : (
             <span
               className={cn(
-                'text-[10px] font-black uppercase px-2 py-0.5 rounded-md',
+                'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full',
                 mode === 'caja'
-                  ? 'bg-amber-100 text-amber-800'
+                  ? 'bg-catador-amber-soft text-[#8B3E03] border border-catador-amber-oak/50'
                   : 'bg-slate-100 text-slate-700'
               )}
             >
@@ -127,25 +128,25 @@ export function CartDrawerItemRow({
         </div>
 
         <div className="flex items-center justify-between gap-2 mt-2.5">
-          <div>
-            <p className="text-sm font-black text-catador-blue leading-none">
+          <div className="tabular-nums">
+            <p className="text-sm font-black text-slate-900 leading-none">
               {itemPrices.usdFormatted}
             </p>
-            <p className="text-[11px] font-bold text-slate-500 font-mono mt-0.5">
+            <p className="text-xs font-bold text-slate-600 mt-0.5">
               {itemPrices.vesFormatted}
             </p>
           </div>
 
-          <div className="flex items-center border border-slate-200 rounded-xl bg-white shadow-2xs">
+          <div className="inline-flex items-center rounded-full bg-catador-blue text-white px-1 py-0.5 shadow-2xs tabular-nums">
             <button
               type="button"
               onClick={() => onUpdateQuantity(product.id, quantity - 1, mode)}
               aria-label="Disminuir cantidad"
-              className="h-9 w-9 flex items-center justify-center text-slate-600 hover:text-slate-900 active:bg-slate-100 rounded-l-xl cursor-pointer"
+              className="h-8 w-8 flex items-center justify-center text-white hover:bg-white/15 rounded-full cursor-pointer transition-colors"
             >
-              <Minus className="h-3.5 w-3.5" />
+              <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
             </button>
-            <span className="min-w-[2rem] px-1 text-center text-xs font-black text-slate-900">
+            <span className="min-w-[1.75rem] px-1 text-center text-xs font-black">
               {quantity}
             </span>
             <button
@@ -155,24 +156,23 @@ export function CartDrawerItemRow({
               aria-label="Aumentar cantidad"
               title={!canAddMore ? 'Stock máximo alcanzado' : 'Aumentar cantidad'}
               className={cn(
-                'h-9 w-9 flex items-center justify-center rounded-r-xl transition-colors',
+                'h-8 w-8 flex items-center justify-center rounded-full transition-colors',
                 canAddMore
-                  ? 'text-slate-600 hover:text-slate-900 active:bg-slate-100 cursor-pointer'
-                  : 'text-slate-300 opacity-40 cursor-not-allowed bg-slate-50'
+                  ? 'text-white hover:bg-white/15 cursor-pointer'
+                  : 'text-white/40 cursor-not-allowed'
               )}
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
             </button>
           </div>
         </div>
 
         {isOutOfStock && (
-          <p className="mt-1.5 text-[10px] font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-2 py-0.5 inline-block">
-            Stock insuficiente en inventario ({product.stockQuantity} unidades)
+          <p className="text-[11px] font-bold text-rose-600 mt-1">
+            Stock insuficiente para este artículo.
           </p>
         )}
       </div>
     </div>
   );
 }
-

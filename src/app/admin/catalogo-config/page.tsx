@@ -81,6 +81,12 @@ export default function AdminCatalogoConfigPage() {
       [field]: !currentValue,
     });
 
+    try {
+      await fetch('/api/admin/revalidate', { method: 'POST' });
+    } catch {
+      // Silencioso
+    }
+
     setConfigsMap((prev) => {
       const next = new Map(prev);
       next.set(product.id, saved);

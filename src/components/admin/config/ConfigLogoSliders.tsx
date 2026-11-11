@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Sliders, Maximize2, Plus, Minus, Save, Loader2 } from 'lucide-react';
 
 interface ConfigLogoSlidersProps {

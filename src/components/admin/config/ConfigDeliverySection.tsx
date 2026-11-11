@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { Truck, DollarSign, Gift, Navigation, Bike, Compass } from 'lucide-react';
 import { StoreConfig } from '@/types';
 

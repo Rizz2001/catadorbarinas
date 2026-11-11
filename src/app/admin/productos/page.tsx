@@ -204,6 +204,7 @@ export default function AdminProductosPage() {
     try {
       setUploadingProductCode(product.id);
       const saved = await uploadProductWebpImage(file, product.id, product.name);
+      void fetch('/api/admin/revalidate', { method: 'POST' });
       setImages((prev) => [
         saved,
         ...prev.filter(
@@ -313,6 +314,7 @@ export default function AdminProductosPage() {
     try {
       setDeletingCode(confirmDeleteCode);
       await deleteProductWebpImage(confirmDeleteCode);
+      void fetch('/api/admin/revalidate', { method: 'POST' });
       setImages((prev) => prev.filter((i) => i.codigo_articulo !== confirmDeleteCode));
       showToast({ body: `Fotografía #${confirmDeleteCode} eliminada.` });
       setConfirmDeleteCode(null);

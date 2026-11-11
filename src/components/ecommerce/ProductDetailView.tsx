@@ -1,22 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  ShoppingCart,
-  Check,
-  Share2,
-  Zap,
-  CheckCircle2,
-  XCircle,
-  Heart,
-  Package,
-  Box,
-  AlertTriangle,
-} from 'lucide-react';
+import { CheckCircle2, Share2, XCircle } from 'lucide-react';
 import { Product, PurchaseMode } from '@/types';
-import { formatPrices } from '@/lib/currency';
+import { formatPrices, splitUsdParts } from '@/lib/currency';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useBcvStore } from '@/store/useBcvStore';
@@ -28,8 +16,10 @@ import {
   getMaxAllowedQuantity,
   getUnitsPerPurchaseMode,
 } from '@/lib/inventory';
+import { ProductDetailGallery } from './ProductDetailGallery';
+import { ProductPresentationSelector } from './ProductPresentationSelector';
+import { ProductDetailBuyBox } from './ProductDetailBuyBox';
 import { ProductDetailExtraSection } from './ProductDetailExtraSection';
-import { cn } from '@/lib/utils';
 
 interface ProductDetailViewProps {
   product: Product;
@@ -71,8 +61,12 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
   const maxBoxesAllowed = getMaxAllowedQuantity(product, 'caja', otherCartItems);
   const currentMax = mode === 'caja' ? maxBoxesAllowed : maxUnitsAllowed;
   const isOutOfStock = !product.allowBackorder && (!product.inStock || currentMax <= 0);
-  const safeQuantity = currentMax > 0 ? Math.min(quantity, currentMax) : (product.allowBackorder ? Math.max(1, quantity) : 0);
-  const requiredBaseUnits = safeQuantity * getUnitsPerPurchaseMode(product, mode);
+  const safeQuantity =
+    currentMax > 0
+      ? Math.min(quantity, currentMax)
+      : product.allowBackorder
+      ? Math.max(1, quantity)
+      : 0;
 
   const handleModeSwitch = (nextMode: PurchaseMode) => {
     setMode(nextMode);
@@ -98,294 +92,117 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
     if (res.added) router.push('/checkout');
   };
 
+  const handleShare = () => {
+    const url = typeof window !== 'undefined' ? window.location.href : '';
+    const text = `🍷 *${product.name}*\n💰 ${totalSelectionPrices.usdFormatted} (${totalSelectionPrices.vesFormatted})\n📦 EL CATADOR. Barinas: ${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const { intPart, decPart } = splitUsdParts(totalSelectionPrices.usdFormatted);
+  const categoryBadge =
+    product.brand && !product.category.toUpperCase().includes(product.brand.toUpperCase())
+      ? `${product.brand} · ${product.category}`
+      : product.category;
+  const priceContextLabel =
+    safeQuantity > 1
+      ? `Total por ${safeQuantity} ${mode === 'caja' ? 'cajas' : 'und'}`
+      : mode === 'caja'
+      ? `${product.boxUnitLabel || 'Caja'} cerrado (${unitsPerBox} und)`
+      : 'Precio por unidad';
+
   return (
     <div className="space-y-6 sm:space-y-8 min-w-0 max-w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-start">
-        {/* Galería de Imágenes (5 cols) */}
-        <div className="lg:col-span-5 space-y-2.5 sm:space-y-3 min-w-0">
-          <div className="relative aspect-[4/3] sm:aspect-square w-full rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 p-4 sm:p-6 flex items-center justify-center overflow-hidden shadow-xs">
-            {product.discountPercentage && (
-              <span className="absolute top-3 left-3 sm:top-4 sm:left-4 z-10 rounded-full bg-catador-discount px-2.5 sm:px-3 py-1 text-[11px] sm:text-xs font-black text-white shadow-xs">
-                -{product.discountPercentage}% OFERTA
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={() => toggleFavorite(product)}
-              className={cn(
-                'absolute top-3 right-3 sm:top-4 sm:right-4 z-10 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full border transition-all cursor-pointer shadow-xs',
-                isFav
-                  ? 'bg-red-50 border-red-200 text-red-500'
-                  : 'bg-white/90 border-slate-200 text-slate-400 hover:text-red-500'
-              )}
-              aria-label="Favorito"
-            >
-              <Heart className={cn('h-4 w-4 sm:h-5 sm:w-5', isFav && 'fill-current')} />
-            </button>
-            <Image
-              src={activeImage}
-              alt={product.name}
-              fill
-              priority
-              sizes="(max-width: 1024px) 92vw, 42vw"
-              className={cn(
-                'object-contain transition-transform duration-300',
-                activeImage === cmsLogo ? 'p-10 sm:p-12 opacity-80' : 'p-3 sm:p-4 hover:scale-105'
-              )}
-              onError={() => setHasError(true)}
-            />
-          </div>
-
-          {product.images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-              {product.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setSelectedImage(img);
-                    setHasError(false);
-                  }}
-                  className={cn(
-                    'relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl bg-white border p-1 overflow-hidden cursor-pointer',
-                    selectedImage === img || (!selectedImage && idx === 0)
-                      ? 'border-catador-blue ring-2 ring-catador-blue/20'
-                      : 'border-slate-200 hover:border-slate-400'
-                  )}
-                >
-                  <Image src={img} alt="" fill sizes="64px" className="object-contain" />
-                </button>
-              ))}
-            </div>
-          )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-7 items-start">
+        <div className="lg:col-span-5 min-w-0">
+          <ProductDetailGallery
+            name={product.name}
+            images={product.images}
+            activeImage={activeImage}
+            selectedImage={selectedImage}
+            cmsLogo={cmsLogo}
+            discountPercentage={product.discountPercentage}
+            isFav={isFav}
+            onSelectImage={(img) => { setSelectedImage(img); setHasError(false); }}
+            onToggleFavorite={() => toggleFavorite(product)}
+            onImageError={() => setHasError(true)}
+          />
         </div>
 
-        {/* Columna Comercial y Selector Unidad / Caja (7 cols) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 p-4 sm:p-7 shadow-xs space-y-4 sm:space-y-5 min-w-0">
+        <section className="lg:col-span-7 rounded-2xl bg-white border border-slate-200 p-5 sm:p-7 space-y-5 min-w-0 shadow-xs">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="inline-flex items-center rounded-full bg-amber-50 border border-amber-200/80 px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-amber-800 max-w-full truncate">
-              {product.brand} • {product.category}
+            <span className="inline-flex items-center rounded-full bg-[#F7F8FA] border border-slate-200 px-3 py-1 text-xs font-extrabold text-slate-700 truncate">
+              {categoryBadge}
             </span>
-            <span className="text-[11px] sm:text-xs font-mono font-bold text-slate-400">SKU: {product.sku}</span>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-xs font-bold text-slate-500 tabular-nums">SKU: {product.sku}</span>
+              <button
+                type="button"
+                onClick={handleShare}
+                aria-label="Compartir por WhatsApp"
+                title="Compartir por WhatsApp"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-extrabold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
+              >
+                <Share2 className="h-3.5 w-3.5 text-catador-blue" />
+                <span className="hidden sm:inline">Compartir</span>
+              </button>
+            </div>
           </div>
 
-          <h1 className="text-lg sm:text-3xl font-black text-slate-900 tracking-tight leading-snug break-words">
-            {product.name}
-          </h1>
-
-          {/* Indicador Transparente de Stock en Unidades y Cajas */}
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="space-y-2.5">
+            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-black text-slate-900 tracking-tight leading-snug break-words">
+              {product.name}
+            </h1>
             {product.inStock ? (
-              <div className="inline-flex items-start sm:items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] sm:text-xs font-extrabold">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0 mt-0.5 sm:mt-0" />
-                <span>
-                  Disponible en Bodegón: {product.stockQuantity} {product.unit.toLowerCase()}s
-                  {product.stockQuantity >= unitsPerBox
-                    ? ` (Equivale a ${Math.floor(product.stockQuantity / unitsPerBox)} cajas de ${unitsPerBox} und)`
-                    : ' (Stock solo para unidades sueltas)'}
-                </span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold tabular-nums">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                <span>{product.stockQuantity} {product.unit.toLowerCase()}s disponibles en Barinas</span>
               </div>
             ) : (
-              <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 text-xs font-bold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold">
                 <XCircle className="h-4 w-4 text-slate-400 shrink-0" />
-                <span>Agotado temporalmente en inventario</span>
+                <span>Agotado temporalmente</span>
               </div>
             )}
           </div>
 
-          {/* Tarjetas Gemelas: Elegir Por Unidad vs Por Caja */}
-          <div className="space-y-2">
-            <label className="text-[11px] sm:text-xs font-extrabold uppercase tracking-wider text-slate-500 block">
-              1. Elige la Presentación de Compra:
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-              {product.saleMode !== 'solo_caja' && (
-                <button
-                  type="button"
-                  onClick={() => handleModeSwitch('unidad')}
-                  className={cn(
-                    'flex flex-col items-start p-3 sm:p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer min-w-0',
-                    mode === 'unidad'
-                      ? 'border-catador-blue bg-blue-50/40 ring-2 ring-catador-blue/15'
-                      : 'border-slate-200 hover:border-slate-300 bg-white'
-                  )}
-                >
-                  <div className="flex items-center justify-between gap-2 w-full mb-1">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-900 uppercase truncate">
-                      <Box className="h-4 w-4 text-catador-blue shrink-0" /> Por Unidad (1 {product.unit})
-                    </span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                      {maxUnitsAllowed > 0
-                        ? `Máx: ${maxUnitsAllowed}`
-                        : product.allowBackorder
-                        ? 'Bajo Pedido'
-                        : 'Agotado'}
-                    </span>
-                  </div>
-                  <span className="text-lg sm:text-xl font-black text-catador-blue">{unitPrices.usdFormatted}</span>
-                  <span className="text-xs font-mono font-bold text-slate-600">{unitPrices.vesFormatted}</span>
-                </button>
-              )}
-
-              {product.saleMode !== 'solo_unidad' && (
-                <button
-                  type="button"
-                  disabled={maxBoxesAllowed <= 0 && !product.allowBackorder}
-                  onClick={() => handleModeSwitch('caja')}
-                  className={cn(
-                    'flex flex-col items-start p-3 sm:p-3.5 rounded-2xl border-2 text-left transition-all min-w-0',
-                    mode === 'caja'
-                      ? 'border-catador-blue bg-blue-50/40 ring-2 ring-catador-blue/15 cursor-pointer'
-                      : maxBoxesAllowed <= 0 && !product.allowBackorder
-                      ? 'border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed'
-                      : 'border-slate-200 hover:border-slate-300 bg-white cursor-pointer'
-                  )}
-                >
-                  <div className="flex items-center justify-between gap-2 w-full mb-1">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-black text-slate-900 uppercase truncate">
-                      <Package className="h-4 w-4 text-catador-amber shrink-0" /> Por {product.boxUnitLabel || 'Caja'} ({unitsPerBox} und)
-                    </span>
-                    <span className="text-[10px] font-bold text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-full shrink-0">
-                      {maxBoxesAllowed > 0
-                        ? `Máx: ${maxBoxesAllowed}`
-                        : product.allowBackorder
-                        ? 'Bajo Pedido'
-                        : 'Sin stock'}
-                    </span>
-                  </div>
-                  <span className="text-lg sm:text-xl font-black text-catador-blue">{boxPrices.usdFormatted}</span>
-                  <span className="text-xs font-mono font-bold text-slate-600">{boxPrices.vesFormatted}</span>
-                </button>
-              )}
+          <div className="rounded-xl bg-[#F7F8FA] border border-slate-200/80 p-4 flex flex-wrap items-baseline justify-between gap-2 tabular-nums">
+            <div>
+              <p className="inline-flex items-start text-3xl sm:text-4xl font-black text-[#0F172A] tracking-tight leading-none">
+                <span className="text-[0.58em] font-extrabold mr-0.5 mt-[0.12em]">$</span>
+                <span>{intPart}</span>
+                <span className="text-[0.55em] font-extrabold ml-0.5 mt-[0.12em]">.{decPart}</span>
+              </p>
+              <p className="text-sm font-extrabold text-slate-600 mt-1">
+                {totalSelectionPrices.vesFormatted} <span className="text-slate-500 font-bold">BCV</span>
+              </p>
             </div>
+            <span className="text-xs font-extrabold text-slate-600">{priceContextLabel}</span>
           </div>
 
-          {/* Control de Cantidad y Descuento Exacto de Stock */}
-          <div className="rounded-2xl bg-slate-50 border border-slate-200/80 p-3.5 sm:p-4 space-y-3">
-            <div className="flex flex-wrap items-center justify-between gap-1.5">
-              <span className="text-xs font-extrabold text-slate-700">
-                2. Cantidad de {mode === 'caja' ? `Cajas (${unitsPerBox} und c/u)` : 'Unidades'}:
-              </span>
-              <span className="text-[11px] font-bold text-catador-blue bg-white px-2.5 py-1 rounded-lg border border-slate-200">
-                Descuenta {requiredBaseUnits} {requiredBaseUnits === 1 ? 'und' : 'unds'} de {product.stockQuantity}
-              </span>
-            </div>
+          <ProductPresentationSelector
+            product={product}
+            mode={mode}
+            unitsPerBox={unitsPerBox}
+            maxBoxesAllowed={maxBoxesAllowed}
+            unitPriceFormatted={unitPrices.usdFormatted}
+            boxPriceFormatted={boxPrices.usdFormatted}
+            onModeSwitch={handleModeSwitch}
+          />
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2">
-                <div className="flex items-center border border-slate-300 rounded-xl bg-white h-11">
-                  <button
-                    type="button"
-                    onClick={() => setQuantity(Math.max(1, safeQuantity - 1))}
-                    className="w-11 h-full font-black text-slate-700 hover:bg-slate-100 rounded-l-xl cursor-pointer"
-                  >
-                    -
-                  </button>
-                  <span className="w-12 text-center text-sm font-black text-slate-900">{safeQuantity}</span>
-                  <button
-                    type="button"
-                    disabled={!product.allowBackorder && safeQuantity >= currentMax}
-                    onClick={() => setQuantity(Math.min(currentMax, safeQuantity + 1))}
-                    className="w-11 h-full font-black text-slate-700 hover:bg-slate-100 disabled:opacity-40 rounded-r-xl cursor-pointer"
-                  >
-                    +
-                  </button>
-                </div>
-
-                {/* Atajos rápidos de cantidad */}
-                {[2, 6, 12].map((preset) =>
-                  preset <= currentMax ? (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setQuantity(preset)}
-                      className={cn(
-                        'px-2.5 h-9 rounded-lg text-xs font-bold border transition-colors cursor-pointer',
-                        safeQuantity === preset
-                          ? 'bg-catador-blue text-white border-catador-blue'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-catador-blue'
-                      )}
-                    >
-                      {preset}
-                    </button>
-                  ) : null
-                )}
-              </div>
-
-              <div className="flex items-center justify-between sm:block border-t sm:border-t-0 border-slate-200/80 pt-2.5 sm:pt-0 sm:text-right">
-                <span className="text-[11px] font-bold text-slate-500 block">Subtotal Selección:</span>
-                <div className="text-right">
-                  <span className="text-lg sm:text-xl font-black text-slate-900">{totalSelectionPrices.usdFormatted}</span>
-                  <span className="block text-xs font-mono font-bold text-slate-600">
-                    {totalSelectionPrices.vesFormatted}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {feedbackMsg && (
-              <div className="flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
-                <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
-                <span>{feedbackMsg}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Botones de Acción Principal */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={isOutOfStock}
-              className={cn(
-                'flex items-center justify-center gap-2 h-12 px-5 rounded-xl font-black text-sm transition-all shadow-sm',
-                isOutOfStock
-                  ? 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
-                  : isAdded
-                  ? 'bg-emerald-600 text-white cursor-pointer'
-                  : 'bg-catador-blue text-white hover:bg-catador-blue-light cursor-pointer'
-              )}
-            >
-              {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4" />}
-              <span>
-                {isOutOfStock
-                  ? 'Agotado en Bodegón'
-                  : isAdded
-                  ? '¡Agregado al Carrito!'
-                  : `Agregar ${safeQuantity} ${mode === 'caja' ? (safeQuantity === 1 ? 'Caja' : 'Cajas') : (safeQuantity === 1 ? 'Unidad' : 'Unidades')}`}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={handleDirectBuy}
-              disabled={isOutOfStock}
-              className={cn(
-                'flex items-center justify-center gap-2 h-12 px-5 rounded-xl font-black text-sm shadow-sm transition-colors',
-                isOutOfStock
-                  ? 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed'
-                  : 'bg-catador-amber hover:bg-catador-amber-dark text-white cursor-pointer'
-              )}
-            >
-              <Zap className="h-4 w-4" />
-              <span>{isOutOfStock ? 'Sin Existencias' : 'Comprar Ahora Directo'}</span>
-            </button>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => {
-              const url = typeof window !== 'undefined' ? window.location.href : '';
-              window.open(
-                `https://wa.me/?text=${encodeURIComponent(`🍷 *${product.name}*\n💰 ${unitPrices.usdFormatted} (${unitPrices.vesFormatted})\n📦 Gran Catador Barinas: ${url}`)}`,
-                '_blank'
-              );
-            }}
-            className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-          >
-            <Share2 className="h-3.5 w-3.5 text-catador-blue" /> Compartir este artículo por WhatsApp
-          </button>
-        </div>
+          <ProductDetailBuyBox
+            mode={mode}
+            unitsPerBox={unitsPerBox}
+            safeQuantity={safeQuantity}
+            currentMax={currentMax}
+            allowBackorder={product.allowBackorder}
+            isOutOfStock={isOutOfStock}
+            isAdded={isAdded}
+            feedbackMsg={feedbackMsg}
+            onQuantityChange={setQuantity}
+            onAddToCart={handleAddToCart}
+            onDirectBuy={handleDirectBuy}
+          />
+        </section>
       </div>
 
       <ProductDetailExtraSection product={product} relatedProducts={relatedProducts} />

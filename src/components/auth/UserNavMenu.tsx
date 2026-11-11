@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { User, LogOut, Package, Shield, Settings } from 'lucide-react';
@@ -45,30 +45,30 @@ export function UserNavMenu() {
 
     loadUser();
 
-    // Escuchar cambios de autenticación
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event: string, session: { user?: { id: string; email?: string } } | null) => {
-        if (session?.user && mounted) {
-          setUser(session.user);
-          supabase
-            .from('perfiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-            .then(({ data: p }: { data: unknown }) => {
-              if (p && mounted) setPerfil(p as PerfilRow);
-            });
-        } else if (mounted) {
-          setUser(null);
-          setPerfil(null);
+    let unsubscribe: (() => void) | undefined;
+    try {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (_event: string, session: { user?: { id: string; email?: string } } | null) => {
+          if (session?.user && mounted) {
+            setUser(session.user);
+            supabase
+              .from('perfiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+              .then(({ data: p }: { data: unknown }) => { if (p && mounted) setPerfil(p as PerfilRow); })
+              .catch(() => {});
+          } else if (mounted) {
+            setUser(null);
+            setPerfil(null);
+          }
         }
-      }
-    );
-
-    return () => {
-      mounted = false;
-      subscription.unsubscribe();
-    };
+      );
+      unsubscribe = () => subscription.unsubscribe();
+    } catch {
+      // Silenciar suscripción si el entorno local carece de llaves Supabase
+    }
+    return () => { mounted = false; unsubscribe?.(); };
   }, []);
 
   // Cerrar al hacer clic fuera
@@ -99,11 +99,11 @@ export function UserNavMenu() {
     return (
       <Link
         href="/login"
-        className="flex items-center gap-1 sm:gap-1.5 rounded-xl border border-slate-200 bg-white px-2 sm:px-3 h-9 sm:min-h-[42px] text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors"
+        className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-[#F7F8FA] px-3 sm:px-3.5 h-10 sm:min-h-[44px] text-xs font-extrabold text-slate-800 hover:border-catador-blue hover:text-catador-blue transition-colors"
       >
-        <User className="h-3.5 w-3.5 shrink-0" />
+        <User className="h-4 w-4 shrink-0" />
         <span className="hidden sm:inline">Iniciar Sesión</span>
-        <span className="sm:hidden text-[10px] xs:text-[11px]">Entrar</span>
+        <span className="sm:hidden text-xs">Entrar</span>
       </Link>
     );
   }
@@ -118,9 +118,9 @@ export function UserNavMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 sm:gap-2 rounded-xl border border-slate-200 bg-white px-1.5 xs:px-2 sm:px-3 h-9 sm:min-h-[42px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 sm:gap-2 rounded-full border border-slate-200 bg-[#F7F8FA] px-2 sm:px-3 h-10 sm:min-h-[44px] text-xs font-bold text-slate-800 hover:border-catador-blue transition-colors cursor-pointer"
       >
-        <div className="h-5 w-5 sm:h-6 sm:w-6 shrink-0 rounded-full bg-catador-blue text-white flex items-center justify-center text-[9px] sm:text-[10px] font-black uppercase">
+        <div className="h-6 w-6 shrink-0 rounded-full bg-catador-blue text-white flex items-center justify-center text-[10px] font-black uppercase border border-catador-amber-oak/50">
           {rawDisplayName.charAt(0)}
         </div>
         <span className="max-w-[42px] xs:max-w-[65px] sm:max-w-[110px] truncate text-[10px] xs:text-[11px] sm:text-xs">

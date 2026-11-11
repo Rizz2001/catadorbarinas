@@ -444,6 +444,7 @@ export async function searchProducts(
 export async function fetchHomeCuratedSections(): Promise<{
   dealsProducts: Product[];
   trendsProducts: Product[];
+  allPool: Product[];
 }> {
   const primaryGroups = ['01', '09', '02', '11', '05'];
   const groupLists = await Promise.all(primaryGroups.map((g) => fetchFullGroupArticulos(g, false)));
@@ -470,5 +471,5 @@ export async function fetchHomeCuratedSections(): Promise<{
     }
   }
 
-  return { dealsProducts, trendsProducts };
+  return { dealsProducts, trendsProducts, allPool: groupLists[0] || [] };
 }

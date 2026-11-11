@@ -62,12 +62,18 @@ export function ProductConfigModal({
   const [precioOfertaUsd, setPrecioOfertaUsd] = useState<string>(
     existingConfig?.precio_oferta_usd ? String(existingConfig.precio_oferta_usd) : ''
   );
+  const [porcentajeDescuento, setPorcentajeDescuento] = useState<string>(
+    existingConfig?.porcentaje_descuento_custom
+      ? String(existingConfig.porcentaje_descuento_custom)
+      : ''
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
+      const parsedDiscount = parseInt(porcentajeDescuento, 10);
       const result = await upsertProductCmsConfig({
         cod_articulo: product.id,
         nombre_referencia: product.name,
@@ -82,7 +88,14 @@ export function ProductConfigModal({
         categoria_tendencia: categoriaTendencia,
         es_oferta_destacada: esOferta,
         precio_oferta_usd: precioOfertaUsd ? parseFloat(precioOfertaUsd) : null,
+        porcentaje_descuento_custom:
+          parsedDiscount > 0 && parsedDiscount < 100 ? parsedDiscount : null,
       });
+      try {
+        await fetch('/api/admin/revalidate', { method: 'POST' });
+      } catch {
+        // Silencioso
+      }
       showToast({ body: `Configuración guardada para ${product.name}` });
       onSaved(result);
     } finally {
@@ -230,13 +243,24 @@ export function ProductConfigModal({
                     value={esOferta}
                     onChange={setEsOferta}
                   />
-                  <div>
+                  <div className="grid grid-cols-2 gap-2">
                     <input
                       type="number"
                       step="0.01"
-                      placeholder={`Precio Oferta USD (Actual: $${product.priceUsd})`}
+                      min="0"
+                      placeholder={`Precio Oferta ($${product.priceUsd})`}
                       value={precioOfertaUsd}
                       onChange={(e) => setPrecioOfertaUsd(e.target.value)}
+                      className="w-full rounded-lg border border-amber-200 bg-white p-2 text-xs font-bold"
+                    />
+                    <input
+                      type="number"
+                      step="1"
+                      min="1"
+                      max="99"
+                      placeholder="% Descuento (ej: 15)"
+                      value={porcentajeDescuento}
+                      onChange={(e) => setPorcentajeDescuento(e.target.value)}
                       className="w-full rounded-lg border border-amber-200 bg-white p-2 text-xs font-bold"
                     />
                   </div>

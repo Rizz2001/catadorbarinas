@@ -83,6 +83,7 @@ export default function AdminAliadosFaqPage() {
     });
     setBrandName('');
     setBrandLogo('');
+    void fetch('/api/admin/revalidate', { method: 'POST' });
     showToastBanner('Empresa aliada agregada correctamente');
     await loadAll();
   };
@@ -99,6 +100,7 @@ export default function AdminAliadosFaqPage() {
     });
     setFaqQuestion('');
     setFaqAnswer('');
+    void fetch('/api/admin/revalidate', { method: 'POST' });
     showToastBanner('Pregunta frecuente publicada');
     await loadAll();
   };

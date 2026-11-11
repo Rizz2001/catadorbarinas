@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { usePathname } from 'next/navigation';
 import { HeaderTopBar } from './HeaderTopBar';
 import { HeaderMain } from './HeaderMain';

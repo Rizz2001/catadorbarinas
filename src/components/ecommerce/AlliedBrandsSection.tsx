@@ -1,9 +1,8 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { AlliedBrand } from '@/types';
 
 interface AlliedBrandsSectionProps {
@@ -15,11 +14,10 @@ export function AlliedBrandsSection({
   brands,
   title = 'Empresas y Marcas Aliadas Oficiales',
 }: AlliedBrandsSectionProps) {
-  // Regla de auditoría UX: Ocultar la sección en portada hasta tener 6 o más marcas activas en el CMS
   if (!brands || brands.length < 6) return null;
 
   return (
-    <section className="rounded-xl bg-white border border-slate-200 p-4 sm:p-6 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
+    <section className="rounded-2xl bg-white border border-slate-200 p-4 sm:p-6 space-y-4 sm:space-y-5 min-w-0 max-w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 pb-3.5 sm:pb-4">
         <div className="min-w-0">
           <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
@@ -31,10 +29,10 @@ export function AlliedBrandsSection({
         </div>
         <Link
           href="/catalogo"
-          className="text-[13px] sm:text-sm font-extrabold text-catador-blue hover:text-catador-blue-light inline-flex items-center gap-1 self-start sm:self-auto"
+          className="text-[13px] sm:text-sm font-extrabold text-catador-blue hover:text-catador-blue-dark inline-flex items-center gap-1 self-start sm:self-auto"
         >
-          <span>Explorar catálogo de marcas</span>
-          <ArrowUpRight className="h-4 w-4" />
+          <span>Explorar catálogo</span>
+          <ChevronRight className="h-4 w-4" />
         </Link>
       </div>
 
@@ -51,10 +49,10 @@ export function AlliedBrandsSection({
             <Link
               key={brand.id}
               href={brand.url_destino || '/catalogo'}
-              className="group relative flex items-center gap-2.5 sm:gap-3 p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-200 hover:border-catador-blue transition-colors duration-150 min-w-0"
+              className="group relative flex items-center gap-2.5 sm:gap-3 p-3 rounded-2xl bg-[#F7F8FA] hover:bg-white border border-slate-200 hover:border-catador-blue transition-colors duration-150 min-w-0"
             >
               <div
-                className="relative flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-lg text-white font-black text-xs overflow-hidden"
+                className="relative flex h-10 w-10 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-full text-white font-black text-xs overflow-hidden"
                 style={{ backgroundColor: brand.color_acento || '#00227B' }}
               >
                 {brand.logo_url ? (
@@ -78,8 +76,6 @@ export function AlliedBrandsSection({
                   {brand.categoria_tag}
                 </span>
               </div>
-
-              <ArrowUpRight className="hidden xs:block h-4 w-4 text-slate-400 group-hover:text-catador-blue shrink-0 transition-colors" />
             </Link>
           );
         })}

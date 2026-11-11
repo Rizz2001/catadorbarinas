@@ -127,6 +127,15 @@ export const useStoreConfigStore = create<StoreConfigState>((set, get) => ({
     try {
       const updated = await updateStoreConfigService(patch);
       set({ config: { ...get().config, ...updated }, hasLoaded: true });
+      try {
+        await fetch('/api/admin/revalidate', { method: 'POST' });
+        if ('bcv_usar_manual' in patch || 'bcv_tasa_manual' in patch) {
+          const { useBcvStore } = await import('./useBcvStore');
+          await useBcvStore.getState().fetchRate(true);
+        }
+      } catch {
+        // Revalidación silenciosa
+      }
       return updated;
     } finally {
       set({ isLoading: false });

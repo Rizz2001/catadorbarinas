@@ -102,10 +102,14 @@ export type BannerType = 'hero' | 'promo_1' | 'promo_2' | 'promo_3' | 'promocion
 export interface Banner {
   id: string;
   titulo: string;
+  titulo_destacado?: string | null;
   subtitulo?: string | null;
   badge_texto?: string | null;
   boton_texto: string;
   boton_url: string;
+  boton_secundario_texto?: string | null;
+  boton_secundario_url?: string | null;
+  color_fondo?: string | null;
   imagen_url?: string | null;
   tipo: BannerType;
   promo_titulo?: string | null;

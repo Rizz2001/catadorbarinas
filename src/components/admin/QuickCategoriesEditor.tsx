@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Wine,
   CupSoda,
@@ -23,6 +23,7 @@ const AVAILABLE_ICONS = [
   { id: 'Cookie', label: 'Galleta / Confitería', icon: Cookie },
   { id: 'Sandwich', label: 'Sándwich / Snacks', icon: Sandwich },
   { id: 'Snowflake', label: 'Copo / Hielo & Eventos', icon: Snowflake },
+  { id: 'Sparkles', label: 'Destellos / Hielo & Agua', icon: Snowflake },
 ];
 
 export function QuickCategoriesEditor() {

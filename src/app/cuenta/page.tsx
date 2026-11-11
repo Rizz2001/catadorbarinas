@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User, Package, Shield, Loader2, ChevronRight, Home } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
+import { useDeliveryStore } from '@/store/useDeliveryStore';
+import { BARINAS_ZONE_COORDS } from '@/lib/delivery';
 import { PedidoConDetalles } from '@/types';
 import { Database } from '@/types/supabase';
 import {
@@ -43,6 +45,7 @@ function CuentaContent() {
     latitud: null as number | null,
     longitud: null as number | null,
   });
+  const [selectedZone, setSelectedZone] = useState('');
 
   useEffect(() => {
     if (tabParam === 'pedidos' || tabParam === 'seguridad' || tabParam === 'perfil') {
@@ -90,6 +93,16 @@ function CuentaContent() {
             latitud: prof.latitud ?? null,
             longitud: prof.longitud ?? null,
           });
+          useDeliveryStore.getState().hydrateFromProfile({
+            userId: currentUser.id,
+            direccion: prof.direccion || null,
+            latitud: typeof prof.latitud === 'number' ? prof.latitud : null,
+            longitud: typeof prof.longitud === 'number' ? prof.longitud : null,
+          });
+          const matchedZone = Object.keys(BARINAS_ZONE_COORDS).find((z) =>
+            (prof.direccion || '').toLowerCase().includes(z.toLowerCase())
+          );
+          if (matchedZone) setSelectedZone(matchedZone);
         }
 
         // Cargar Pedidos del Usuario
@@ -171,6 +184,18 @@ function CuentaContent() {
           ? { ...prev, ...payload }
           : ({ id: user.id, ...payload, rol: 'cliente' } as PerfilRow)
       );
+      useDeliveryStore.getState().applyProfileSavedLocation({
+        userId: user.id,
+        direccion: formData.direccion,
+        latitud: formData.latitud,
+        longitud: formData.longitud,
+      });
+      if (selectedZone && BARINAS_ZONE_COORDS[selectedZone]) {
+        const z = BARINAS_ZONE_COORDS[selectedZone];
+        useDeliveryStore
+          .getState()
+          .setZoneWithFallbackCoords(selectedZone, formData.latitud ?? z.lat, formData.longitud ?? z.lng);
+      }
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3500);
     } catch (err: unknown) {
@@ -210,28 +235,28 @@ function CuentaContent() {
       {/* Hero del Usuario con Avatar, Rol, Estadísticas y Salir */}
       <AccountHero user={user} perfil={perfil} orders={userOrders} />
 
-      {/* Pestañas de Navegación del Panel */}
-      <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-slate-200/80 border border-slate-300">
+      {/* Pestañas de Navegación en Píldora (Opción C) */}
+      <div className="flex items-center gap-1.5 p-1 rounded-full bg-white border border-slate-200">
         <button
           type="button"
           onClick={() => setActiveTab('perfil')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
             activeTab === 'perfil'
-              ? 'bg-catador-blue text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900'
+              ? 'bg-catador-blue text-white'
+              : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
           <User className="h-4 w-4 shrink-0" />
-          <span>Datos Personales</span>
+          <span>Mi Perfil y GPS</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('pedidos')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
             activeTab === 'pedidos'
-              ? 'bg-catador-blue text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900'
+              ? 'bg-catador-blue text-white'
+              : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
           <Package className="h-4 w-4 shrink-0" />
@@ -240,8 +265,8 @@ function CuentaContent() {
             <span
               className={`h-5 min-w-[20px] px-1.5 rounded-full text-xs flex items-center justify-center font-black tabular-nums ${
                 activeTab === 'pedidos'
-                  ? 'bg-catador-amber text-white shadow-xs'
-                  : 'bg-slate-300 text-slate-800'
+                  ? 'bg-catador-amber text-white'
+                  : 'bg-catador-amber-soft text-[#8B3E03]'
               }`}
             >
               {userOrders.length}
@@ -252,10 +277,10 @@ function CuentaContent() {
         <button
           type="button"
           onClick={() => setActiveTab('seguridad')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
+          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-xs sm:text-sm font-extrabold transition-all cursor-pointer min-h-[44px] ${
             activeTab === 'seguridad'
-              ? 'bg-catador-blue text-white shadow-md'
-              : 'text-slate-700 hover:text-slate-900'
+              ? 'bg-catador-blue text-white'
+              : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
           <Shield className="h-4 w-4 shrink-0" />
@@ -268,6 +293,8 @@ function CuentaContent() {
         <AccountProfileTab
           isEmailConfirmed={Boolean(perfil?.correo_confirmado || perfil?.rol === 'admin')}
           userEmail={user?.email}
+          selectedZone={selectedZone}
+          onSelectZone={setSelectedZone}
           formData={formData}
           onChange={handleFieldChange}
           onChangeLocation={handleLocationChange}

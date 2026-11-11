@@ -30,7 +30,7 @@ export function BannerImageUploader({ imageUrl, onImageChange }: BannerImageUplo
   return (
     <div className="space-y-2">
       <label className="block font-bold text-slate-700 text-xs">
-        Imagen de Fondo del Banner (Opcional)
+        Fotografía Atmosférica de Fondo (Opcional · Sin textos ni logotipos)
       </label>
 
       {imageUrl ? (

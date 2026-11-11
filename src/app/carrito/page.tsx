@@ -1,37 +1,34 @@
-import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ShoppingBag, ChevronRight } from 'lucide-react';
 import { CartItemList, CartOrderSummary, CartCheckoutForm } from '@/components/cart';
 
 export const metadata: Metadata = {
-  title: 'Carrito de Compras | Gran Catador Barinas',
+  title: 'Carrito de Compras | EL CATADOR. Barinas',
   description: 'Revisa tu pedido de licores, víveres y bodegón con precios bimonetarios oficiales en dólares y bolívares.',
 };
 
 export default function CarritoPage() {
   return (
-    <main className="container mx-auto px-4 py-6 md:py-8 space-y-6">
-      {/* Breadcrumb de Navegación */}
-      <nav className="flex items-center gap-2 text-xs text-slate-500">
-        <Link href="/" className="hover:text-catador-blue transition-colors">
+    <main className="container mx-auto max-w-7xl px-4 py-6 md:py-8 space-y-6">
+      <nav className="flex items-center gap-2 text-xs text-slate-600">
+        <Link href="/" className="hover:text-catador-blue transition-colors font-semibold">
           Inicio
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
-        <span className="font-bold text-slate-800">Carrito de Compras</span>
+        <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+        <span className="font-extrabold text-slate-900">Carrito de Compras</span>
       </nav>
 
-      {/* Título de la Página */}
-      <div className="flex items-center gap-2.5 border-b border-slate-200 pb-4">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
+      <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-catador-blue text-white shrink-0">
           <ShoppingBag className="h-5 w-5" />
         </div>
         <div>
           <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
             Tu Carrito de Compras
           </h1>
-          <p className="text-xs text-slate-500">
-            Revisa tus artículos y coordina tu entrega a domicilio o retiro en Bodegón del Catador Barinas
+          <p className="text-[13px] text-slate-600">
+            Revisa tus artículos y coordina tu entrega GPS o retiro en EL CATADOR. Barinas
           </p>
         </div>
       </div>

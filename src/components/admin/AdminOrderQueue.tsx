@@ -87,7 +87,7 @@ export function AdminOrderQueue({
           placeholder="Buscar por cliente, #orden o cédula..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full min-h-[44px] rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/20"
+          className="w-full min-h-[44px] rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/15"
         />
 
         <div className="overflow-x-auto pb-0.5 no-scrollbar tabular-nums">
@@ -136,8 +136,8 @@ export function AdminOrderQueue({
                 className={cn(
                   'p-4 transition-colors cursor-pointer border-l-4 relative space-y-2',
                   isSelected
-                    ? 'border-l-catador-amber bg-amber-50/40'
-                    : 'border-l-transparent hover:bg-slate-50'
+                    ? 'border-l-catador-amber bg-catador-amber-soft/50'
+                    : 'border-l-transparent hover:bg-[#F7F8FA]'
                 )}
               >
                 <div className="flex items-center justify-between tabular-nums">

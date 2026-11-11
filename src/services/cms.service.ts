@@ -51,11 +51,6 @@ export async function upsertBanner(banner: Partial<Banner>): Promise<Banner> {
   return data as Banner;
 }
 
-export async function deleteBanner(id: string): Promise<void> {
-  const { error } = await supabase.from('banners').delete().eq('id', id);
-  if (error) throw error;
-}
-
 // ============================================================================
 // CATEGORÍAS RÁPIDAS (ACCESOS DIRECTOS DEL HERO)
 // ============================================================================
@@ -90,15 +85,15 @@ export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise
   return data as QuickCategory;
 }
 
-export async function deleteQuickCategory(id: string): Promise<void> {
-  const { error } = await supabase.from('categorias_rapidas').delete().eq('id', id);
-  if (error) throw error;
-}
-
 // ============================================================================
 // CONFIGURACIÓN DE LA TIENDA
 // ============================================================================
 let cachedStoreConfig: { data: StoreConfig | null; expiry: number } | null = null;
+
+export function invalidateClientCmsCaches(): void {
+  cachedStoreConfig = null;
+  cachedImagesMap = null;
+}
 
 export async function getStoreConfig(): Promise<StoreConfig | null> {
   const now = Date.now();

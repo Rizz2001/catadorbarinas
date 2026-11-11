@@ -1,6 +1,5 @@
-import React from 'react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Banner } from '@/types';
 
 interface PromoBannersGridProps {
@@ -75,8 +74,8 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
     activeCards.length === 1
       ? 'grid-cols-1'
       : activeCards.length === 2
-        ? 'grid-cols-1 md:grid-cols-2'
-        : 'grid-cols-1 md:grid-cols-3';
+      ? 'grid-cols-1 md:grid-cols-2'
+      : 'grid-cols-1 md:grid-cols-3';
 
   return (
     <section
@@ -87,29 +86,36 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
         <Link
           key={card.id}
           href={card.ctaUrl}
-          className="group relative overflow-hidden rounded-xl p-5 sm:p-6 border border-slate-800/40 flex flex-col justify-end min-h-[156px] sm:min-h-[200px] transition-colors duration-150 hover:border-catador-amber"
+          className="group relative overflow-hidden rounded-2xl p-5 sm:p-6 border border-slate-200 flex flex-col justify-between min-h-[168px] sm:min-h-[208px] transition-colors duration-150 hover:border-catador-blue"
           style={{
-            backgroundImage: `linear-gradient(to top, rgba(15, 23, 42, 0.94) 0%, rgba(15, 23, 42, 0.58) 60%, rgba(15, 23, 42, 0.25) 100%), url(${card.image})`,
+            backgroundImage: `linear-gradient(to top, rgba(0, 23, 84, 0.94) 0%, rgba(0, 23, 84, 0.6) 60%, rgba(0, 23, 84, 0.25) 100%), url(${card.image})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
         >
-          <div className="space-y-1.5">
-            {card.badge && card.badge.trim() !== '' && (
-              <span className="inline-block text-xs font-extrabold uppercase tracking-wider text-amber-300">
+          <div className="flex items-start justify-between gap-2">
+            {card.badge && card.badge.trim() !== '' ? (
+              <span className="inline-block rounded-full bg-catador-amber-soft border border-catador-amber-oak/70 px-2.5 py-0.5 text-xs font-extrabold text-[#8B3E03]">
                 {card.badge.replace(/^[★✨\s]+/, '')}
               </span>
+            ) : (
+              <span />
             )}
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white group-hover:bg-white group-hover:text-catador-blue transition-colors shadow-xs">
+              <ChevronRight className="h-4 w-4" />
+            </span>
+          </div>
+
+          <div className="space-y-1.5 pt-4">
             <h2 className="text-base sm:text-xl font-black text-white leading-tight tracking-tight">
               {card.title}
             </h2>
             <p className="text-[13px] text-slate-200 leading-relaxed line-clamp-2">
               {card.subtitle}
             </p>
-            <div className="pt-1.5 inline-flex items-center gap-1.5 text-[13px] font-extrabold text-amber-300 group-hover:text-white transition-colors">
-              <span>{card.ctaText}</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </div>
+            <span className="inline-block pt-1 text-[13px] font-extrabold text-catador-amber-oak group-hover:text-white transition-colors">
+              {card.ctaText}
+            </span>
           </div>
         </Link>
       ))}

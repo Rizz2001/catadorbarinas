@@ -1,4 +1,5 @@
-import type { DualPriceResult } from '../types';
+import type { CartItem, CartTotals, DualPriceResult, StoreConfig } from '../types';
+import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from './inventory';
 
 /**
  * Tasa BCV de respaldo oficial en caso de desconexión o fallo de API
@@ -73,35 +74,66 @@ export function formatPrices(
 }
 
 /**
- * Formatea un precio dual con descuento para banners y fichas de producto.
+ * Separa la cadena USD formateada en parte entera (con separadores de miles) y decimales.
+ * Evita partir erróneamente montos >= $1,000 como "$1,294.00".
  */
-export function formatDiscountedPrices(
-  currentPriceUsd: number,
-  originalPriceUsd: number,
-  bcvRate: number = DEFAULT_BCV_RATE
-): DualPriceResult & {
-  originalUsdFormatted: string;
-  originalVesFormatted: string;
-  savingsUsdFormatted: string;
-  savingsVesFormatted: string;
-  discountPercentage: number;
+export function splitUsdParts(usdFormatted: string): {
+  intPart: string;
+  decPart: string;
 } {
-  const base = formatPrices(currentPriceUsd, bcvRate);
-  const original = formatPrices(originalPriceUsd, bcvRate);
-  const savingsUsd = Math.max(0, originalPriceUsd - currentPriceUsd);
-  const savingsVes = convertUsdToVes(savingsUsd, bcvRate);
+  const cleaned = usdFormatted.replace(/[^0-9.,]/g, '');
+  const dotIndex = cleaned.lastIndexOf('.');
+  if (dotIndex === -1) {
+    return { intPart: cleaned || '0', decPart: '00' };
+  }
+  return {
+    intPart: cleaned.slice(0, dotIndex) || '0',
+    decPart: cleaned.slice(dotIndex + 1).padEnd(2, '0').slice(0, 2),
+  };
+}
 
-  const discountPercentage =
-    originalPriceUsd > 0
-      ? Math.round(((originalPriceUsd - currentPriceUsd) / originalPriceUsd) * 100)
-      : 0;
+/**
+ * Fuente única de verdad para calcular subtotales, ahorros y envío del carrito
+ * respetando la modalidad real ('unidad' vs 'caja') de cada ítem.
+ */
+export function calculateCartTotals(
+  items: CartItem[],
+  bcvRate: number = DEFAULT_BCV_RATE,
+  storeConfig?: Partial<StoreConfig> | null
+): CartTotals {
+  let subtotalUsd = 0;
+  let discountUsd = 0;
+  let itemCount = 0;
+
+  items.forEach(({ product, quantity, purchaseMode }) => {
+    const mode = purchaseMode || 'unidad';
+    const effectivePrice = getEffectivePriceUsd(product, mode);
+    subtotalUsd += effectivePrice * quantity;
+    itemCount += quantity;
+
+    const units = getUnitsPerPurchaseMode(product, mode);
+    const regularTotalPerItem = (product.originalPriceUsd || product.priceUsd) * units;
+    if (regularTotalPerItem > effectivePrice) {
+      discountUsd += (regularTotalPerItem - effectivePrice) * quantity;
+    }
+  });
+
+  const freeThreshold = storeConfig?.delivery_gratis_minimo_usd ?? 30.0;
+  const baseShipping = storeConfig?.delivery_base_usd ?? 2.0;
+  const shippingUsd = subtotalUsd >= freeThreshold || subtotalUsd === 0 ? 0 : baseShipping;
+  const totalUsd = subtotalUsd + shippingUsd;
+
+  const safeRate = Number.isFinite(bcvRate) && bcvRate > 0 ? bcvRate : DEFAULT_BCV_RATE;
 
   return {
-    ...base,
-    originalUsdFormatted: original.usdFormatted,
-    originalVesFormatted: original.vesFormatted,
-    savingsUsdFormatted: formatUsd(savingsUsd),
-    savingsVesFormatted: formatVes(savingsVes),
-    discountPercentage,
+    subtotalUsd: Number(subtotalUsd.toFixed(2)),
+    subtotalVes: convertUsdToVes(subtotalUsd, safeRate),
+    discountUsd: Number(discountUsd.toFixed(2)),
+    discountVes: convertUsdToVes(discountUsd, safeRate),
+    shippingUsd: Number(shippingUsd.toFixed(2)),
+    shippingVes: convertUsdToVes(shippingUsd, safeRate),
+    totalUsd: Number(totalUsd.toFixed(2)),
+    totalVes: convertUsdToVes(totalUsd, safeRate),
+    itemCount,
   };
 }

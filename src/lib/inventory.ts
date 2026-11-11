@@ -40,7 +40,9 @@ export function getEffectivePriceUsd(
     if (product.boxPriceUsd && product.boxPriceUsd > 0) {
       return Number(product.boxPriceUsd.toFixed(2));
     }
-    return product.priceUsd;
+    return Number(
+      (product.priceUsd * getUnitsPerPurchaseMode(product, 'caja')).toFixed(2)
+    );
   }
   return product.priceUsd;
 }
@@ -48,7 +50,7 @@ export function getEffectivePriceUsd(
 /**
  * Calcula cuántas unidades base del mismo producto están ya comprometidas en el carrito.
  */
-export function getCommittedBaseUnits(
+function getCommittedBaseUnits(
   items: CartItem[],
   productId: string,
   excludeMode?: PurchaseMode
