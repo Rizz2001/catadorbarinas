@@ -38,16 +38,16 @@ export function ProductDetailExtraSection({
 
   return (
     <div className="space-y-6 sm:space-y-8 pt-2 sm:pt-4 min-w-0 max-w-full">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-        <section className="lg:col-span-7 rounded-2xl bg-white border border-slate-200 p-5 sm:p-6 flex flex-col justify-between gap-4">
-          <div className="space-y-2.5">
-            <h2 className="text-base font-black text-slate-900">Detalles del producto</h2>
-            <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+        <section className="lg:col-span-7 rounded-2xl bg-white border border-slate-100 sm:border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col justify-between gap-4">
+          <div className="space-y-2">
+            <h2 className="text-sm sm:text-base font-black text-slate-900">Detalles del producto</h2>
+            <p className="text-[13px] sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
               {displayDescription}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 text-xs font-bold text-slate-700">
+          <div className="hidden sm:flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 text-xs font-bold text-slate-700">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7F8FA] border border-slate-200 px-3 py-1.5">
               <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
               100% Original y Precintado
@@ -59,7 +59,7 @@ export function ProductDetailExtraSection({
           </div>
         </section>
 
-        <section className="lg:col-span-5 rounded-2xl bg-white border border-slate-200 p-5 sm:p-6 flex flex-col justify-between gap-4">
+        <section className="lg:col-span-5 rounded-2xl bg-white border border-slate-100 sm:border-slate-200 shadow-sm p-4 sm:p-6 flex flex-col justify-between gap-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-2">
               <div>
@@ -105,9 +105,14 @@ export function ProductDetailExtraSection({
               Completa tu combo en {product.category}
             </h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2.5 sm:gap-3.5">
+          <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-1 scrollbar-none sm:grid sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-3.5 sm:pb-0">
             {relatedProducts.slice(0, 5).map((rel) => (
-              <ProductCard key={rel.id} product={rel} />
+              <ProductCard
+                key={rel.id}
+                product={rel}
+                isCompact
+                className="w-[46vw] min-w-[168px] max-w-[205px] shrink-0 snap-start sm:w-auto sm:min-w-0 sm:max-w-none"
+              />
             ))}
           </div>
         </section>

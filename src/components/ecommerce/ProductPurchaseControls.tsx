@@ -100,7 +100,7 @@ export function ProductPurchaseControls({
           <span
             className={cn(
               'inline-flex items-start font-black tracking-tight leading-none text-[#0F172A]',
-              isCompact ? 'text-base' : 'text-[19px] sm:text-[21px]',
+              isCompact ? 'text-sm sm:text-base' : 'text-base sm:text-[21px]',
               hasDiscount && 'text-[#0F172A]'
             )}
           >
@@ -108,7 +108,7 @@ export function ProductPurchaseControls({
             <span>{intPart}</span>
             <span className="text-[0.58em] font-extrabold ml-0.5 mt-[0.12em]">.{decPart}</span>
           </span>
-          <span className="text-xs font-bold text-slate-600 mt-1 leading-tight truncate max-w-full">
+          <span className="text-[11px] sm:text-xs font-semibold text-slate-500 mt-1 leading-tight truncate max-w-full">
             {prices.vesFormatted}
           </span>
         </div>
@@ -128,7 +128,7 @@ export function ProductPurchaseControls({
               if (inCartQty > 0) onUpdateQuantity(inCartQty - 1);
             }}
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-95',
+              'flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full transition-all active:scale-95',
               inCartQty > 0
                 ? 'text-white hover:bg-white/15 cursor-pointer'
                 : 'text-white/40 cursor-not-allowed'
@@ -138,7 +138,7 @@ export function ProductPurchaseControls({
             <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
           </button>
 
-          <span className="px-2 text-xs sm:text-[13px] font-black min-w-[22px] text-center select-none">
+          <span className="px-1.5 sm:px-2 text-xs sm:text-[13px] font-black min-w-[20px] text-center select-none">
             {inCartQty > 0 ? inCartQty : 1}
           </span>
 
@@ -154,7 +154,7 @@ export function ProductPurchaseControls({
               }
             }}
             className={cn(
-              'flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-95',
+              'flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-full transition-all active:scale-95',
               canAddMore
                 ? 'text-white hover:bg-white/15 cursor-pointer'
                 : 'text-white/40 cursor-not-allowed'

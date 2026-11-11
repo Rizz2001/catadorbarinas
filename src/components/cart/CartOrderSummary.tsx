@@ -1,52 +1,26 @@
 'use client';
 
-import { useMemo } from 'react';
 import { Truck, Clock } from 'lucide-react';
-import { useCartStore } from '@/store/useCartStore';
-import { useCartTotals } from '@/hooks/useCartTotals';
-import { useCartUserLocation } from '@/hooks/useCartUserLocation';
-import { useBcvStore } from '@/store/useBcvStore';
-import { useStoreConfigStore } from '@/store/useStoreConfigStore';
+import { useCartOrderQuote } from '@/hooks/useCartOrderQuote';
 import { formatUsd, formatVes, convertUsdToVes } from '@/lib/currency';
-import { calculateSmartDeliveryQuote } from '@/lib/delivery';
 import { CartDeliveryAddressBox } from './CartDeliveryAddressBox';
 
 export function CartOrderSummary() {
-  const { items } = useCartStore();
-  const totals = useCartTotals();
-  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
-  const storeConfig = useStoreConfigStore((state) => state.config);
-  const { isAuthenticated, profileAddress, userLocation } = useCartUserLocation(true);
-
-  const deliveryQuote = useMemo(() => {
-    return calculateSmartDeliveryQuote({
-      items,
-      subtotalUsd: totals.subtotalUsd,
-      deliveryType: userLocation.deliveryType,
-      userLat: userLocation.latitud,
-      userLng: userLocation.longitud,
-      zonaBarinas: userLocation.zonaBarinas,
-      storeConfig,
-    });
-  }, [
-    items,
-    totals.subtotalUsd,
-    userLocation.deliveryType,
-    userLocation.latitud,
-    userLocation.longitud,
-    userLocation.zonaBarinas,
-    storeConfig,
-  ]);
-
-  const totalConDeliveryUsd = Number((totals.subtotalUsd + deliveryQuote.shippingUsd).toFixed(2));
-  const totalConDeliveryVes = Number(
-    (totals.subtotalVes + convertUsdToVes(deliveryQuote.shippingUsd, bcvRate)).toFixed(2)
-  );
+  const {
+    totals,
+    bcvRate,
+    deliveryQuote,
+    totalConDeliveryUsd,
+    totalConDeliveryVes,
+    isAuthenticated,
+    profileAddress,
+    userLocation,
+  } = useCartOrderQuote(true);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 className="text-base font-black text-slate-900">Resumen de la Orden</h3>
+    <div className="rounded-2xl border border-slate-100 bg-white shadow-sm p-4 sm:p-5 space-y-3.5 sm:space-y-4">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-2.5 sm:pb-3">
+        <h3 className="text-[15px] sm:text-base font-black text-slate-900">Resumen de la Orden</h3>
         <span className="inline-flex items-center gap-1 rounded-full bg-catador-amber-soft border border-catador-amber-oak/70 px-2.5 py-1 text-[11px] font-black text-[#8B3E03] tabular-nums">
           <Clock className="h-3 w-3" />
           BCV: Bs. {bcvRate.toFixed(2)}

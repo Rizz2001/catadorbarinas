@@ -13,6 +13,8 @@ interface ProductDetailBuyBoxProps {
   isOutOfStock: boolean;
   isAdded: boolean;
   feedbackMsg: string | null;
+  totalUsdFormatted: string;
+  totalVesFormatted: string;
   onQuantityChange: (qty: number) => void;
   onAddToCart: () => void;
   onDirectBuy: () => void;
@@ -27,6 +29,8 @@ export function ProductDetailBuyBox({
   isOutOfStock,
   isAdded,
   feedbackMsg,
+  totalUsdFormatted,
+  totalVesFormatted,
   onQuantityChange,
   onAddToCart,
   onDirectBuy,
@@ -106,7 +110,7 @@ export function ProductDetailBuyBox({
           onClick={onAddToCart}
           disabled={isOutOfStock}
           className={cn(
-            'w-full flex items-center justify-center gap-2 h-12 px-5 rounded-full font-extrabold text-sm transition-all active:scale-[0.98]',
+            'hidden md:flex w-full items-center justify-center gap-2 h-12 px-5 rounded-full font-extrabold text-sm transition-all active:scale-[0.98]',
             isOutOfStock
               ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
               : isAdded
@@ -129,7 +133,7 @@ export function ProductDetailBuyBox({
           onClick={onDirectBuy}
           disabled={isOutOfStock}
           className={cn(
-            'w-full flex items-center justify-center gap-2 h-12 px-5 rounded-full font-extrabold text-[13px] border transition-all active:scale-[0.98]',
+            'w-full flex items-center justify-center gap-2 h-11 md:h-12 px-5 rounded-full font-extrabold text-[13px] border transition-all active:scale-[0.98]',
             isOutOfStock
               ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed'
               : 'bg-[#FEF3C7]/60 hover:bg-[#FEF3C7] text-[#8B3E03] border-[#EB9C53]/70 cursor-pointer'
@@ -137,6 +141,31 @@ export function ProductDetailBuyBox({
         >
           <Zap className="h-4 w-4 text-[#D99B38]" />
           <span>{isOutOfStock ? 'Sin Existencias' : 'Comprar ahora directo'}</span>
+        </button>
+      </div>
+
+      {/* Barra fija inferior en móvil sobre BottomNav para agregar con 1 toque */}
+      <div className="md:hidden fixed bottom-[calc(4rem+env(safe-area-inset-bottom))] left-0 right-0 z-30 bg-white/95 backdrop-blur-md border-t border-slate-200/80 shadow-[0_-4px_16px_rgba(15,23,42,0.06)] px-3.5 py-2.5 flex items-center justify-between gap-3">
+        <div className="min-w-0 tabular-nums">
+          <p className="text-base font-black text-slate-900 leading-none">{totalUsdFormatted}</p>
+          <p className="text-[11px] font-semibold text-slate-500 mt-0.5 truncate">{totalVesFormatted}</p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onAddToCart}
+          disabled={isOutOfStock}
+          className={cn(
+            'flex-1 min-h-[44px] h-11 flex items-center justify-center gap-2 px-4 rounded-full font-extrabold text-sm transition-all active:scale-[0.98]',
+            isOutOfStock
+              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              : isAdded
+              ? 'bg-emerald-600 text-white'
+              : 'bg-[#0F172A] text-white shadow-sm'
+          )}
+        >
+          {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4 text-[#EB9C53]" />}
+          <span>{isOutOfStock ? 'Agotado' : isAdded ? '¡Agregado!' : 'Agregar'}</span>
         </button>
       </div>
     </div>

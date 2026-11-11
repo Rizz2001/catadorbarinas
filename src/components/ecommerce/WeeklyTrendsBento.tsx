@@ -43,13 +43,13 @@ export function WeeklyTrendsBento({
   const displayItems = sortedProducts.slice(0, 6);
 
   return (
-    <section className="rounded-3xl border border-slate-200/90 bg-white p-4 sm:p-6 shadow-xs space-y-4 min-w-0 max-w-full overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 border-b border-slate-100 pb-3.5">
+    <section className="rounded-2xl sm:rounded-3xl border border-slate-100 sm:border-slate-200/90 bg-white p-3.5 sm:p-6 shadow-sm space-y-3.5 sm:space-y-4 min-w-0 max-w-full overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-3 border-b border-slate-100 pb-3 sm:pb-3.5">
         <div className="min-w-0">
-          <h2 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-base sm:text-xl font-black text-slate-900 tracking-tight leading-tight">
             {customTitle || 'Selección del Catador · Por Unidad o Caja'}
           </h2>
-          <p className="text-[13px] text-slate-600 mt-1">
+          <p className="hidden sm:block text-[13px] text-slate-500 mt-1">
             {customSubtitle || 'Artículos con mayor rotación en Barinas y disponibilidad inmediata'}
           </p>
         </div>

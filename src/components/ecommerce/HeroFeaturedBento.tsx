@@ -39,7 +39,7 @@ export function HeroFeaturedBento({
     <div
       onMouseEnter={() => onPauseChange(true)}
       onMouseLeave={() => onPauseChange(false)}
-      className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:border-catador-blue transition-colors flex flex-col justify-between min-h-[146px]"
+      className="w-[70vw] min-w-[235px] max-w-[265px] shrink-0 snap-start md:w-auto md:min-w-0 md:max-w-none rounded-2xl bg-white border border-slate-100 sm:border-slate-200 p-3.5 sm:p-4 shadow-sm hover:border-catador-blue transition-colors flex flex-col justify-between min-h-[124px] sm:min-h-[146px]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">

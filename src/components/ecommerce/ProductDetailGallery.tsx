@@ -57,7 +57,7 @@ export function ProductDetailGallery({
         </div>
       )}
 
-      <div className="relative flex-1 aspect-[4/3] sm:aspect-square rounded-2xl bg-white border border-slate-200 p-5 sm:p-7 flex items-center justify-center overflow-hidden">
+      <div className="relative flex-1 aspect-[4/3] max-h-[250px] sm:max-h-none sm:aspect-square rounded-2xl bg-white border border-slate-100 sm:border-slate-200 shadow-sm p-4 sm:p-7 flex items-center justify-center overflow-hidden">
         {discountPercentage ? (
           <span className="absolute top-3.5 left-3.5 z-10 rounded-full bg-catador-amber-soft border border-catador-amber-oak/70 px-3 py-1 text-xs font-black text-[#8B3E03] tabular-nums">
             -{discountPercentage}%

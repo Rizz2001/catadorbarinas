@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function CarritoPage() {
   return (
-    <main className="container mx-auto max-w-7xl px-4 py-6 md:py-8 space-y-6">
+    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 md:py-8 pb-6 md:pb-8 space-y-4 sm:space-y-6">
       <nav className="flex items-center gap-2 text-xs text-slate-600">
         <Link href="/" className="hover:text-catador-blue transition-colors font-semibold">
           Inicio
@@ -19,22 +19,22 @@ export default function CarritoPage() {
         <span className="font-extrabold text-slate-900">Carrito de Compras</span>
       </nav>
 
-      <div className="flex items-center gap-3 border-b border-slate-200 pb-4">
-        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-catador-blue text-white shrink-0">
-          <ShoppingBag className="h-5 w-5" />
+      <div className="flex items-center gap-3 border-b border-slate-100 pb-3 sm:pb-4">
+        <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-full bg-catador-blue text-white shrink-0">
+          <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5" />
         </div>
         <div>
-          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             Tu Carrito de Compras
           </h1>
-          <p className="text-[13px] text-slate-600">
+          <p className="hidden sm:block text-[13px] text-slate-600">
             Revisa tus artículos y coordina tu entrega GPS o retiro en EL CATADOR. Barinas
           </p>
         </div>
       </div>
 
       {/* Grid Principal: Lista a la Izquierda y Resumen / Checkout a la Derecha */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 items-start">
         {/* Columna de Artículos (7 o 8 cols) */}
         <section className="lg:col-span-7 xl:col-span-8">
           <CartItemList />

@@ -49,36 +49,44 @@ export function CartDeliveryAddressBox({
     <div
       id={variant === 'page' ? 'cotizar-delivery' : undefined}
       className={cn(
-        'rounded-2xl border border-slate-200 bg-[#F7F8FA] space-y-2.5',
-        variant === 'drawer' ? 'p-3' : 'p-3.5'
+        'space-y-2.5 border-b border-gray-100',
+        variant === 'drawer' ? 'pb-3' : 'pb-4'
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="inline-flex rounded-full bg-white p-0.5 border border-slate-200">
+        <div
+          role="radiogroup"
+          aria-label="Modalidad de entrega"
+          className="grid grid-cols-2 rounded-lg bg-slate-100 p-0.5 flex-1 max-w-[230px]"
+        >
           <button
             type="button"
+            role="radio"
+            aria-checked={deliveryType === 'delivery'}
             onClick={() => setDeliveryType('delivery')}
             className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold transition-colors cursor-pointer',
+              'inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer',
               deliveryType === 'delivery'
-                ? 'bg-catador-blue text-white'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-slate-900 shadow-2xs'
+                : 'text-slate-500 hover:text-slate-800'
             )}
           >
-            <Truck className="h-3 w-3" />
+            <Truck className="h-3.5 w-3.5" />
             <span>Delivery</span>
           </button>
           <button
             type="button"
+            role="radio"
+            aria-checked={deliveryType === 'pickup'}
             onClick={() => setDeliveryType('pickup')}
             className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-extrabold transition-colors cursor-pointer',
+              'inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all cursor-pointer',
               deliveryType === 'pickup'
-                ? 'bg-catador-blue text-white'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-slate-900 shadow-2xs'
+                : 'text-slate-500 hover:text-slate-800'
             )}
           >
-            <Store className="h-3 w-3" />
+            <Store className="h-3.5 w-3.5" />
             <span>Retiro Gratis</span>
           </button>
         </div>
@@ -87,7 +95,7 @@ export function CartDeliveryAddressBox({
           <Link
             href="/cuenta?tab=perfil"
             onClick={onNavigate}
-            className="text-[11px] font-extrabold text-catador-blue hover:underline shrink-0"
+            className="text-xs font-semibold text-catador-blue hover:underline shrink-0"
           >
             {profileAddress ? 'Editar perfil' : 'Guardar en perfil'}
           </Link>
@@ -95,20 +103,20 @@ export function CartDeliveryAddressBox({
       </div>
 
       {deliveryType === 'pickup' ? (
-        <p className="text-xs font-semibold text-slate-700 flex items-center gap-1.5 px-1">
+        <p className="text-xs text-slate-600 flex items-center gap-1.5 pt-0.5">
           <Store className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
           <span className="truncate">Retiro en {storeAddress} · Gratis</span>
         </p>
       ) : (
         <div className="space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-extrabold text-slate-700 flex items-center gap-1">
-              <MapPin className="h-3 w-3 text-catador-blue shrink-0" />
+            <span className="text-xs font-medium text-slate-600 flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
               <span>Dirección de entrega</span>
             </span>
             {isSavedFromProfile && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
-                <CheckCircle2 className="h-2.5 w-2.5" />
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700">
+                <CheckCircle2 className="h-3 w-3" />
                 De tu perfil
               </span>
             )}
@@ -120,7 +128,7 @@ export function CartDeliveryAddressBox({
             onChange={(e) => setManualAddress(e.target.value)}
             placeholder="Coloca tu dirección o guárdala en tu perfil"
             aria-label="Dirección de entrega guardada"
-            className="w-full min-h-[38px] rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue"
+            className="w-full min-h-[40px] rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-base sm:text-xs text-slate-900 placeholder:text-slate-400 transition-colors focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/15"
           />
 
           <div className="flex items-center gap-2">
@@ -132,7 +140,7 @@ export function CartDeliveryAddressBox({
                 setZoneWithFallbackCoords(z, coords?.lat ?? null, coords?.lng ?? null);
               }}
               aria-label="Sector de Barinas"
-              className="flex-1 min-w-0 min-h-[36px] rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-bold text-slate-800 focus:outline-none focus:border-catador-blue"
+              className="flex-1 min-w-0 min-h-[38px] rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-800 transition-colors focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/15"
             >
               {ZONAS_BARINAS.map((z) => (
                 <option key={z} value={z}>
@@ -145,7 +153,7 @@ export function CartDeliveryAddressBox({
               type="button"
               onClick={detectGps}
               disabled={locatingGps}
-              className="inline-flex items-center justify-center gap-1.5 rounded-full bg-catador-amber-soft hover:bg-[#FDE68A] border border-catador-amber-oak/70 px-3 min-h-[36px] text-[11px] font-extrabold text-[#8B3E03] transition-colors cursor-pointer shrink-0"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-slate-50 hover:bg-slate-100 px-3 min-h-[38px] text-xs font-semibold text-catador-blue transition-colors cursor-pointer shrink-0"
             >
               {locatingGps ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -157,7 +165,7 @@ export function CartDeliveryAddressBox({
           </div>
 
           {gpsStatus && (
-            <p className="text-[11px] font-bold text-emerald-700 px-0.5">{gpsStatus}</p>
+            <p className="text-[11px] font-medium text-emerald-700">{gpsStatus}</p>
           )}
         </div>
       )}

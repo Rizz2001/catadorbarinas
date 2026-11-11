@@ -13,9 +13,9 @@ const POPULAR_SEARCHES = [
   { name: 'Harina P.A.N.', href: '/buscar?q=harina%20pan' },
 ];
 
-export function HeaderSearchTrends({ compact = false }: { compact?: boolean }) {
+export function HeaderSearchTrends() {
   const { terms: recentTerms, hasLocalTerms, removeTerm, clearAllTerms } = useRecentSearches();
-  const displayRecent = compact ? recentTerms.slice(0, 4) : recentTerms;
+  const displayRecent = recentTerms;
 
   return (
     <div className="flex items-center justify-between gap-2 pt-1.5 text-[13px] text-slate-600 overflow-hidden">
@@ -33,17 +33,15 @@ export function HeaderSearchTrends({ compact = false }: { compact?: boolean }) {
                 >
                   {term}
                 </Link>
-                {!compact && (
-                  <button
-                    type="button"
-                    onClick={() => removeTerm(term)}
-                    title={`Quitar "${term}" de recientes`}
-                    aria-label={`Quitar ${term}`}
-                    className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => removeTerm(term)}
+                  title={`Quitar "${term}" de recientes`}
+                  aria-label={`Quitar ${term}`}
+                  className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
+                >
+                  <X className="h-3 w-3" />
+                </button>
               </span>
               {idx < displayRecent.length - 1 && (
                 <span className="text-slate-300 select-none">·</span>
@@ -72,7 +70,7 @@ export function HeaderSearchTrends({ compact = false }: { compact?: boolean }) {
         </div>
       )}
 
-      {!compact && recentTerms.length > 0 && hasLocalTerms && (
+      {recentTerms.length > 0 && hasLocalTerms && (
         <button
           type="button"
           onClick={clearAllTerms}

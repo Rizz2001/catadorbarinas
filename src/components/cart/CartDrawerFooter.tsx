@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, Truck } from 'lucide-react';
-import { formatUsd, formatVes, convertUsdToVes } from '@/lib/currency';
+import { ArrowRight } from 'lucide-react';
 import { CartTotals } from '@/types';
 import { CartAuthBottomSheet } from './CartAuthBottomSheet';
 import { CartDeliveryAddressBox } from './CartDeliveryAddressBox';
+import { CartPriceSummaryRows } from './CartPriceSummaryRows';
 
 interface CartDrawerFooterProps {
   totals: CartTotals;
@@ -45,8 +45,11 @@ export function CartDrawerFooter({
     );
   }
 
+  const deliveryLabel =
+    deliveryType === 'pickup' ? 'Retiro Pick-Up' : `Delivery (${tierBadge})`;
+
   return (
-    <div className="p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-slate-200 bg-white space-y-3">
+    <div className="px-4 pt-3.5 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-gray-100 bg-white space-y-3.5">
       <CartDeliveryAddressBox
         isAuthenticated={isAuthenticated}
         profileAddress={profileAddress}
@@ -54,58 +57,17 @@ export function CartDrawerFooter({
         onNavigate={onCloseCart}
       />
 
-      <div className="space-y-1.5 text-[13px] text-slate-700 border-b border-slate-100 pb-2.5 tabular-nums">
-        <div className="flex justify-between items-center">
-          <span className="font-medium text-slate-600">Costo de productos</span>
-          <div className="text-right font-bold text-slate-900">
-            <span>{formatUsd(totals.subtotalUsd)}</span>
-            <span className="text-xs text-slate-500 ml-1.5">
-              ({formatVes(totals.subtotalVes)})
-            </span>
-          </div>
-        </div>
-
-        {totals.discountUsd > 0 && (
-          <div className="flex justify-between items-center text-emerald-700">
-            <span className="font-bold">Ahorro aplicado</span>
-            <span className="font-black">
-              -{formatUsd(totals.discountUsd)} (-{formatVes(totals.discountVes)})
-            </span>
-          </div>
-        )}
-
-        <div className="flex justify-between items-center">
-          <span className="flex items-center gap-1.5 font-medium text-slate-700">
-            <Truck className="h-3.5 w-3.5 text-catador-blue shrink-0" />
-            <span>{deliveryType === 'pickup' ? 'Retiro Pick-Up' : `Delivery (${tierBadge})`}</span>
-          </span>
-          <div className="text-right font-bold text-slate-900">
-            <span>{shippingUsd === 0 ? 'Gratis' : formatUsd(shippingUsd)}</span>
-            {shippingUsd > 0 && (
-              <span className="text-xs text-slate-500 ml-1.5">
-                ({formatVes(convertUsdToVes(shippingUsd, bcvRate))})
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between pt-0.5 tabular-nums">
-        <div>
-          <span className="text-xs font-extrabold text-slate-700 uppercase tracking-wide block">
-            Total
-          </span>
-          <span className="text-xs font-bold text-catador-blue">
-            {formatVes(totalConDeliveryVes)}
-          </span>
-        </div>
-        <div className="text-right">
-          <p className="text-xl font-black text-slate-900 leading-none">
-            {formatUsd(totalConDeliveryUsd)}
-          </p>
-          <span className="text-[11px] font-semibold text-slate-500">Tasa Oficial BCV</span>
-        </div>
-      </div>
+      <CartPriceSummaryRows
+        subtotalUsd={totals.subtotalUsd}
+        subtotalVes={totals.subtotalVes}
+        discountUsd={totals.discountUsd}
+        discountVes={totals.discountVes}
+        deliveryLabel={deliveryLabel}
+        shippingUsd={shippingUsd}
+        bcvRate={bcvRate}
+        totalUsd={totalConDeliveryUsd}
+        totalVes={totalConDeliveryVes}
+      />
 
       {isAuthenticated ? (
         <Link

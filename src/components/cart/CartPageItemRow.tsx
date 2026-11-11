@@ -56,14 +56,14 @@ export function CartPageItemRow({
   const itemImg = isNoImg ? cmsLogo : rawImg;
 
   return (
-    <div className="pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div className="flex items-start gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
-        <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-white border border-slate-200 p-1.5 overflow-hidden">
+    <div className="pt-3.5 sm:pt-4 first:pt-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+      <div className="flex items-start gap-3 sm:gap-3.5 flex-1 min-w-0 w-full sm:w-auto">
+        <div className="relative h-16 w-16 sm:h-20 sm:w-20 shrink-0 rounded-xl bg-white border border-slate-100 shadow-xs p-1.5 overflow-hidden">
           <Image src={itemImg} alt={product.name} fill sizes="80px" className={cn('object-contain', isNoImg && 'p-2 opacity-80')} />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold uppercase text-slate-500 tracking-wider truncate">
+            <span className="hidden sm:inline text-[11px] font-bold uppercase text-slate-500 tracking-wider truncate">
               {product.brand}
             </span>
             {supportsBothModes ? (
@@ -101,7 +101,7 @@ export function CartPageItemRow({
               </span>
             )}
           </div>
-          <h3 className="text-[13px] sm:text-sm font-extrabold text-slate-900 line-clamp-2 sm:truncate mt-1">
+          <h3 className="text-sm font-bold sm:font-extrabold text-slate-900 leading-tight line-clamp-2 sm:truncate mt-0.5 sm:mt-1">
             {product.name}
           </h3>
           <p className="text-xs text-slate-500 mt-0.5 tabular-nums">
@@ -119,12 +119,12 @@ export function CartPageItemRow({
         </div>
       </div>
 
-      <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-5 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
+      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-5 w-full sm:w-auto border-t sm:border-t-0 pt-2.5 sm:pt-0 border-slate-100">
         <div className="inline-flex items-center rounded-full bg-catador-blue text-white px-1 py-0.5 tabular-nums">
           <button
             type="button"
             onClick={() => onUpdateQuantity(product.id, quantity - 1, mode)}
-            className="h-8 w-8 flex items-center justify-center text-white hover:bg-white/15 transition-colors rounded-full cursor-pointer"
+            className="h-9 w-9 sm:h-8 sm:w-8 flex items-center justify-center text-white hover:bg-white/15 transition-colors rounded-full cursor-pointer"
             aria-label="Disminuir cantidad"
           >
             <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
@@ -136,7 +136,7 @@ export function CartPageItemRow({
             onClick={() => onUpdateQuantity(product.id, quantity + 1, mode)}
             aria-label="Aumentar cantidad"
             className={cn(
-              'h-8 w-8 flex items-center justify-center transition-colors rounded-full',
+              'h-9 w-9 sm:h-8 sm:w-8 flex items-center justify-center transition-colors rounded-full',
               canAddMore ? 'text-white hover:bg-white/15 cursor-pointer' : 'text-white/40 cursor-not-allowed'
             )}
           >
@@ -152,7 +152,7 @@ export function CartPageItemRow({
         <button
           type="button"
           onClick={() => onRemoveItem(product.id, mode)}
-          className="h-9 w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
+          className="h-10 w-10 sm:h-9 sm:w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
           aria-label={`Eliminar ${product.name}`}
         >
           <Trash2 className="h-4 w-4" />

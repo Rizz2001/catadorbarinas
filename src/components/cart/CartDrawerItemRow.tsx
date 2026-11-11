@@ -53,7 +53,7 @@ export function CartDrawerItemRow({
 
   return (
     <div className="py-3.5 flex gap-3 items-start">
-      <div className="relative h-16 w-16 shrink-0 rounded-xl bg-white border border-slate-200 overflow-hidden p-1.5">
+      <div className="relative h-16 w-16 shrink-0 rounded-xl bg-slate-50/70 overflow-hidden p-1.5">
         <Image
           src={itemImg}
           alt={product.name}

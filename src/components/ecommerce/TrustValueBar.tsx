@@ -55,28 +55,28 @@ export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarPr
   return (
     <section
       aria-label="Garantías operativas de EL CATADOR."
-      className="rounded-3xl bg-white border border-slate-200/90 shadow-xs overflow-hidden"
+      className="rounded-2xl sm:rounded-3xl bg-white border border-slate-100 sm:border-slate-200/90 shadow-sm overflow-hidden"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/80">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-2.5 sm:p-0 sm:gap-0 sm:divide-x divide-slate-200/70">
         {metrics.map((item, idx) => {
           const Icon = METRIC_ICONS[idx % METRIC_ICONS.length];
           return (
             <div
               key={idx}
-              className="p-4 sm:p-5 flex items-start gap-3.5 min-w-0 hover:bg-[#F7F8FA]/60 transition-colors"
+              className="p-3 sm:p-5 rounded-xl sm:rounded-none bg-[#F7F8FA]/80 sm:bg-white flex flex-col sm:flex-row items-start gap-2.5 sm:gap-3.5 min-w-0 hover:bg-[#F7F8FA]/60 transition-colors"
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#FEF3C7]/80 border border-[#EB9C53]/60 text-[#0F172A] mt-0.5 shadow-2xs">
-                <Icon className="h-5 w-5" />
+              <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-[#FEF3C7]/80 border border-[#EB9C53]/60 text-[#0F172A] shadow-2xs">
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7F8FA] border border-slate-200 px-2.5 py-0.5 text-[11px] font-black uppercase tracking-wider text-[#0F172A] tabular-nums">
+                <span className="inline-flex items-center gap-1 rounded-full bg-white sm:bg-[#F7F8FA] border border-slate-200 px-2 py-0.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#0F172A] tabular-nums">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#D99B38]" />
                   <span>{item.figura}</span>
                 </span>
-                <h3 className="text-[13px] sm:text-sm font-black text-slate-900 leading-snug mt-1.5">
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 leading-tight mt-1.5">
                   {item.titulo}
                 </h3>
-                <p className="text-xs sm:text-[13px] text-slate-600 leading-snug mt-1">
+                <p className="hidden sm:block text-[13px] text-slate-600 leading-snug mt-1">
                   {item.subtitulo}
                 </p>
               </div>

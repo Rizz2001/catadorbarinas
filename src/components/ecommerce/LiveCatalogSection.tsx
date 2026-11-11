@@ -95,15 +95,15 @@ export function LiveCatalogSection({
       id="catalogo-en-vivo"
       className="scroll-mt-44 space-y-4 sm:space-y-5 pt-4 sm:pt-6 border-t border-slate-200 min-w-0 max-w-full overflow-hidden"
     >
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-2.5 sm:gap-3">
+      <div className="flex items-end justify-between gap-2.5 sm:gap-3">
         <div className="min-w-0">
-          <h2 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+          <h2 className="text-base sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
             {catalogTitle}
           </h2>
-          <p className="text-[13px] sm:text-sm text-slate-600 mt-1">{catalogSubtitle}</p>
+          <p className="hidden sm:block text-sm text-slate-500 mt-1">{catalogSubtitle}</p>
         </div>
-        <span className="self-start md:self-auto text-xs sm:text-[13px] font-bold text-slate-700 bg-white px-3.5 py-1.5 rounded-full border border-slate-200 tabular-nums">
-          {isLoading ? 'Consultando inventario...' : `${visibleProducts.length} de ${totalAvailableCount} artículos`}
+        <span className="shrink-0 text-[11px] sm:text-[13px] font-bold text-slate-600 bg-white px-3 py-1 rounded-full border border-slate-100 sm:border-slate-200 shadow-2xs tabular-nums">
+          {isLoading ? 'Cargando...' : `${visibleProducts.length} de ${totalAvailableCount}`}
         </span>
       </div>
 

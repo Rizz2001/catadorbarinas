@@ -71,7 +71,7 @@ export default async function HomePage() {
     .slice(0, 5);
 
   return (
-    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 sm:py-7 space-y-6 sm:space-y-8 overflow-x-clip">
+    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-3 sm:py-7 space-y-6 sm:space-y-9 overflow-x-clip">
       {/* 1. Hero Banner Principal + 4 Bento Cards + Píldoras de Categorías Rápidas */}
       <HeroBanner
         initialBanner={heroBanner}

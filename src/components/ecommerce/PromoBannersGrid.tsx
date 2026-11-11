@@ -72,21 +72,21 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
 
   const gridColsClass =
     activeCards.length === 1
-      ? 'grid-cols-1'
+      ? 'md:grid-cols-1'
       : activeCards.length === 2
-      ? 'grid-cols-1 md:grid-cols-2'
-      : 'grid-cols-1 md:grid-cols-3';
+      ? 'md:grid-cols-2'
+      : 'md:grid-cols-3';
 
   return (
     <section
       aria-label="Colecciones Destacadas del Bodegón"
-      className={`grid ${gridColsClass} gap-3 sm:gap-4`}
+      className={`flex overflow-x-auto snap-x snap-mandatory gap-3 pb-1 scrollbar-none md:grid ${gridColsClass} md:gap-4 md:pb-0`}
     >
       {activeCards.map((card) => (
         <Link
           key={card.id}
           href={card.ctaUrl}
-          className="group relative overflow-hidden rounded-2xl p-5 sm:p-6 border border-slate-200 flex flex-col justify-between min-h-[168px] sm:min-h-[208px] transition-colors duration-150 hover:border-catador-blue"
+          className="w-[78vw] min-w-[255px] max-w-[310px] shrink-0 snap-start md:w-auto md:min-w-0 md:max-w-none group relative overflow-hidden rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[146px] sm:min-h-[208px] transition-colors duration-150 hover:border-catador-blue"
           style={{
             backgroundImage: `linear-gradient(to top, rgba(0, 23, 84, 0.94) 0%, rgba(0, 23, 84, 0.6) 60%, rgba(0, 23, 84, 0.25) 100%), url(${card.image})`,
             backgroundSize: 'cover',
@@ -101,19 +101,19 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
             ) : (
               <span />
             )}
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white group-hover:bg-white group-hover:text-catador-blue transition-colors shadow-xs">
+            <span className="flex h-9 w-9 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white group-hover:bg-white group-hover:text-catador-blue transition-colors shadow-xs">
               <ChevronRight className="h-4 w-4" />
             </span>
           </div>
 
-          <div className="space-y-1.5 pt-4">
+          <div className="space-y-1 pt-3">
             <h2 className="text-base sm:text-xl font-black text-white leading-tight tracking-tight">
               {card.title}
             </h2>
-            <p className="text-[13px] text-slate-200 leading-relaxed line-clamp-2">
+            <p className="hidden sm:block text-[13px] text-slate-200 leading-relaxed line-clamp-2">
               {card.subtitle}
             </p>
-            <span className="inline-block pt-1 text-[13px] font-extrabold text-catador-amber-oak group-hover:text-white transition-colors">
+            <span className="inline-block pt-0.5 text-xs sm:text-[13px] font-extrabold text-catador-amber-oak group-hover:text-white transition-colors">
               {card.ctaText}
             </span>
           </div>

@@ -76,11 +76,11 @@ export function HeroBanner({
   const isHeroVisible = banner?.activo !== false;
 
   return (
-    <div className="space-y-6 sm:space-y-7">
+    <div className="space-y-5 sm:space-y-7">
       <div>
         {isHeroVisible && (
           <div
-            className="relative overflow-hidden rounded-3xl px-5 pt-7 pb-16 sm:px-10 sm:pt-11 sm:pb-20 text-white shadow-sm"
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl px-4 py-6 sm:px-10 sm:pt-11 sm:pb-20 text-white shadow-sm"
             style={{ backgroundColor: hero.heroBgColor }}
           >
             <div
@@ -95,24 +95,24 @@ export function HeroBanner({
             />
             <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[520px] rounded-full bg-[#EB9C53]/15 blur-3xl" />
 
-            <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto space-y-3.5">
-              <span className="inline-block rounded-full bg-white/10 border border-[#EB9C53]/45 px-3.5 py-1 text-xs font-extrabold uppercase tracking-widest text-[#EB9C53]">
+            <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto space-y-3 sm:space-y-3.5">
+              <span className="inline-block rounded-full bg-white/10 border border-[#EB9C53]/45 px-3 py-0.5 sm:px-3.5 sm:py-1 text-[11px] sm:text-xs font-extrabold uppercase tracking-widest text-[#EB9C53]">
                 {hero.badgeTexto}
               </span>
 
-              <h1 className="font-serif text-[clamp(1.65rem,4vw,3.1rem)] font-bold tracking-tight leading-[1.12] uppercase">
+              <h1 className="font-serif text-[22px] sm:text-[clamp(1.85rem,4vw,3.1rem)] font-bold tracking-tight leading-[1.15] uppercase">
                 <span className="block text-white">{hero.primaryTitle}</span>
                 {hero.highlightedTitle && (
                   <span className="block text-[#EB9C53] mt-1">{hero.highlightedTitle}</span>
                 )}
               </h1>
 
-              <p className="text-[13px] sm:text-base text-slate-300 max-w-2xl leading-relaxed">
+              <p className="hidden sm:block text-base text-slate-300 max-w-2xl leading-relaxed">
                 {hero.subtitulo}
               </p>
 
               {hero.hasPromo && (
-                <div className="inline-flex flex-wrap items-center justify-center gap-2.5 rounded-full bg-white/10 border border-white/15 px-4 py-1.5 text-[13px]">
+                <div className="inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-white/10 border border-white/15 px-3.5 py-1 text-xs sm:text-[13px]">
                   <span className="font-extrabold text-[#EB9C53]">{hero.promoTitulo}</span>
                   {hero.promoPrecio !== null && hero.promoPrecio > 0 && (
                     <span className="font-black text-white tabular-nums">
@@ -121,15 +121,17 @@ export function HeroBanner({
                     </span>
                   )}
                   {hero.promoAhorro && (
-                    <span className="text-xs font-bold text-[#FEF3C7]">· {hero.promoAhorro}</span>
+                    <span className="hidden sm:inline text-xs font-bold text-[#FEF3C7]">
+                      · {hero.promoAhorro}
+                    </span>
                   )}
                 </div>
               )}
 
-              <div className="pt-1 flex flex-wrap items-center justify-center gap-3">
+              <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
                 <Link
                   href={hero.botonUrl}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#D99B38] hover:bg-[#C88A28] active:scale-[0.98] text-white min-h-[42px] px-6 py-2 text-[13px] sm:text-sm font-black transition-all shadow-xs"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#D99B38] hover:bg-[#C88A28] active:scale-[0.98] text-white min-h-[42px] px-5 sm:px-6 py-2 text-[13px] sm:text-sm font-black transition-all shadow-xs"
                 >
                   <span>{hero.botonTexto}</span>
                   <ArrowRight className="h-4 w-4 shrink-0" />
@@ -137,7 +139,7 @@ export function HeroBanner({
                 {hero.secondaryBtnText && (
                   <Link
                     href={hero.secondaryBtnUrl}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] border border-white/25 min-h-[42px] px-5 py-2 text-[13px] sm:text-sm font-extrabold text-white transition-all"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-[0.98] border border-white/25 min-h-[42px] px-4 sm:px-5 py-2 text-[13px] sm:text-sm font-extrabold text-white transition-all"
                   >
                     <span>{hero.secondaryBtnText}</span>
                   </Link>

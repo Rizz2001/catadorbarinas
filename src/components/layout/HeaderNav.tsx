@@ -22,7 +22,7 @@ export function HeaderNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-[#081229] text-white relative z-30 border-b border-white/10">
+    <nav className="hidden md:block bg-[#081229] text-white relative z-30 border-b border-white/10">
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 flex items-center justify-between gap-4">
         <div className="relative shrink-0">
           <button

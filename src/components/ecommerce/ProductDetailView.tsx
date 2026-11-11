@@ -128,19 +128,21 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
           />
         </div>
 
-        <section className="lg:col-span-7 rounded-2xl bg-white border border-slate-200 p-5 sm:p-7 space-y-5 min-w-0 shadow-xs">
+        <section className="lg:col-span-7 rounded-2xl bg-white border border-slate-100 sm:border-slate-200 p-4 sm:p-7 space-y-4 sm:space-y-5 min-w-0 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="inline-flex items-center rounded-full bg-[#F7F8FA] border border-slate-200 px-3 py-1 text-xs font-extrabold text-slate-700 truncate">
+            <span className="inline-flex items-center rounded-full bg-[#F7F8FA] border border-slate-200/80 px-3 py-1 text-xs font-extrabold text-slate-700 truncate">
               {categoryBadge}
             </span>
             <div className="flex items-center gap-2 shrink-0">
-              <span className="text-xs font-bold text-slate-500 tabular-nums">SKU: {product.sku}</span>
+              <span className="hidden sm:inline text-xs font-bold text-slate-500 tabular-nums">
+                SKU: {product.sku}
+              </span>
               <button
                 type="button"
                 onClick={handleShare}
                 aria-label="Compartir por WhatsApp"
                 title="Compartir por WhatsApp"
-                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-xs font-extrabold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 min-h-[36px] text-xs font-extrabold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
               >
                 <Share2 className="h-3.5 w-3.5 text-catador-blue" />
                 <span className="hidden sm:inline">Compartir</span>
@@ -148,8 +150,8 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
             </div>
           </div>
 
-          <div className="space-y-2.5">
-            <h1 className="text-xl sm:text-2xl lg:text-[26px] font-black text-slate-900 tracking-tight leading-snug break-words">
+          <div className="space-y-2">
+            <h1 className="text-lg sm:text-2xl lg:text-[26px] font-black text-slate-900 tracking-tight leading-tight break-words">
               {product.name}
             </h1>
             {product.inStock ? (
@@ -198,6 +200,8 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
             isOutOfStock={isOutOfStock}
             isAdded={isAdded}
             feedbackMsg={feedbackMsg}
+            totalUsdFormatted={totalSelectionPrices.usdFormatted}
+            totalVesFormatted={totalSelectionPrices.vesFormatted}
             onQuantityChange={setQuantity}
             onAddToCart={handleAddToCart}
             onDirectBuy={handleDirectBuy}

@@ -21,6 +21,7 @@ export function BottomNav() {
     itemCount === 0 ||
     isOpen ||
     pathname === '/carrito' ||
+    pathname.startsWith('/producto/') ||
     pathname === '/login' ||
     pathname === '/registro';
 

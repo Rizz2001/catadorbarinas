@@ -98,9 +98,9 @@ export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) 
 
   return (
     <nav aria-label="Departamentos Principales">
-      {/* Móvil: Tarjetas limpias 2x2 con cintillo inferior diagonal '+' */}
-      <div className="grid grid-cols-2 gap-2.5 sm:hidden">
-        {activeCategories.slice(0, 6).map((cat, idx) => {
+      {/* Móvil: Carrusel horizontal compacto con cintillo inferior '+' */}
+      <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-1 scrollbar-none sm:hidden">
+        {activeCategories.map((cat, idx) => {
           const Icon = ICON_MAP[cat.icono] || Wine;
           const accent = RIBBON_ACCENTS[idx % RIBBON_ACCENTS.length];
           const [bgClass, textClass, borderClass] = accent.split(' ');
@@ -108,28 +108,23 @@ export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) 
             <Link
               key={cat.id || cat.nombre}
               href={cat.url}
-              className="group relative overflow-hidden rounded-2xl bg-white border border-slate-200 flex flex-col justify-between min-h-[118px]"
+              className="w-[132px] shrink-0 snap-start group relative overflow-hidden rounded-xl bg-white border border-slate-100 shadow-sm flex flex-col justify-between min-h-[96px]"
             >
-              <div className="flex-1 flex flex-col items-center justify-center p-2.5 text-center gap-1.5">
-                <div className="h-11 w-11 rounded-full bg-[#FEF3C7]/70 border border-[#EB9C53]/50 flex items-center justify-center text-[#8B3E03]">
-                  <Icon className="h-5 w-5" />
+              <div className="flex-1 flex flex-col items-center justify-center p-2.5 text-center">
+                <div className="h-10 w-10 rounded-full bg-[#FEF3C7]/80 border border-[#EB9C53]/50 flex items-center justify-center text-[#8B3E03]">
+                  <Icon className="h-4.5 w-4.5" />
                 </div>
-                {cat.descripcion && (
-                  <span className="text-[11px] font-semibold text-slate-500 line-clamp-1">
-                    {cat.descripcion}
-                  </span>
-                )}
               </div>
 
-              <div className={`flex items-center justify-between border-b-4 pl-3 ${borderClass}`}>
-                <span className={`text-[13px] font-extrabold truncate py-1.5 ${textClass}`}>
+              <div className={`flex items-center justify-between border-b-4 pl-2.5 ${borderClass}`}>
+                <span className={`text-xs font-extrabold truncate py-1.5 ${textClass}`}>
                   {cat.nombre}
                 </span>
                 <span
-                  className={`inline-flex items-center justify-center px-3 py-1.5 text-white ${bgClass}`}
+                  className={`inline-flex items-center justify-center px-2.5 py-1.5 text-white ${bgClass}`}
                   style={{ clipPath: 'polygon(22% 0, 100% 0, 100% 100%, 0 100%)' }}
                 >
-                  <Plus className="h-3.5 w-3.5 stroke-[3]" />
+                  <Plus className="h-3 w-3 stroke-[3]" />
                 </span>
               </div>
             </Link>

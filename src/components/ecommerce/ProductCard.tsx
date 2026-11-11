@@ -86,7 +86,7 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
   return (
     <article
       className={cn(
-        'group relative flex flex-col justify-between min-w-0 max-w-full overflow-hidden rounded-2xl bg-white border border-slate-200 p-3 sm:p-4 transition-colors duration-150 hover:border-catador-blue',
+        'group relative flex flex-col justify-between min-w-0 max-w-full overflow-hidden rounded-2xl bg-white border border-slate-100 sm:border-slate-200 p-2.5 sm:p-4 shadow-sm transition-colors duration-150 hover:border-catador-blue',
         className
       )}
     >
@@ -107,8 +107,8 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
       <Link
         href={productHref}
         className={cn(
-          'relative w-full overflow-hidden rounded-xl bg-white flex items-center justify-center p-4 sm:p-5 mb-2.5 block',
-          isCompact ? 'h-36 sm:h-40' : 'h-44 sm:h-48'
+          'relative w-full overflow-hidden rounded-xl bg-white flex items-center justify-center p-2.5 sm:p-5 mb-2 block',
+          isCompact ? 'h-32 sm:h-40' : 'h-36 sm:h-48'
         )}
       >
         <Image
@@ -136,8 +136,8 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
       </Link>
 
       <div className="flex flex-col flex-1 min-w-0">
-        <div className="flex items-center justify-between gap-1.5 min-h-[22px]">
-          <span className="text-xs font-bold text-slate-600 truncate min-w-0">
+        <div className="flex items-center justify-between gap-1.5 min-h-[20px] sm:min-h-[22px]">
+          <span className="hidden sm:inline text-xs font-bold text-slate-500 truncate min-w-0">
             {product.brand || product.category}
           </span>
           <ProductStockStatus
@@ -148,7 +148,7 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
 
         <Link href={productHref}>
           <h3
-            className="h-[38px] sm:h-[42px] text-[13px] sm:text-sm font-extrabold text-slate-900 line-clamp-2 mt-1 leading-[1.35] group-hover:text-catador-blue transition-colors break-words"
+            className="h-[36px] sm:h-[42px] text-[13px] sm:text-sm font-bold sm:font-extrabold text-slate-900 line-clamp-2 mt-0.5 sm:mt-1 leading-tight group-hover:text-catador-blue transition-colors break-words"
             title={product.name}
           >
             {product.name}
