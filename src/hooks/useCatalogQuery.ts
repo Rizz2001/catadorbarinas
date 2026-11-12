@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Product } from '@/types';
 import { SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
+import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
 
 interface UseCatalogQueryOptions {
   initialGroup: string;
@@ -27,8 +28,9 @@ export function useCatalogQuery({
   syncUrlPrefix,
   onSelectionChange,
 }: UseCatalogQueryOptions) {
+  const normalizedInitialSubgroup = resolveCatalogSubgroup(initialSubgroup) ?? 'todos';
   const [selectedGroup, setSelectedGroup] = useState<string>(initialGroup);
-  const [selectedSubgroup, setSelectedSubgroup] = useState<string>(initialSubgroup);
+  const [selectedSubgroup, setSelectedSubgroup] = useState<string>(normalizedInitialSubgroup);
   const [subgroups, setSubgroups] = useState<SmartVentasSubgroup[]>(initialSubgroups);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isLoading, setIsLoading] = useState<boolean>(initialProducts.length === 0);
@@ -143,7 +145,8 @@ export function useCatalogQuery({
     }
   };
 
-  const selectSubgroup = async (codSubgrupo: string) => {
+  const selectSubgroup = async (rawCodSubgrupo: string) => {
+    const codSubgrupo = resolveCatalogSubgroup(rawCodSubgrupo) ?? 'todos';
     if (codSubgrupo === selectedSubgroup) return;
     setSelectedSubgroup(codSubgrupo);
     onSelectionChange?.();

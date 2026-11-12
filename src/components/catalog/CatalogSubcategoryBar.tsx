@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { SlidersHorizontal } from 'lucide-react';
 import { SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
+import { isAllSubgroup } from '@/lib/catalogFilters';
 
 interface CatalogSubcategoryBarProps {
   subgroups: SmartVentasSubgroup[];
@@ -60,13 +61,13 @@ export function CatalogSubcategoryBar({
         className="flex flex-nowrap items-center gap-1 overflow-x-auto hide-scrollbar snap-x py-2"
       >
         <button
-          ref={selectedSubgroup === 'all' ? activeItemRef : undefined}
+          ref={isAllSubgroup(selectedSubgroup) ? activeItemRef : undefined}
           type="button"
           role="tab"
-          aria-selected={selectedSubgroup === 'all'}
-          onClick={() => onSelectSubgroup('all')}
+          aria-selected={isAllSubgroup(selectedSubgroup)}
+          onClick={() => onSelectSubgroup('todos')}
           className={`px-4 py-2 shrink-0 snap-start whitespace-nowrap min-h-[40px] flex items-center text-sm rounded-full transition-colors cursor-pointer ${
-            selectedSubgroup === 'all'
+            isAllSubgroup(selectedSubgroup)
               ? 'bg-slate-100 text-slate-900 font-semibold'
               : 'font-medium text-slate-500 hover:text-slate-900 hover:bg-slate-50/70'
           }`}

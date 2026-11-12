@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { fetchArticulosSmartVentas, fetchSubgruposInv } from '@/services/foxdata.service';
+import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const codGrupo = searchParams.get('codGrupo') || '01';
-  const codSubgrupo = searchParams.get('codSubgrupo') || undefined;
+  const codSubgrupo = resolveCatalogSubgroup(searchParams.get('codSubgrupo'));
   const fetchSubgroupsOnly = searchParams.get('subgroups') === 'true';
   const includeHidden = searchParams.get('includeHidden') === 'true';
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     const products = await fetchArticulosSmartVentas(
       codGrupo,
-      codSubgrupo === 'todos' ? undefined : codSubgrupo,
+      codSubgrupo,
       includeHidden
     );
 

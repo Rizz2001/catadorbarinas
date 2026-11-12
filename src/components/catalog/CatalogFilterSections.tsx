@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { SmartVentasGroup, SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
+import { isAllSubgroup } from '@/lib/catalogFilters';
 import {
   BrandFilterOption,
   PRICE_RANGE_OPTIONS,
@@ -77,7 +78,7 @@ export function CatalogFilterSections({
     <div className="space-y-6">
       {subgroups.length > 0 && (
         <FilterGroup title="Subcategorías">
-          <button type="button" onClick={() => onSelectSubgroup('all')} className={pillClass(selectedSubgroup === 'all')}>
+          <button type="button" onClick={() => onSelectSubgroup('todos')} className={pillClass(isAllSubgroup(selectedSubgroup))}>
             Todas
           </button>
           {subgroups.map((sub) => (

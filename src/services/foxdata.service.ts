@@ -1,6 +1,7 @@
 import { Product } from '../types';
 import { adaptFoxDataProducts, RawFoxDataProductDto } from '../adapters/foxdata.adapter';
 import { getProductImagesMap, getProductCmsConfigsMap, getStoreConfig } from './cms.service';
+import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
 import {
   DEFAULT_GROUPS,
   DEFAULT_SUBGROUPS,
@@ -345,12 +346,12 @@ export async function fetchArticulosSmartVentas(
   includeHidden = false
 ): Promise<Product[]> {
   const allGroupProducts = await fetchFullGroupArticulos(codGrupo, includeHidden);
+  const targetSub = resolveCatalogSubgroup(codSubgrupo);
 
-  if (!codSubgrupo || codSubgrupo === 'todos') {
+  if (!targetSub) {
     return allGroupProducts;
   }
 
-  const targetSub = String(codSubgrupo).trim();
   const filtered = allGroupProducts.filter(
     (p) => String(p.codSubgrupo || '').trim() === targetSub
   );

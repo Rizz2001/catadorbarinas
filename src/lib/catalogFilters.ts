@@ -52,6 +52,18 @@ export function filterAndSortCatalogProducts(
   return result;
 }
 
+export function resolveCatalogSubgroup(raw?: string | null): string | undefined {
+  const trimmed = raw?.trim();
+  if (!trimmed) return undefined;
+  const lower = trimmed.toLowerCase();
+  if (lower === 'all' || lower === 'todos') return undefined;
+  return trimmed;
+}
+
+export function isAllSubgroup(raw?: string | null): boolean {
+  return resolveCatalogSubgroup(raw) === undefined;
+}
+
 export function countActiveCatalogFilters(c: CatalogFilterCriteria): number {
   return (
     Number(c.onlyInStock) +

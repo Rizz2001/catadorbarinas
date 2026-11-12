@@ -7,6 +7,7 @@ import {
   fetchArticulosSmartVentas,
 } from '@/services/foxdata.service';
 import { CatalogBrowser } from '@/components/catalog';
+import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
 
 export const revalidate = 60;
 
@@ -18,7 +19,7 @@ interface CatalogGroupPageProps {
 export async function generateMetadata({ params }: CatalogGroupPageProps): Promise<Metadata> {
   const { slug } = await params;
   const codGrupo = slug[0] || '01';
-  const codSubgrupo = slug[1] || 'todos';
+  const codSubgrupoParam = resolveCatalogSubgroup(slug[1]);
 
   const [groups, subgroups] = await Promise.all([
     fetchGruposInv(),
@@ -26,8 +27,8 @@ export async function generateMetadata({ params }: CatalogGroupPageProps): Promi
   ]);
 
   const groupName = groups.find((g: { CodGrupo: string }) => g.CodGrupo === codGrupo)?.Nombre || 'Catálogo';
-  const subName = codSubgrupo !== 'todos'
-    ? subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupo)?.Nombre
+  const subName = codSubgrupoParam
+    ? subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupoParam)?.Nombre
     : undefined;
 
   const title = subName
@@ -58,17 +59,20 @@ export default async function CatalogoGroupPage({
   const { slug } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const codGrupo = slug[0] || '01';
-  const codSubgrupo = slug[1] || 'todos';
+  const codSubgrupoParam = resolveCatalogSubgroup(slug[1]);
+  const codSubgrupo = codSubgrupoParam ?? 'todos';
   const initialOnlyBoxes = resolvedSearchParams?.caja === '1';
 
   const [groups, subgroups, products] = await Promise.all([
     fetchGruposInv(),
     fetchSubgruposInv(codGrupo),
-    fetchArticulosSmartVentas(codGrupo, codSubgrupo === 'todos' ? undefined : codSubgrupo),
+    fetchArticulosSmartVentas(codGrupo, codSubgrupoParam),
   ]);
 
   const activeGroup = groups.find((g: { CodGrupo: string }) => g.CodGrupo === codGrupo);
-  const activeSub = subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupo);
+  const activeSub = codSubgrupoParam
+    ? subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupoParam)
+    : undefined;
 
   return (
     <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 md:py-8 space-y-4 sm:space-y-6 overflow-x-clip">
