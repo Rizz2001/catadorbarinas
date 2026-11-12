@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Save,
   Loader2,
   LayoutTemplate,
   Tag,
@@ -15,35 +14,24 @@ import {
   SegmentedControlItem,
   TabList,
   Tab,
-  Switch,
 } from '@/components/admin/ui';
 import { Banner as AstryxBanner } from '@astryxdesign/core/Banner';
-import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Banner } from '@/types';
 import { getBanners, upsertBanner, revalidateStorefrontCache } from '@/services/cms.service';
 import {
   BannerPreview,
-  BannerImageUploader,
   PromoCardPreview,
   QuickCategoriesEditor,
   DeviceSimulator,
-  ImageControls,
   SortablePromoOrderBar,
+  BannerEditorForm,
   type PromoSlotKey,
 } from '@/components/admin';
 
 type MainTab = 'banners' | 'quick_categories';
 type BannerSlot = 'hero' | 'promo_1' | 'promo_2' | 'promo_3';
 const PROMO_SLOTS: PromoSlotKey[] = ['promo_1', 'promo_2', 'promo_3'];
-
-const HERO_COLOR_PRESETS = [
-  { label: 'Midnight Navy', hex: '#081229' },
-  { label: 'Azul Catador', hex: '#001754' },
-  { label: 'Slate Oscuro', hex: '#0F172A' },
-  { label: 'Negro Carbón', hex: '#111827' },
-  { label: 'Roble Añejo', hex: '#2B160B' },
-];
 
 const DEFAULT_BANNER_SLOTS: Record<BannerSlot, Partial<Banner>> = {
   hero: {
@@ -336,251 +324,13 @@ export default function AdminBannersPage() {
             }
           </DeviceSimulator>
 
-          <form
+          <BannerEditorForm
+            activeSlot={activeSlot}
+            currentBanner={currentBanner}
+            saving={saving}
+            onUpdate={updateCurrent}
             onSubmit={handleSave}
-            className="space-y-6 text-xs bg-white p-6 rounded-xl border border-slate-200"
-          >
-            <div className="space-y-3">
-              <BannerImageUploader
-                imageUrl={currentBanner.imagen_url}
-                onImageChange={(url) => updateCurrent({ imagen_url: url })}
-              />
-
-              <ImageControls
-                overlayOpacity={currentBanner.overlay_opacity ?? 85}
-                objectPosition={currentBanner.object_position ?? 'center'}
-                onOverlayChange={(opacity) => updateCurrent({ overlay_opacity: opacity })}
-                onPositionChange={(pos) => updateCurrent({ object_position: pos })}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {activeSlot === 'hero' ? 'Título Principal Línea 1 (Blanco) *' : 'Título Principal *'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={currentBanner.titulo || ''}
-                  onChange={(e) => updateCurrent({ titulo: e.target.value })}
-                  placeholder={activeSlot === 'hero' ? 'CAVAS, LICORES & BODEGÓN ·' : ''}
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                />
-              </div>
-
-              {activeSlot === 'hero' ? (
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Título Destacado Línea 2 (Dorado Ámbar)
-                  </label>
-                  <input
-                    type="text"
-                    value={currentBanner.titulo_destacado || ''}
-                    onChange={(e) => updateCurrent({ titulo_destacado: e.target.value })}
-                    placeholder="ej. ENTREGA INMEDIATA EN BARINAS"
-                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                  />
-                </div>
-              ) : (
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Texto Superior / Pill Dorado (Opcional)
-                  </label>
-                  <input
-                    type="text"
-                    value={currentBanner.badge_texto || ''}
-                    onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
-                    placeholder="ej. SELECCIÓN PREMIUM"
-                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                  />
-                </div>
-              )}
-
-              {activeSlot === 'hero' && (
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Pill Superior Dorado (Cintillo Arriba del Título)
-                  </label>
-                  <input
-                    type="text"
-                    value={currentBanner.badge_texto || ''}
-                    onChange={(e) => updateCurrent({ badge_texto: e.target.value })}
-                    placeholder="ej. BODEGÓN MODERNO · C.C. CIUDAD CATADOR LOCAL N1"
-                    className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                  />
-                </div>
-              )}
-
-              {activeSlot === 'hero' && (
-                <div>
-                  <label className="block font-bold text-slate-700 mb-1">
-                    Color de Fondo del Hero
-                  </label>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <input
-                      type="color"
-                      value={currentBanner.color_fondo || '#081229'}
-                      onChange={(e) => updateCurrent({ color_fondo: e.target.value })}
-                      className="h-9 w-11 rounded-lg border border-slate-200 cursor-pointer bg-white p-0.5"
-                    />
-                    {HERO_COLOR_PRESETS.map((preset) => (
-                      <button
-                        key={preset.hex}
-                        type="button"
-                        onClick={() => updateCurrent({ color_fondo: preset.hex })}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 text-[11px] font-bold text-slate-700 cursor-pointer"
-                      >
-                        <span
-                          className="h-3 w-3 rounded-full border border-black/10"
-                          style={{ backgroundColor: preset.hex }}
-                        />
-                        <span>{preset.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="md:col-span-2">
-                <label className="block font-bold text-slate-700 mb-1">
-                  Subtítulo Descriptivo
-                </label>
-                <textarea
-                  rows={2}
-                  value={currentBanner.subtitulo || ''}
-                  onChange={(e) => updateCurrent({ subtitulo: e.target.value })}
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {activeSlot === 'hero' ? 'Texto Botón Primario (Dorado)' : 'Texto del Botón'}
-                </label>
-                <input
-                  type="text"
-                  value={currentBanner.boton_texto || ''}
-                  onChange={(e) => updateCurrent({ boton_texto: e.target.value })}
-                  placeholder="ej. Ver Ofertas del Día"
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-700 mb-1">
-                  {activeSlot === 'hero' ? 'Enlace Botón Primario' : 'Enlace del Botón'}
-                </label>
-                <input
-                  type="text"
-                  value={currentBanner.boton_url || ''}
-                  onChange={(e) => updateCurrent({ boton_url: e.target.value })}
-                  placeholder="ej. /#ofertas"
-                  className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                />
-              </div>
-
-              {activeSlot === 'hero' && (
-                <>
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Texto Botón Secundario (Opcional · Dejar vacío para ocultar)
-                    </label>
-                    <input
-                      type="text"
-                      value={currentBanner.boton_secundario_texto ?? ''}
-                      onChange={(e) =>
-                        updateCurrent({ boton_secundario_texto: e.target.value })
-                      }
-                      placeholder="ej. Explorar Catálogo"
-                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Enlace Botón Secundario
-                    </label>
-                    <input
-                      type="text"
-                      value={currentBanner.boton_secundario_url ?? ''}
-                      onChange={(e) =>
-                        updateCurrent({ boton_secundario_url: e.target.value })
-                      }
-                      placeholder="ej. /catalogo"
-                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-
-            {activeSlot === 'hero' && (
-              <>
-                <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider border-b border-slate-100 pb-2 pt-2">
-                  Píldora Promocional Destacada del Hero
-                </h2>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Título de la Promo
-                    </label>
-                    <input
-                      type="text"
-                      value={currentBanner.promo_titulo || ''}
-                      onChange={(e) => updateCurrent({ promo_titulo: e.target.value })}
-                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Precio Promocional ($)
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={currentBanner.promo_precio ?? ''}
-                      onChange={(e) =>
-                        updateCurrent({ promo_precio: parseFloat(e.target.value) || 0 })
-                      }
-                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-700 mb-1">
-                      Texto de Ahorro
-                    </label>
-                    <input
-                      type="text"
-                      value={currentBanner.promo_ahorro || ''}
-                      onChange={(e) => updateCurrent({ promo_ahorro: e.target.value })}
-                      className="w-full rounded-lg border border-slate-200 p-2.5 text-xs text-slate-900 focus:ring-2 focus:ring-catador-blue/20"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <Switch
-                label="Banner Activo en la Tienda"
-                value={Boolean(currentBanner.activo)}
-                onChange={(checked) => updateCurrent({ activo: checked })}
-              />
-
-              <Button
-                type="submit"
-                label={`Guardar Banner (${activeSlot})`}
-                variant="primary"
-                size="lg"
-                icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
-                isLoading={saving}
-              />
-            </div>
-          </form>
+          />
         </>
       )}
     </main>

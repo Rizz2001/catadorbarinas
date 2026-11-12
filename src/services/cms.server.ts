@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { MOCK_HOME_CMS_RESPONSE } from '@/constants/home-cms.mock';
 import { Banner, StoreConfig, QuickCategory, AlliedBrand } from '@/types';
 
 interface ServerCacheItem<T> {
@@ -8,12 +9,14 @@ interface ServerCacheItem<T> {
 
 let cachedBanners: ServerCacheItem<Banner[]> | null = null;
 let cachedQuickCats: ServerCacheItem<QuickCategory[]> | null = null;
+let cachedCatalogCats: ServerCacheItem<QuickCategory[]> | null = null;
 let cachedConfig: ServerCacheItem<StoreConfig | null> | null = null;
 let cachedAlliedBrands: ServerCacheItem<AlliedBrand[]> | null = null;
 
 export function invalidateServerCmsCache() {
   cachedBanners = null;
   cachedQuickCats = null;
+  cachedCatalogCats = null;
   cachedConfig = null;
   cachedAlliedBrands = null;
 }
@@ -76,6 +79,45 @@ export async function getQuickCategoriesServer(): Promise<QuickCategory[]> {
   } catch (err) {
     console.error('Error cargando categorias rapidas en servidor:', err);
     return [];
+  }
+}
+
+/**
+ * Obtiene todas las categorías activas del catálogo visual (/catalogo) en Servidor (Cache 60s)
+ */
+export async function getCatalogCategoriesServer(): Promise<QuickCategory[]> {
+  const now = Date.now();
+  if (cachedCatalogCats && cachedCatalogCats.expiresAt > now) {
+    return cachedCatalogCats.data;
+  }
+
+  try {
+    const supabase = getSupabaseAdmin();
+    const { data, error } = await supabase
+      .from('categorias_rapidas')
+      .select('*')
+      .eq('activo', true)
+      .order('orden', { ascending: true });
+
+    if (error) {
+      console.error('Error en getCatalogCategoriesServer:', error);
+      return MOCK_HOME_CMS_RESPONSE.quickCategories;
+    }
+
+    const normalized = ((data || []) as QuickCategory[]).map((cat) => ({
+      ...cat,
+      icon_name: cat.icon_name || cat.icono || 'Wine',
+      image_url: cat.image_url ?? null,
+      is_featured: Boolean(cat.is_featured),
+      show_on_homepage: cat.show_on_homepage ?? true,
+    }));
+
+    const result = normalized.length > 0 ? normalized : MOCK_HOME_CMS_RESPONSE.quickCategories;
+    cachedCatalogCats = { data: result, expiresAt: now + 60000 };
+    return result;
+  } catch (err) {
+    console.error('Error cargando catálogo de categorías en servidor:', err);
+    return MOCK_HOME_CMS_RESPONSE.quickCategories;
   }
 }
 

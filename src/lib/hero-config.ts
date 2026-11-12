@@ -106,7 +106,7 @@ export function resolveHeroDisplay(banner?: Partial<Banner> | null): ResolvedHer
       : 'Explorar Catálogo';
   const secondaryBtnUrl =
     banner?.boton_secundario_url?.trim() ||
-    (botonUrl === '/catalogo' ? '/catalogo?caja=1' : '/catalogo');
+    (botonUrl === '/catalogo' ? '/catalogo/01?caja=1' : '/catalogo');
 
   const rawBgColor = banner?.color_fondo?.trim() || '#081229';
   const heroBgColor = /^#[0-9A-Fa-f]{6}$/.test(rawBgColor) ? rawBgColor : '#081229';

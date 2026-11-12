@@ -21,14 +21,14 @@ export function CopyableFieldsBox({
   gridClass,
   amountLabel,
   copiedField,
-  onCopy,
+  onCopyAction,
 }: {
   title: string;
   fields: BankFieldRow[];
   gridClass: string;
   amountLabel: string;
   copiedField: string | null;
-  onCopy: (text: string, fieldId: string) => void;
+  onCopyAction: (text: string, fieldId: string) => void;
 }) {
   return (
     <div className="space-y-2.5 text-xs">
@@ -63,7 +63,7 @@ export function CopyableFieldsBox({
             {field.copyValue && (
               <button
                 type="button"
-                onClick={() => onCopy(field.copyValue!, field.id)}
+                onClick={() => onCopyAction(field.copyValue!, field.id)}
                 className="p-1.5 text-slate-400 hover:text-catador-blue cursor-pointer shrink-0 rounded-lg hover:bg-slate-50 transition-colors"
                 aria-label={`Copiar ${field.label}`}
               >
@@ -89,8 +89,8 @@ export function ReferenceAndReceiptFields({
   refMaxLength,
   uploadLabel,
   paymentData,
-  onChange,
-  onFileChange,
+  onChangeAction,
+  onFileChangeAction,
 }: {
   bancoLabel: string;
   bancoPlaceholder: string;
@@ -99,8 +99,8 @@ export function ReferenceAndReceiptFields({
   refMaxLength?: number;
   uploadLabel: string;
   paymentData: PaymentDataState;
-  onChange: (patch: Partial<PaymentDataState>) => void;
-  onFileChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChangeAction: (patch: Partial<PaymentDataState>) => void;
+  onFileChangeAction: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <>
@@ -112,7 +112,7 @@ export function ReferenceAndReceiptFields({
             required
             placeholder={bancoPlaceholder}
             value={paymentData.bancoOrigen}
-            onChange={(e) => onChange({ bancoOrigen: e.target.value })}
+            onChange={(e) => onChangeAction({ bancoOrigen: e.target.value })}
             className={CHECKOUT_INPUT_CLASS}
           />
         </div>
@@ -124,7 +124,7 @@ export function ReferenceAndReceiptFields({
             maxLength={refMaxLength}
             placeholder={refPlaceholder}
             value={paymentData.referencia}
-            onChange={(e) => onChange({ referencia: e.target.value })}
+            onChange={(e) => onChangeAction({ referencia: e.target.value })}
             className={cn(CHECKOUT_INPUT_CLASS, 'font-mono')}
           />
         </div>
@@ -136,7 +136,7 @@ export function ReferenceAndReceiptFields({
           <input
             type="file"
             accept="image/*"
-            onChange={onFileChange}
+            onChange={onFileChangeAction}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
           />
           <UploadCloud className="h-5 w-5 text-catador-blue mx-auto mb-1" strokeWidth={1.5}/>

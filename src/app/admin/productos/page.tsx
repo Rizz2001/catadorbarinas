@@ -1,22 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Search,
-  CheckCircle2,
-  Loader2,
-  Camera,
-  FileImage,
-  FolderOpen,
-} from 'lucide-react';
-import {
-  SegmentedControl,
-  SegmentedControlItem,
-  Switch,
-} from '@/components/admin/ui';
+import { FileImage } from 'lucide-react';
 import { Banner } from '@astryxdesign/core/Banner';
 import { AlertDialog } from '@astryxdesign/core/AlertDialog';
-import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductImageMapping } from '@/types';
 import {
@@ -27,13 +14,11 @@ import {
 import { DEFAULT_GROUPS, DEFAULT_SUBGROUPS } from '@/constants/fallback-products';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import {
-  ProductImageCard,
-  MissingPhotoProductCard,
   PhotoUploadToolbar,
+  AdminProductsFiltersPanel,
+  AdminProductsPhotoGrid,
+  type PhotoStatusTab,
 } from '@/components/admin';
-import { cn } from '@/lib/utils';
-
-type PhotoStatusTab = 'missing' | 'assigned' | 'all';
 
 export default function AdminProductosPage() {
   const showToast = useToast();
@@ -379,221 +364,39 @@ export default function AdminProductosPage() {
         onManualUpload={handleManualUpload}
       />
 
-      {/* Panel de Clasificación por Categoría, Subcategoría y Estado Fotográfico */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-2xs space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          {/* Selector de Categoría (Grupo FoxData) */}
-          <div className="md:col-span-4">
-            <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
-              1. Categoría de Productos
-            </label>
-            <div className="relative">
-              <FolderOpen className="h-4 w-4 text-catador-blue absolute left-3 top-2.5 pointer-events-none" strokeWidth={1.5}/>
-              <select
-                value={selectedGroup}
-                onChange={(e) => {
-                  setSelectedGroup(e.target.value);
-                  setSelectedSubgroup('todos');
-                }}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-2 min-h-[40px] text-xs font-black text-slate-900 focus:outline-none focus:border-catador-blue"
-              >
-                {DEFAULT_GROUPS.map((g) => (
-                  <option key={g.CodGrupo} value={g.CodGrupo}>
-                    Categoría {g.CodGrupo}: {g.Nombre}
-                  </option>
-                ))}
-                <option value="GLOBAL_UPLOADED">
-                  Ver Todas las Fotos Subidas ({images.length})
-                </option>
-              </select>
-            </div>
-          </div>
+      <AdminProductsFiltersPanel
+        selectedGroup={selectedGroup}
+        onSelectGroup={(group) => {
+          setSelectedGroup(group);
+          setSelectedSubgroup('todos');
+        }}
+        selectedSubgroup={selectedSubgroup}
+        onSelectSubgroup={setSelectedSubgroup}
+        availableSubgroups={availableSubgroups}
+        search={search}
+        onSearchChange={setSearch}
+        onlyInStock={onlyInStock}
+        onOnlyInStockChange={setOnlyInStock}
+        statusTab={statusTab}
+        onStatusTabChange={setStatusTab}
+        stats={stats}
+        totalUploadedImages={images.length}
+      />
 
-          {/* Buscador */}
-          <div className="md:col-span-5">
-            <label className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
-              2. Buscar Producto o Código
-            </label>
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
-              <input
-                type="text"
-                placeholder="Buscar por nombre (ej: Cacique, Polar) o código..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 pl-9 pr-3 py-2 min-h-[40px] text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-catador-blue"
-              />
-            </div>
-          </div>
-
-          {/* Filtro rápido de Stock */}
-          <div className="md:col-span-3 flex flex-col justify-center">
-            <span className="block text-[11px] font-extrabold uppercase tracking-wider text-slate-500 mb-1">
-              3. Filtro de Inventario
-            </span>
-            <div className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 min-h-[40px] flex items-center">
-              <Switch
-                label="Solo con stock"
-                size="sm"
-                labelPosition="start"
-                labelSpacing="spread"
-                isDisabled={selectedGroup === 'GLOBAL_UPLOADED'}
-                value={onlyInStock}
-                onChange={setOnlyInStock}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Chips de Subcategorías cuando hay una categoría activa */}
-        {selectedGroup !== 'GLOBAL_UPLOADED' && availableSubgroups.length > 0 && (
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 border-t border-slate-100 no-scrollbar">
-            <button
-              type="button"
-              onClick={() => setSelectedSubgroup('todos')}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-[11px] font-extrabold shrink-0 transition-colors cursor-pointer',
-                selectedSubgroup === 'todos'
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              )}
-            >
-              Todas las Subcategorías
-            </button>
-            {availableSubgroups.map((sub) => (
-              <button
-                key={sub.CodSubgrupo}
-                type="button"
-                onClick={() => setSelectedSubgroup(sub.CodSubgrupo)}
-                className={cn(
-                  'px-3 py-1.5 rounded-lg text-[11px] font-bold shrink-0 transition-colors cursor-pointer',
-                  selectedSubgroup === sub.CodSubgrupo
-                    ? 'bg-catador-blue text-white shadow-2xs'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                )}
-              >
-                {sub.Nombre}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Pestañas: Faltan por Foto / Con Fotografía / Todos + Barra de Cobertura */}
-        {selectedGroup !== 'GLOBAL_UPLOADED' && (
-          <div className="pt-2 border-t border-slate-100 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            <div className="overflow-x-auto no-scrollbar tabular-nums">
-              <SegmentedControl
-                size="md"
-                label="Estado fotográfico de productos"
-                value={statusTab}
-                onChange={(val) => setStatusTab(val as PhotoStatusTab)}
-              >
-                <SegmentedControlItem
-                  value="missing"
-                  icon={<Camera className="h-3.5 w-3.5" strokeWidth={1.5}/>}
-                  label={`Faltan por Foto (${stats.missing})`}
-                />
-                <SegmentedControlItem
-                  value="assigned"
-                  icon={<CheckCircle2 className="h-3.5 w-3.5" strokeWidth={1.5}/>}
-                  label={`Con Foto (${stats.assigned})`}
-                />
-                <SegmentedControlItem value="all" label={`Todos (${stats.total})`} />
-              </SegmentedControl>
-            </div>
-
-            {/* Resumen de cobertura de la categoría */}
-            <div className="flex items-center gap-3 bg-slate-50 border border-slate-200/80 rounded-xl px-3.5 py-2 text-xs tabular-nums">
-              <div className="flex-1 min-w-[140px]">
-                <div className="flex items-center justify-between text-[11px] font-bold text-slate-700 mb-1">
-                  <span>Cobertura de Categoría</span>
-                  <span className="font-black text-catador-blue">{stats.coveragePercent}%</span>
-                </div>
-                <div className="h-2 w-full rounded-full bg-slate-200 overflow-hidden">
-                  <div
-                    className="h-full bg-emerald-500 transition-all duration-300"
-                    style={{ width: `${stats.coveragePercent}%` }}
-                  />
-                </div>
-              </div>
-              <div className="text-[11px] text-slate-500 border-l border-slate-200 pl-3">
-                <span className="font-bold text-amber-800 block">
-                  {stats.missingWithStock} con stock sin foto
-                </span>
-                <span>de {stats.missing} pendientes</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
-
-      {/* Grilla de Productos / Fotografías */}
-      {loading ? (
-        <div className="p-12 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
-          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
-          <span>Sincronizando productos y fotografías de la categoría...</span>
-        </div>
-      ) : selectedGroup === 'GLOBAL_UPLOADED' ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {globalFilteredImages.map((item) => (
-            <ProductImageCard
-              key={item.codigo_articulo}
-              item={item}
-              onDelete={handleDelete}
-              onReplace={handleReplacePhoto}
-              isDeleting={deletingCode === item.codigo_articulo}
-              isReplacing={uploadingProductCode === item.codigo_articulo}
-            />
-          ))}
-        </div>
-      ) : displayedProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-10">
-          <EmptyState
-            icon={<Camera className="h-10 w-10 text-slate-400" strokeWidth={1.5}/>}
-            title={
-              statusTab === 'missing'
-                ? '¡Excelente! No hay productos pendientes por fotografía con este filtro'
-                : 'No se encontraron productos con fotografía en esta selección'
-            }
-            description="Prueba cambiando de categoría, subcategoría o desactivando el filtro de stock."
-          />
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {displayedProducts.map((product) => {
-            const imgRecord = resolveProductImageRecord(product);
-            const categoryLabel = resolveCategoryBadge(product);
-
-            if (imgRecord) {
-              return (
-                <ProductImageCard
-                  key={product.id}
-                  item={{
-                    ...imgRecord,
-                    nombre_articulo: product.name || imgRecord.nombre_articulo,
-                  }}
-                  categoryLabel={categoryLabel}
-                  stockQuantity={product.stockQuantity}
-                  onDelete={handleDelete}
-                  onReplace={handleReplacePhoto}
-                  isDeleting={deletingCode === imgRecord.codigo_articulo}
-                  isReplacing={uploadingProductCode === imgRecord.codigo_articulo}
-                />
-              );
-            }
-
-            return (
-              <MissingPhotoProductCard
-                key={product.id}
-                product={product}
-                categoryLabel={categoryLabel}
-                onQuickUpload={handleQuickProductUpload}
-                isUploading={uploadingProductCode === product.id}
-              />
-            );
-          })}
-        </div>
-      )}
+      <AdminProductsPhotoGrid
+        loading={loading}
+        selectedGroup={selectedGroup}
+        statusTab={statusTab}
+        globalFilteredImages={globalFilteredImages}
+        displayedProducts={displayedProducts}
+        deletingCode={deletingCode}
+        uploadingProductCode={uploadingProductCode}
+        resolveProductImageRecord={resolveProductImageRecord}
+        resolveCategoryBadge={resolveCategoryBadge}
+        onDelete={handleDelete}
+        onReplace={handleReplacePhoto}
+        onQuickUpload={handleQuickProductUpload}
+      />
 
       <AlertDialog
         isOpen={Boolean(confirmDeleteCode)}

@@ -10,7 +10,6 @@ import { useDeliveryStore } from '@/store/useDeliveryStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
 import { convertUsdToVes, formatUsd, formatVes } from '@/lib/currency';
 import { calculateSmartDeliveryQuote } from '@/lib/delivery';
-import { getEffectivePriceUsd, getUnitsPerPurchaseMode } from '@/lib/inventory';
 import {
   CheckoutDeliveryForm,
   CheckoutPaymentForm,
@@ -81,7 +80,7 @@ export default function CheckoutPage() {
           const { data: ultimoPedido } = await supabase
             .from('pedidos')
             .select('direccion_entrega')
-            .eq('user_id', user.id)
+            .eq('usuario_id', user.id)
             .not('direccion_entrega', 'is', null)
             .neq('direccion_entrega', '')
             .order('created_at', { ascending: false })
@@ -150,7 +149,6 @@ export default function CheckoutPage() {
   ]);
 
   const shippingUsd = deliveryQuote.shippingUsd;
-  const shippingVes = convertUsdToVes(shippingUsd, bcvRate);
   const finalTotalUsd = Number((baseTotals.subtotalUsd + shippingUsd).toFixed(2));
   const finalTotalVes = convertUsdToVes(finalTotalUsd, bcvRate);
 
@@ -263,13 +261,30 @@ export default function CheckoutPage() {
 
     setIsSubmitting(true);
     try {
+      let comprobantePath: string | null = null;
+      if (paymentData.comprobanteFile) {
+        const file = paymentData.comprobanteFile;
+        const rawExt = file.name.split('.').pop() || 'jpg';
+        const safeExt = rawExt.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'jpg';
+        const storagePath = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('payment-proofs')
+          .upload(storagePath, file, { cacheControl: '3600', upsert: false });
+
+        if (uploadError || !uploadData?.path) {
+          throw new Error(
+            `No se pudo subir el comprobante de pago: ${uploadError?.message || 'intenta de nuevo'}`
+          );
+        }
+        comprobantePath = uploadData.path;
+      }
+
       const gpsNote =
         deliveryData.latitud && deliveryData.longitud
-          ? ` | GPS: https://maps.google.com/?q=${deliveryData.latitud},${deliveryData.longitud} (${deliveryQuote.distanceKm}km - ${deliveryQuote.transportType})`
+          ? ` | GPS: https://maps.google.com/?q=${deliveryData.latitud},${deliveryData.longitud}`
           : '';
 
       const payload = {
-        usuarioId: userId,
         clienteNombre: deliveryData.nombre,
         clienteTelefono: deliveryData.telefono,
         clienteCedula: deliveryData.cedula,
@@ -280,43 +295,22 @@ export default function CheckoutPage() {
         notas: `${deliveryData.notas || ''}${gpsNote}`.trim(),
         latitudEntrega: deliveryData.latitud ?? null,
         longitudEntrega: deliveryData.longitud ?? null,
-        distanciaKm: deliveryQuote.distanceKm,
-        tipoTransporte: deliveryQuote.transportType,
-        subtotalUsd: baseTotals.subtotalUsd,
-        subtotalVes: baseTotals.subtotalVes,
-        deliveryUsd: shippingUsd,
-        deliveryVes: shippingVes,
-        totalUsd: finalTotalUsd,
-        totalVes: finalTotalVes,
-        tasaBcv: bcvRate,
-        items: items.map((it) => {
-          const mode = it.purchaseMode || 'unidad';
-          const effectivePriceUsd = getEffectivePriceUsd(it.product, mode);
-          const unitsPerBox = getUnitsPerPurchaseMode(it.product, mode);
-          return {
-            codArticuloFoxdata: it.product.id,
-            nombreArticulo: it.product.name,
-            cantidad: it.quantity,
-            modalidadCompra: mode,
-            unidadesPorCaja: unitsPerBox,
-            unidadesTotalesDescontadas: it.quantity * unitsPerBox,
-            precioUnitarioUsd: effectivePriceUsd,
-            precioUnitarioVes: Number((effectivePriceUsd * bcvRate).toFixed(2)),
-            subtotalUsd: Number((effectivePriceUsd * it.quantity).toFixed(2)),
-            subtotalVes: Number((effectivePriceUsd * it.quantity * bcvRate).toFixed(2)),
-            imagenUrl: it.product.images[0],
-          };
-        }),
+        items: items.map((it) => ({
+          codArticuloFoxdata: it.product.id,
+          codGrupo: it.product.codGrupo,
+          cantidad: it.quantity,
+          modalidadCompra: it.purchaseMode || 'unidad',
+        })),
         pago: {
           metodoPago: paymentData.metodoPago,
-          montoUsd: finalTotalUsd,
-          montoVes: finalTotalVes,
           bancoOrigen: paymentData.bancoOrigen,
           telefonoOrigen: paymentData.telefonoOrigen || deliveryData.telefono,
           referencia: paymentData.referencia,
-          comprobanteUrl: paymentData.comprobanteUrl,
-          billetePagoUsd: paymentData.billetePagoUsd,
-          vueltoCalculadoUsd: paymentData.vueltoCalculadoUsd,
+          comprobantePath,
+          billetePagoUsd:
+            paymentData.metodoPago === 'efectivo_usd'
+              ? paymentData.billetePagoUsd
+              : null,
         },
       };
 

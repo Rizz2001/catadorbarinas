@@ -14,12 +14,15 @@ import {
 
 function normalizeQuickCategory(cat: QuickCategory): QuickCategory {
   const resolvedIcon = (cat.icon_name || cat.icono || 'Wine').trim() || 'Wine';
-  const resolvedVisible = cat.show_on_homepage ?? cat.activo ?? true;
+  const resolvedActive = cat.activo ?? true;
+  const resolvedVisible = cat.show_on_homepage ?? resolvedActive;
   return {
     ...cat,
     icono: resolvedIcon,
     icon_name: resolvedIcon,
-    activo: resolvedVisible,
+    image_url: cat.image_url?.trim() || null,
+    is_featured: Boolean(cat.is_featured),
+    activo: resolvedActive,
     show_on_homepage: resolvedVisible,
   };
 }
@@ -75,6 +78,8 @@ export function useQuickCategoriesAdmin() {
         url: '/catalogo',
         icono: 'Wine',
         icon_name: 'Wine',
+        image_url: null,
+        is_featured: false,
         orden: prev.length + 1,
         activo: true,
         show_on_homepage: true,

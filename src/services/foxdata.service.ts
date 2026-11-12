@@ -34,7 +34,6 @@ async function fetchWithRetry(
     try {
       const res = await fetch(url, {
         ...options,
-        cache: 'no-store',
         signal: AbortSignal.timeout(timeoutMs),
       });
       return res;
@@ -132,6 +131,10 @@ const memorySubgroupsCache = new Map<
  * Ejecuta una petición GET autenticada contra FoxData, renovando automáticamente el token si recibe 401
  */
 async function fetchFoxDataAuthenticated(url: string, timeoutMs = 9000): Promise<Response> {
+  const nextCacheOptions = {
+    revalidate: 60,
+    tags: ['foxdata-catalog'],
+  };
   let token = await getFoxDataToken(false);
   let res = await fetchWithRetry(
     url,
@@ -140,6 +143,7 @@ async function fetchFoxDataAuthenticated(url: string, timeoutMs = 9000): Promise
         Authorization: `Bearer ${token}`,
         ...FOXDATA_HEADERS,
       },
+      next: nextCacheOptions,
     },
     2,
     timeoutMs
@@ -155,6 +159,7 @@ async function fetchFoxDataAuthenticated(url: string, timeoutMs = 9000): Promise
           Authorization: `Bearer ${token}`,
           ...FOXDATA_HEADERS,
         },
+        next: nextCacheOptions,
       },
       2,
       timeoutMs

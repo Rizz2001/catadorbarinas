@@ -14,7 +14,7 @@ const NAV_LINKS = [
   { href: '/catalogo/02', label: 'Refrescos & Agua' },
   { href: '/catalogo/11', label: 'Despensa & Snacks' },
   { href: '/#ofertas', label: 'Ofertas' },
-  { href: '/catalogo?caja=1', label: 'Por Caja', hideMobile: true },
+  { href: '/catalogo/01?caja=1', label: 'Por Caja', hideMobile: true },
 ];
 
 export function HeaderNav() {

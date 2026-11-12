@@ -44,7 +44,7 @@ export function CheckoutPaymentDetails({
           gridClass="grid-cols-1 sm:grid-cols-3"
           amountLabel={formatVes(totalVes)}
           copiedField={copiedField}
-          onCopy={onCopy}
+          onCopyAction={onCopy}
           fields={[
             { id: 'banco', label: 'Banco', value: banco, copyValue: storeConfig?.pago_movil_banco || '0134' },
             { id: 'rif', label: 'RIF / Cédula', value: rif, copyValue: rif },
@@ -59,8 +59,8 @@ export function CheckoutPaymentDetails({
           refMaxLength={8}
           uploadLabel="Comprobante (Capture) *"
           paymentData={paymentData}
-          onChange={onChange}
-          onFileChange={onFileChange}
+          onChangeAction={onChange}
+          onFileChangeAction={onFileChange}
         />
       </div>
     );
@@ -79,7 +79,7 @@ export function CheckoutPaymentDetails({
           gridClass="grid-cols-1 sm:grid-cols-2"
           amountLabel={formatVes(totalVes)}
           copiedField={copiedField}
-          onCopy={onCopy}
+          onCopyAction={onCopy}
           fields={[
             { id: 'tf_banco', label: 'Banco Receptor', value: banco, copyValue: storeConfig?.transferencia_banco || 'Banco Mercantil' },
             { id: 'tf_tipo', label: 'Tipo de Cuenta', value: storeConfig?.transferencia_tipo_cuenta || 'Cuenta Corriente' },
@@ -95,8 +95,8 @@ export function CheckoutPaymentDetails({
           refPlaceholder="Ej: 00482910"
           uploadLabel="Comprobante (Capture) *"
           paymentData={paymentData}
-          onChange={onChange}
-          onFileChange={onFileChange}
+          onChangeAction={onChange}
+          onFileChangeAction={onFileChange}
         />
       </div>
     );
@@ -113,7 +113,7 @@ export function CheckoutPaymentDetails({
           gridClass="grid-cols-1"
           amountLabel={formatUsd(totalUsd)}
           copiedField={copiedField}
-          onCopy={onCopy}
+          onCopyAction={onCopy}
           fields={[
             { id: 'zelle', label: `Correo · Titular: ${zelleTitular}`, value: zelleEmail, copyValue: zelleEmail },
           ]}
@@ -125,8 +125,8 @@ export function CheckoutPaymentDetails({
           refPlaceholder="Ej: ZL-894120"
           uploadLabel="Comprobante Zelle (Capture) *"
           paymentData={paymentData}
-          onChange={onChange}
-          onFileChange={onFileChange}
+          onChangeAction={onChange}
+          onFileChangeAction={onFileChange}
         />
       </div>
     );

@@ -9,6 +9,7 @@ import {
   Award,
   Search,
   LayoutGrid,
+  FolderKanban,
 } from 'lucide-react';
 
 export interface AdminNavGroup {
@@ -33,6 +34,7 @@ export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
     groupLabel: 'Catálogo y Portada',
     items: [
       { href: '/admin/inicio', label: 'Portada e Inicio (CMS)', icon: LayoutGrid, exact: true },
+      { href: '/admin/categorias', label: 'Categorías Visuales', icon: FolderKanban, exact: true },
       { href: '/admin/catalogo-config', label: 'Artículos, Cajas y Secciones', icon: Sliders, exact: true },
       { href: '/admin/productos', label: 'Fotografías WebP (SKU)', icon: Camera, exact: true },
       { href: '/admin/banners', label: 'Banners y Departamentos', icon: ImageIcon, exact: true },

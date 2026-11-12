@@ -44,7 +44,7 @@ export const MOCK_HOME_CMS_RESPONSE: HomeCmsSectionsPayload = {
       title: 'Compra por',
       titleLineBreak: 'Caja Cerrada',
       subtitle: 'Precios al mayor',
-      href: '/catalogo?caja=1',
+      href: '/catalogo/01?caja=1',
       pillText: 'Mayor',
       icon: 'Package',
       active: true,

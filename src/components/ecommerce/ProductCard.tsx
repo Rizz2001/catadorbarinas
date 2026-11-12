@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Product, PurchaseMode } from '@/types';
-import { formatPrices } from '@/lib/currency';
+import { DEFAULT_BCV_RATE, formatPrices } from '@/lib/currency';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useBcvStore } from '@/store/useBcvStore';
@@ -40,12 +41,17 @@ export function ProductCard({ product, className, isCompact = false }: ProductCa
 
   const displaySrc = isNoImage || hasError ? cmsLogo : rawImage;
 
-  const cartItems = useCartStore((state) => state.items);
+  const isHydrated = useIsHydrated();
+  const rawCartItems = useCartStore((state) => state.items);
   const addItem = useCartStore((state) => state.addItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
-  const isFav = useWishlistStore((state) => state.items.some((i) => i.id === product.id));
+  const rawIsFav = useWishlistStore((state) => state.items.some((i) => i.id === product.id));
   const toggleFavorite = useWishlistStore((state) => state.toggleFavorite);
-  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const rawBcvRate = useBcvStore((state) => state.rateInfo.rate);
+
+  const cartItems = isHydrated ? rawCartItems : [];
+  const isFav = isHydrated ? rawIsFav : false;
+  const bcvRate = isHydrated ? rawBcvRate : DEFAULT_BCV_RATE;
 
   const unitsPerBox = getUnitsPerPurchaseMode(product, 'caja');
   const activePriceUsd = getEffectivePriceUsd(product, mode);

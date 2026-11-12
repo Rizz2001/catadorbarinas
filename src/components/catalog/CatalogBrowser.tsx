@@ -1,13 +1,16 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { RotateCcw } from 'lucide-react';
 import { Product } from '@/types';
 import { ProductCard } from '@/components/ecommerce/ProductCard';
-import { LiveCatalogFilterBar } from '@/components/ecommerce/LiveCatalogFilterBar';
 import { Skeleton } from '@/components/ui/Skeleton';
-import { CatalogFiltersBar, PriceRangeFilter, SortOption } from './CatalogFiltersBar';
 import { SmartVentasGroup, SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
 import { useCatalogQuery } from '@/hooks/useCatalogQuery';
+import { countActiveCatalogFilters, extractAvailableBrands, filterAndSortCatalogProducts } from '@/lib/catalogFilters';
+import { PriceRangeFilter, SortOption } from './catalogFilterTypes';
+import { CatalogSubcategoryBar } from './CatalogSubcategoryBar';
+import { CatalogFiltersDrawer } from './CatalogFiltersDrawer';
 
 interface CatalogBrowserProps {
   groups: SmartVentasGroup[];
@@ -15,6 +18,7 @@ interface CatalogBrowserProps {
   products: Product[];
   currentGroup: string;
   currentSubgroup: string;
+  initialOnlyBoxes?: boolean;
 }
 
 const ITEMS_PER_PAGE = 24;
@@ -25,13 +29,16 @@ export function CatalogBrowser({
   products: initialProducts,
   currentGroup: initialGroup,
   currentSubgroup: initialSubgroup,
+  initialOnlyBoxes = false,
 }: CatalogBrowserProps) {
-  const [onlyInStock, setOnlyInStock] = useState<boolean>(false);
-  const [onlyDeals, setOnlyDeals] = useState<boolean>(false);
-  const [onlyBoxes, setOnlyBoxes] = useState<boolean>(false);
+  const [onlyInStock, setOnlyInStock] = useState(false);
+  const [onlyDeals, setOnlyDeals] = useState(false);
+  const [onlyBoxes, setOnlyBoxes] = useState(initialOnlyBoxes);
   const [priceRange, setPriceRange] = useState<PriceRangeFilter>('all');
+  const [selectedBrand, setSelectedBrand] = useState('all');
   const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [visibleCount, setVisibleCount] = useState<number>(ITEMS_PER_PAGE);
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const {
     selectedGroup: activeGroup,
@@ -47,30 +54,29 @@ export function CatalogBrowser({
     initialSubgroups,
     initialProducts,
     syncUrlPrefix: '/catalogo',
-    onSelectionChange: () => setVisibleCount(ITEMS_PER_PAGE),
+    onSelectionChange: () => {
+      setVisibleCount(ITEMS_PER_PAGE);
+      setSelectedBrand('all');
+    },
   });
 
-  const processedProducts = useMemo(() => {
-    let result = [...products];
-    if (onlyInStock) result = result.filter((p) => p.inStock);
-    if (onlyDeals) {
-      result = result.filter(
-        (p) => (p.discountPercentage && p.discountPercentage > 0) || (p.originalPriceUsd && p.originalPriceUsd > p.priceUsd)
-      );
-    }
-    if (onlyBoxes) {
-      result = result.filter((p) => p.saleMode !== 'solo_unidad' && (p.unitsPerBox || 1) > 1);
-    }
-    if (priceRange === 'under_5') result = result.filter((p) => p.priceUsd < 5);
-    else if (priceRange === '5_to_15') result = result.filter((p) => p.priceUsd >= 5 && p.priceUsd <= 15);
-    else if (priceRange === '15_to_40') result = result.filter((p) => p.priceUsd > 15 && p.priceUsd <= 40);
-    else if (priceRange === 'over_40') result = result.filter((p) => p.priceUsd > 40);
+  const filterCriteria = useMemo(
+    () => ({ onlyInStock, onlyDeals, onlyBoxes, selectedBrand, priceRange, sortBy }),
+    [onlyInStock, onlyDeals, onlyBoxes, selectedBrand, priceRange, sortBy]
+  );
+  const availableBrands = useMemo(() => extractAvailableBrands(products), [products]);
+  const processedProducts = useMemo(() => filterAndSortCatalogProducts(products, filterCriteria), [products, filterCriteria]);
+  const activeFiltersCount = countActiveCatalogFilters(filterCriteria);
 
-    if (sortBy === 'price_asc') result.sort((a, b) => a.priceUsd - b.priceUsd);
-    else if (sortBy === 'price_desc') result.sort((a, b) => b.priceUsd - a.priceUsd);
-    else if (sortBy === 'name_asc') result.sort((a, b) => a.name.localeCompare(b.name));
-    return result;
-  }, [products, onlyInStock, onlyDeals, onlyBoxes, priceRange, sortBy]);
+  const handleResetFilters = () => {
+    setOnlyInStock(false);
+    setOnlyDeals(false);
+    setOnlyBoxes(false);
+    setPriceRange('all');
+    setSelectedBrand('all');
+    setSortBy('default');
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
 
   const displayedProducts = useMemo(() => processedProducts.slice(0, visibleCount), [processedProducts, visibleCount]);
   const activeGroups = groups.filter((g) => g.SmartVentas === 1 || g.SmartVentas === undefined);
@@ -79,32 +85,30 @@ export function CatalogBrowser({
   const categoryTitle = activeSubObj ? `${activeGroupObj?.Nombre || ''} - ${activeSubObj.Nombre}` : activeGroupObj?.Nombre || 'Catálogo';
 
   return (
-    <div className="space-y-4 sm:space-y-6 min-w-0 max-w-full">
-      <LiveCatalogFilterBar
-        groups={activeGroups}
+    <div className="space-y-4 sm:space-y-5 min-w-0 max-w-full">
+      <CatalogSubcategoryBar
         subgroups={subgroups}
-        selectedGroup={activeGroup}
         selectedSubgroup={activeSubgroup}
-        currentGroupName={activeGroupObj?.Nombre || 'Todos'}
-        onSelectGroup={selectGroup}
         onSelectSubgroup={selectSubgroup}
+        activeFiltersCount={activeFiltersCount}
+        onOpenFilters={() => setIsFiltersOpen(true)}
       />
 
-      <CatalogFiltersBar
-        totalCount={processedProducts.length}
-        displayedCount={displayedProducts.length}
-        onlyInStock={onlyInStock}
-        onToggleInStock={setOnlyInStock}
-        onlyDeals={onlyDeals}
-        onToggleDeals={setOnlyDeals}
-        onlyBoxes={onlyBoxes}
-        onToggleBoxes={setOnlyBoxes}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-        priceRange={priceRange}
-        onPriceRangeChange={setPriceRange}
-        categoryTitle={categoryTitle}
-      />
+      {activeFiltersCount > 0 && (
+        <div className="flex items-center justify-between gap-3 px-1 text-xs text-slate-500">
+          <span className="tabular-nums font-medium">
+            {processedProducts.length} {processedProducts.length === 1 ? 'resultado' : 'resultados'} con filtros activos
+          </span>
+          <button
+            type="button"
+            onClick={handleResetFilters}
+            className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
+          >
+            <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.75} />
+            Limpiar filtros
+          </button>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3.5">
@@ -117,9 +121,19 @@ export function CatalogBrowser({
           ))}
         </div>
       ) : displayedProducts.length === 0 ? (
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 sm:p-12 text-center text-slate-600">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 sm:p-12 text-center text-slate-600 space-y-3">
           <p className="text-sm font-bold">No se encontraron productos disponibles con estos filtros.</p>
-          <p className="text-xs text-slate-500 mt-1">Prueba desactivando el filtro de stock o eligiendo otro subgrupo.</p>
+          <p className="text-xs text-slate-500">Prueba ajustando los filtros activos o seleccionando otra subcategoría.</p>
+          {activeFiltersCount > 0 && (
+            <button
+              type="button"
+              onClick={handleResetFilters}
+              className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.75} />
+              Restablecer filtros
+            </button>
+          )}
         </div>
       ) : (
         <div key={`${activeGroup}-${activeSubgroup}`} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3.5 animate-in fade-in-50 duration-200">
@@ -143,6 +157,34 @@ export function CatalogBrowser({
           </p>
         </div>
       )}
+
+      <CatalogFiltersDrawer
+        isOpen={isFiltersOpen}
+        onClose={() => setIsFiltersOpen(false)}
+        totalCount={processedProducts.length}
+        categoryTitle={categoryTitle}
+        activeFiltersCount={activeFiltersCount}
+        onResetFilters={handleResetFilters}
+        groups={activeGroups}
+        selectedGroup={activeGroup}
+        onSelectGroup={selectGroup}
+        subgroups={subgroups}
+        selectedSubgroup={activeSubgroup}
+        onSelectSubgroup={selectSubgroup}
+        brands={availableBrands}
+        selectedBrand={selectedBrand}
+        onSelectBrand={setSelectedBrand}
+        priceRange={priceRange}
+        onPriceRangeChange={setPriceRange}
+        onlyInStock={onlyInStock}
+        onToggleInStock={setOnlyInStock}
+        onlyDeals={onlyDeals}
+        onToggleDeals={setOnlyDeals}
+        onlyBoxes={onlyBoxes}
+        onToggleBoxes={setOnlyBoxes}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
     </div>
   );
 }

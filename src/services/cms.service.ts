@@ -90,6 +90,8 @@ export async function getQuickCategories(onlyActive = true): Promise<QuickCatego
     return ((data || []) as QuickCategory[]).map((cat) => ({
       ...cat,
       icon_name: cat.icon_name || cat.icono || 'Wine',
+      image_url: cat.image_url ?? null,
+      is_featured: Boolean(cat.is_featured),
       show_on_homepage: cat.show_on_homepage ?? cat.activo ?? true,
     }));
   } catch (err) {
@@ -100,14 +102,19 @@ export async function getQuickCategories(onlyActive = true): Promise<QuickCatego
 
 export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise<QuickCategory> {
   const resolvedIcon = (item.icon_name ?? item.icono ?? 'Wine').trim() || 'Wine';
-  const resolvedVisible = item.show_on_homepage ?? item.activo ?? true;
+  const resolvedActive = item.activo ?? true;
+  const resolvedVisible = item.show_on_homepage ?? resolvedActive;
+  const resolvedImageUrl = item.image_url?.trim() || null;
+  const resolvedFeatured = Boolean(item.is_featured);
   const now = new Date().toISOString();
 
   const fullPayload: Record<string, unknown> = {
     ...item,
     icono: resolvedIcon,
     icon_name: resolvedIcon,
-    activo: resolvedVisible,
+    image_url: resolvedImageUrl,
+    is_featured: resolvedFeatured,
+    activo: resolvedActive,
     show_on_homepage: resolvedVisible,
     updated_at: now,
   };
@@ -124,11 +131,13 @@ export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise
     error.code === 'PGRST204' ||
     error.code === '42703' ||
     error.message?.includes('icon_name') ||
-    error.message?.includes('show_on_homepage');
+    error.message?.includes('show_on_homepage') ||
+    error.message?.includes('image_url') ||
+    error.message?.includes('is_featured');
 
   if (!isMissingSchemaColumn) throw error;
 
-  // Fallback seguro si la migración SQL de icon_name / show_on_homepage aún no se ejecuta en Supabase
+  // Fallback seguro si alguna columna aún no existe en Supabase
   const legacyPayload: Record<string, unknown> = {
     id: item.id,
     nombre: item.nombre,
@@ -136,7 +145,7 @@ export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise
     url: item.url ?? '/catalogo',
     icono: resolvedIcon,
     orden: item.orden ?? 1,
-    activo: resolvedVisible,
+    activo: resolvedActive,
     updated_at: now,
   };
 
@@ -150,6 +159,8 @@ export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise
   return {
     ...(retry.data as QuickCategory),
     icon_name: resolvedIcon,
+    image_url: resolvedImageUrl,
+    is_featured: resolvedFeatured,
     show_on_homepage: resolvedVisible,
   };
 }
@@ -356,6 +367,30 @@ export async function uploadStoreLogo(file: File): Promise<string> {
   if (uploadError) throw uploadError;
 
   const { data: { publicUrl } } = supabase.storage.from('products').getPublicUrl(filePath);
+  return publicUrl;
+}
+
+export async function uploadCategoryImage(file: File, categoryId?: string): Promise<string> {
+  const rawExt = file.name.split('.').pop()?.toLowerCase() || 'webp';
+  const ext = rawExt.replace(/[^a-z0-9]/g, '') || 'webp';
+  const cleanPrefix = (categoryId || 'cat')
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '-');
+  const filePath = `${cleanPrefix}_${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('category-images')
+    .upload(filePath, file, {
+      contentType: file.type || 'image/webp',
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from('category-images').getPublicUrl(filePath);
   return publicUrl;
 }
 

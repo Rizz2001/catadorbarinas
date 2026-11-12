@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, Share2, XCircle } from 'lucide-react';
 import { Product, PurchaseMode } from '@/types';
-import { formatPrices, splitUsdParts } from '@/lib/currency';
+import { DEFAULT_BCV_RATE, formatPrices, splitUsdParts } from '@/lib/currency';
+import { useIsHydrated } from '@/hooks/useIsHydrated';
 import { useCartStore } from '@/store/useCartStore';
 import { useWishlistStore } from '@/store/useWishlistStore';
 import { useBcvStore } from '@/store/useBcvStore';
@@ -42,11 +43,16 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
   const isNoImage = !rawImage || rawImage === IMAGE_FALLBACKS.product || rawImage.includes('logo');
   const activeImage = isNoImage || hasError ? cmsLogo : rawImage;
 
-  const cartItems = useCartStore((state) => state.items);
+  const isHydrated = useIsHydrated();
+  const rawCartItems = useCartStore((state) => state.items);
   const addItem = useCartStore((state) => state.addItem);
-  const isFav = useWishlistStore((state) => state.items.some((i) => i.id === product.id));
+  const rawIsFav = useWishlistStore((state) => state.items.some((i) => i.id === product.id));
   const toggleFavorite = useWishlistStore((state) => state.toggleFavorite);
-  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const rawBcvRate = useBcvStore((state) => state.rateInfo.rate);
+
+  const cartItems = isHydrated ? rawCartItems : [];
+  const isFav = isHydrated ? rawIsFav : false;
+  const bcvRate = isHydrated ? rawBcvRate : DEFAULT_BCV_RATE;
 
   const unitsPerBox = getUnitsPerPurchaseMode(product, 'caja');
   const unitPrices = formatPrices(getEffectivePriceUsd(product, 'unidad'), bcvRate);

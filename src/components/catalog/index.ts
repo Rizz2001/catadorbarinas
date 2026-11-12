@@ -1,3 +1,5 @@
 export { CatalogBrowser } from './CatalogBrowser';
-export { CatalogFiltersBar } from './CatalogFiltersBar';
-export type { SortOption } from './CatalogFiltersBar';
+export { CatalogFiltersDrawer } from './CatalogFiltersDrawer';
+export { CatalogSubcategoryBar } from './CatalogSubcategoryBar';
+export { CatalogVisualGrid } from './CatalogVisualGrid';
+export type { BrandFilterOption, PriceRangeFilter, SortOption } from './catalogFilterTypes';

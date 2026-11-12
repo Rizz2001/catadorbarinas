@@ -31,6 +31,8 @@ export interface CategoryPillNode {
   url: string;
   icono: string;
   icon_name?: string;
+  image_url?: string | null;
+  is_featured?: boolean;
   orden: number;
   activo: boolean;
   show_on_homepage?: boolean;

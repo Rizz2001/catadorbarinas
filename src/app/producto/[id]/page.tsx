@@ -6,7 +6,6 @@ import { fetchArticulosSmartVentas, fetchProductById } from '@/services/foxdata.
 import { ProductDetailView } from '@/components/ecommerce';
 import { formatUsd } from '@/lib/currency';
 
-export const dynamic = 'force-dynamic';
 export const revalidate = 60;
 
 interface ProductPageProps {

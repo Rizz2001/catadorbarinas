@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { Banner, BentoCardNode, CategoryPillNode, Product } from '@/types';
-import { getBanners, getQuickCategories } from '@/services/cms.service';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { convertUsdToVes, DEFAULT_BCV_RATE, formatVes } from '@/lib/currency';
@@ -27,10 +26,8 @@ export function HeroBanner({
   starProduct,
   heroProducts = [],
 }: HeroBannerProps) {
-  const [banner, setBanner] = useState<Banner | null>(initialBanner || null);
-  const [quickCategories, setQuickCategories] = useState<CategoryPillNode[]>(
-    initialQuickCategories
-  );
+  const banner = initialBanner || null;
+  const quickCategories = initialQuickCategories;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -42,29 +39,6 @@ export function HeroBanner({
     if (heroProducts.length > 0) return heroProducts.slice(0, 5);
     return starProduct ? [starProduct] : [];
   }, [heroProducts, starProduct]);
-
-  useEffect(() => {
-    let mounted = true;
-    async function loadCMSData() {
-      try {
-        const [bannersList, categoriesList] = await Promise.all([
-          getBanners(false),
-          getQuickCategories(true),
-        ]);
-        if (mounted) {
-          const hero = bannersList.find((b) => b.tipo === 'hero');
-          if (hero) setBanner(hero);
-          if (categoriesList.length > 0) setQuickCategories(categoriesList);
-        }
-      } catch {
-        // Silencioso
-      }
-    }
-    loadCMSData();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
   useEffect(() => {
     if (slides.length <= 1 || isPaused) return;

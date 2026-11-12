@@ -71,6 +71,26 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
+  // 0. Protección temprana en Edge/Middleware para APIs privadas y administrativas
+  if (pathname.startsWith('/api/pedidos') || pathname.startsWith('/api/admin')) {
+    if (!user) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+    if (pathname.startsWith('/api/admin')) {
+      const { data: perfil } = await supabase
+        .from('perfiles')
+        .select('rol')
+        .eq('id', user.id)
+        .single();
+      if (!perfil || (perfil as { rol: string }).rol !== 'admin') {
+        return NextResponse.json(
+          { error: 'Permisos insuficientes' },
+          { status: 403 }
+        );
+      }
+    }
+  }
+
   // 1. Protección de rutas administrativas (/admin/*)
   if (pathname.startsWith('/admin')) {
     if (!user) {

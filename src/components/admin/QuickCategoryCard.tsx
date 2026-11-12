@@ -3,9 +3,10 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CheckCircle2, GripVertical, Loader2, Save, Trash2 } from 'lucide-react';
-import { Switch } from '@/components/admin/ui';
 import { QuickCategory } from '@/types';
 import { DynamicLucideIcon } from '@/components/ui';
+import { CategoryImageUploader } from './CategoryImageUploader';
+import { QuickCategorySwitches } from './QuickCategorySwitches';
 import { LucideIconField } from './LucideIconField';
 import { cn } from '@/lib/utils';
 
@@ -19,7 +20,7 @@ interface QuickCategoryCardProps {
 }
 
 /**
- * Tarjeta individual editable y ordenable por arrastre para una categoría rápida de portada.
+ * Tarjeta individual editable y ordenable por arrastre para gestionar categorías visuales y portada.
  */
 export function QuickCategoryCard({
   category,
@@ -32,8 +33,11 @@ export function QuickCategoryCard({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: category.id,
   });
+
   const iconValue = category.icon_name ?? category.icono ?? 'Wine';
+  const isFeatured = Boolean(category.is_featured);
   const showOnHome = category.show_on_homepage ?? category.activo ?? true;
+  const isActive = category.activo ?? true;
 
   return (
     <div
@@ -71,39 +75,51 @@ export function QuickCategoryCard({
               />
             </div>
             <div className="min-w-0">
-              <span className="text-[10px] font-mono text-slate-400 block truncate">
-                {category.id}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono text-slate-400 truncate">
+                  {category.id}
+                </span>
+                <span
+                  className={cn(
+                    'rounded-full px-1.5 py-0.5 text-[9px] font-black uppercase',
+                    isFeatured
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-slate-100 text-slate-600'
+                  )}
+                >
+                  {isFeatured ? 'Ancho' : '1:1'}
+                </span>
+              </div>
               <h3 className="text-xs font-black text-slate-900 truncate">{category.nombre}</h3>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            <Switch
-              label=""
-              size="sm"
-              value={showOnHome}
-              onChange={(checked) => onChange({ show_on_homepage: checked, activo: checked })}
-            />
-            <button
-              type="button"
-              onClick={onDelete}
-              title="Eliminar categoría"
-              className="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 cursor-pointer"
-            >
-              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onDelete}
+            title="Eliminar categoría"
+            aria-label={`Eliminar categoría ${category.nombre}`}
+            className="p-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 cursor-pointer shrink-0"
+          >
+            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+          </button>
         </div>
 
-        <div className="flex items-center justify-between text-[11px] bg-slate-50 px-2.5 py-1.5 rounded-lg">
-          <span className="font-semibold text-slate-600">
-            <code className="font-mono">show_on_homepage</code>:
-          </span>
-          <span className={showOnHome ? 'font-bold text-emerald-700' : 'font-bold text-slate-400'}>
-            {showOnHome ? 'Visible en Inicio' : 'Oculta en Inicio'}
-          </span>
-        </div>
+        <CategoryImageUploader
+          categoryId={category.id}
+          categoryName={category.nombre}
+          imageUrl={category.image_url}
+          onImageChange={(url) => onChange({ image_url: url })}
+        />
+
+        <QuickCategorySwitches
+          isFeatured={isFeatured}
+          showOnHomepage={showOnHome}
+          isActive={isActive}
+          onToggleFeatured={(checked) => onChange({ is_featured: checked })}
+          onToggleHomepage={(checked) => onChange({ show_on_homepage: checked })}
+          onToggleActive={(checked) => onChange({ activo: checked })}
+        />
 
         <div className="grid grid-cols-3 gap-2">
           <div className="col-span-2">
@@ -144,35 +160,14 @@ export function QuickCategoryCard({
         </div>
 
         <div>
-          <label className="block text-[11px] font-bold text-slate-700 mb-0.5">
-            URL de Destino
-          </label>
-          <input
-            type="text"
-            value={category.url}
-            onChange={(e) => onChange({ url: e.target.value })}
-            className="w-full h-9 rounded-xl border border-slate-200 px-2.5 text-xs font-mono text-slate-900"
-          />
+          <label className="block text-[11px] font-bold text-slate-700 mb-0.5">URL de Destino</label>
+          <input type="text" value={category.url} onChange={(e) => onChange({ url: e.target.value })} className="w-full h-9 rounded-xl border border-slate-200 px-2.5 text-xs font-mono text-slate-900" />
         </div>
 
-        <LucideIconField
-          label="Icono Lucide (icon_name)"
-          value={iconValue}
-          onChange={(val) => onChange({ icon_name: val, icono: val })}
-          placeholder="Wine, CupSoda, Snowflake"
-        />
+        <LucideIconField label="Icono Lucide (Inicio y Fallback)" value={iconValue} onChange={(val) => onChange({ icon_name: val, icono: val })} placeholder="Wine, CupSoda, Snowflake" />
       </div>
 
-      <button
-        type="button"
-        disabled={isSaving}
-        onClick={onSave}
-        className={`w-full h-10 flex items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-          isSuccess
-            ? 'bg-emerald-600 text-white'
-            : 'bg-catador-blue hover:bg-catador-blue-light text-white shadow-2xs'
-        }`}
-      >
+      <button type="button" disabled={isSaving} onClick={onSave} className={cn('w-full h-10 flex items-center justify-center gap-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer', isSuccess ? 'bg-emerald-600 text-white' : 'bg-catador-blue hover:bg-catador-blue-light text-white shadow-2xs')}>
         {isSaving ? (
           <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5} />
         ) : isSuccess ? (
@@ -185,4 +180,3 @@ export function QuickCategoryCard({
     </div>
   );
 }
-

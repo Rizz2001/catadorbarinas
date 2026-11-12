@@ -1,390 +1,653 @@
+import { randomUUID } from 'crypto';
 import { getSupabaseAdmin } from '@/lib/supabase/server';
+import { convertUsdToVes } from '@/lib/currency';
 import {
-  PedidoRow,
-  PedidoInsert,
-  PedidoItemRow,
+  canBuyBox,
+  canBuyUnit,
+  getEffectivePriceUsd,
+  getUnitsPerPurchaseMode,
+} from '@/lib/inventory';
+import { calculateSmartDeliveryQuote } from '@/lib/delivery';
+import { fetchProductById } from '@/services/foxdata.service';
+import { fetchBcvRateFromDolarApi } from '@/services/bcv.service';
+import type { CartItem, Product, PurchaseMode, StoreConfig } from '@/types';
+import type {
+  EstadoPago,
+  EstadoPedido,
+  MetodoPago,
   PagoPedidoRow,
   PedidoConDetalles,
+  PedidoInsert,
+  PedidoItemRow,
+  PedidoMensajeInsert,
   PedidoMensajeRow,
-  EstadoPedido,
-  EstadoPago,
-} from '@/types';
-import { fetchExistenciasBodegonMap } from './foxdata.service';
-import { getProductCmsConfigsMap, getStoreConfig } from './cms.service';
+  PedidoRow,
+} from '@/types/supabase';
 
-// Memoria volátil de respaldo para desarrollo si Supabase no está sincronizado
-const memoryOrders = new Map<string, PedidoConDetalles>();
+const PAYMENT_PROOFS_BUCKET = 'payment-proofs';
+const PROOF_SIGNED_URL_TTL_SECONDS = 3600;
+const ALLOWED_PAYMENT_METHODS: ReadonlySet<MetodoPago> = new Set([
+  'pago_movil',
+  'zelle',
+  'efectivo_usd',
+  'punto_venta',
+  'transferencia_bancaria',
+]);
+
+export class OrderError extends Error {
+  readonly statusCode: number;
+
+  constructor(message: string, statusCode = 400) {
+    super(message);
+    this.name = 'OrderError';
+    this.statusCode = statusCode;
+  }
+}
+
+export interface CreateOrderItemInput {
+  codArticuloFoxdata: string;
+  codGrupo?: string;
+  cantidad: number;
+  modalidadCompra?: PurchaseMode;
+}
 
 export interface CreateOrderPayload {
-  usuarioId?: string | null;
+  usuarioId: string;
   clienteNombre: string;
   clienteTelefono: string;
   clienteCedula: string;
-  clienteEmail?: string;
+  clienteEmail?: string | null;
   tipoEntrega: 'delivery' | 'pickup';
-  direccionEntrega?: string;
-  zonaBarinas?: string;
-  notas?: string;
+  direccionEntrega?: string | null;
+  zonaBarinas?: string | null;
   latitudEntrega?: number | null;
   longitudEntrega?: number | null;
-  distanciaKm?: number | null;
-  tipoTransporte?: 'motorizado' | 'vehiculo_carga' | 'pickup';
+  notas?: string | null;
+  items: CreateOrderItemInput[];
+  pago: {
+    metodoPago: MetodoPago;
+    bancoOrigen?: string | null;
+    telefonoOrigen?: string | null;
+    referencia?: string | null;
+    comprobantePath?: string | null;
+    billetePagoUsd?: number | null;
+  };
+}
+
+function extractPaymentProofObjectPath(rawValue?: string | null): string | null {
+  if (!rawValue) return null;
+  const trimmed = rawValue.trim();
+  if (!trimmed || trimmed.startsWith('blob:') || trimmed.startsWith('data:')) {
+    return null;
+  }
+
+  let candidate = trimmed;
+  if (candidate.startsWith(`${PAYMENT_PROOFS_BUCKET}:`)) {
+    candidate = candidate.slice(PAYMENT_PROOFS_BUCKET.length + 1);
+  } else if (candidate.startsWith('http://') || candidate.startsWith('https://')) {
+    const markerPublic = `/storage/v1/object/public/${PAYMENT_PROOFS_BUCKET}/`;
+    const markerSign = `/storage/v1/object/sign/${PAYMENT_PROOFS_BUCKET}/`;
+    const idx = candidate.includes(markerPublic)
+      ? candidate.indexOf(markerPublic) + markerPublic.length
+      : candidate.includes(markerSign)
+      ? candidate.indexOf(markerSign) + markerSign.length
+      : -1;
+    if (idx === -1) return null;
+    candidate = candidate.slice(idx).split('?')[0];
+  }
+
+  candidate = candidate.replace(/^\/+/, '');
+  if (!candidate || candidate.includes('..')) {
+    return null;
+  }
+  return candidate;
+}
+
+function normalizeOwnedProofPath(
+  rawPath: string | null | undefined,
+  usuarioId: string
+): string | null {
+  const path = extractPaymentProofObjectPath(rawPath);
+  if (!path) return null;
+  if (!path.startsWith(`${usuarioId}/`)) {
+    throw new OrderError(
+      'El comprobante de pago no pertenece a la sesión autenticada.',
+      403
+    );
+  }
+  return path;
+}
+
+async function resolveSignedPaymentProofUrl(
+  rawPathOrUrl: string | null | undefined
+): Promise<string | null> {
+  const objectPath = extractPaymentProofObjectPath(rawPathOrUrl);
+  if (!objectPath) return null;
+
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data, error } = await supabaseAdmin.storage
+    .from(PAYMENT_PROOFS_BUCKET)
+    .createSignedUrl(objectPath, PROOF_SIGNED_URL_TTL_SECONDS);
+
+  if (error || !data?.signedUrl) {
+    return null;
+  }
+  return data.signedUrl;
+}
+
+async function fetchActiveStoreConfig(): Promise<StoreConfig | null> {
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data, error } = await supabaseAdmin
+    .from('configuracion_tienda')
+    .select('*')
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw new OrderError('Error consultando la configuración oficial de la tienda.', 500);
+  }
+  return (data as StoreConfig | null) ?? null;
+}
+
+async function resolveAuthoritativeBcvRate(storeConfig: StoreConfig | null): Promise<number> {
+  if (
+    storeConfig?.bcv_usar_manual &&
+    typeof storeConfig.bcv_tasa_manual === 'number' &&
+    storeConfig.bcv_tasa_manual > 0
+  ) {
+    return Number(storeConfig.bcv_tasa_manual);
+  }
+
+  const info = await fetchBcvRateFromDolarApi();
+  if (!Number.isFinite(info.rate) || info.rate <= 0) {
+    throw new OrderError('No fue posible validar la tasa oficial BCV.', 503);
+  }
+  return Number(info.rate);
+}
+
+function assertPaymentMethodEnabled(metodo: MetodoPago, storeConfig: StoreConfig | null): void {
+  if (!ALLOWED_PAYMENT_METHODS.has(metodo)) {
+    throw new OrderError('Método de pago no soportado.', 400);
+  }
+  if (!storeConfig) return;
+
+  if (metodo === 'transferencia_bancaria' && storeConfig.transferencia_activa === false) {
+    throw new OrderError('El método Transferencia Bancaria está deshabilitado temporalmente.', 400);
+  }
+}
+
+async function rollbackOrderCascade(pedidoId: string): Promise<void> {
+  const supabaseAdmin = getSupabaseAdmin();
+  await supabaseAdmin.from('pedido_mensajes').delete().eq('pedido_id', pedidoId);
+  await supabaseAdmin.from('pagos_pedido').delete().eq('pedido_id', pedidoId);
+  await supabaseAdmin.from('pedido_items').delete().eq('pedido_id', pedidoId);
+  await supabaseAdmin.from('pedidos').delete().eq('id', pedidoId);
+}
+
+async function resolveAndValidateOrderItems(
+  rawItems: CreateOrderItemInput[],
+  tasaBcv: number
+): Promise<{
+  verifiedItemsData: Array<Omit<PedidoItemRow, 'id' | 'pedido_id' | 'created_at'>>;
+  authoritativeCart: CartItem[];
   subtotalUsd: number;
   subtotalVes: number;
-  deliveryUsd: number;
-  deliveryVes: number;
-  totalUsd: number;
-  totalVes: number;
-  tasaBcv: number;
-  items: Array<{
-    codArticuloFoxdata: string;
-    nombreArticulo: string;
-    cantidad: number;
-    modalidadCompra?: 'unidad' | 'caja';
-    unidadesPorCaja?: number;
-    unidadesTotalesDescontadas?: number;
-    precioUnitarioUsd: number;
-    precioUnitarioVes: number;
-    subtotalUsd: number;
-    subtotalVes: number;
-    imagenUrl?: string;
-  }>;
-  pago: {
-    metodoPago: 'pago_movil' | 'zelle' | 'efectivo_usd' | 'punto_venta' | 'transferencia_bancaria';
-    montoUsd: number;
-    montoVes: number;
-    bancoOrigen?: string;
-    telefonoOrigen?: string;
-    referencia?: string;
-    comprobanteUrl?: string;
-    billetePagoUsd?: number;
-    vueltoCalculadoUsd?: number;
-  };
-}
-
-/**
- * Valida matemáticamente el stock real en unidades base en Bodegón (Depósito 01) y crea el pedido en Supabase
- */
-export async function createOrder(payload: CreateOrderPayload): Promise<PedidoConDetalles> {
-  if (!payload.usuarioId || !payload.usuarioId.trim()) {
-    throw new Error(
-      'Debes registrarte e iniciar sesión en Gran Catador para poder realizar una compra.'
-    );
+}> {
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
+    throw new OrderError('El pedido debe contener al menos un producto.', 400);
   }
 
-  // 0. Validar que la cuenta de usuario no esté suspendida y tenga correo confirmado
-  const supabase = getSupabaseAdmin();
-  const { data: perfilUsuario } = await supabase
-    .from('perfiles')
-    .select('suspendido, motivo_suspension, correo_confirmado, rol')
-    .eq('id', payload.usuarioId)
-    .single();
-
-  if (perfilUsuario?.suspendido) {
-    const motivo = perfilUsuario.motivo_suspension
-      ? `: ${perfilUsuario.motivo_suspension}`
-      : '.';
-    throw new Error(
-      `Tu cuenta se encuentra temporalmente inhabilitada${motivo} Por favor comunícate con atención al cliente.`
-    );
-  }
-
-  if (perfilUsuario?.rol !== 'admin' && perfilUsuario?.correo_confirmado === false) {
-    throw new Error(
-      'Debes confirmar tu correo electrónico antes de realizar un pedido. Revisa tu bandeja de entrada o solicita un nuevo enlace en tu panel de cuenta.'
-    );
-  }
-
-  // 1. Validar existencias reales en unidades base contra FoxData Bodegón
-  const [existencias, cmsConfigsMap, storeConfig] = await Promise.all([
-    fetchExistenciasBodegonMap(),
-    getProductCmsConfigsMap(),
-    getStoreConfig(),
-  ]);
-
-  const globalAllowBackorder = Boolean(storeConfig?.permitir_venta_sin_stock_global);
-
-  if (existencias.size > 0) {
-    // Sumar todas las unidades base requeridas por código de artículo (por si lleva cajas + unidades del mismo producto)
-    const requiredByCode = new Map<string, { totalUnits: number; name: string; detail: string }>();
-
-    for (const item of payload.items) {
-      const code = item.codArticuloFoxdata.trim();
-      const mode = item.modalidadCompra || 'unidad';
-      const unitsPerBox = mode === 'caja' ? Math.max(2, item.unidadesPorCaja || 12) : 1;
-      const unitsRequired = item.unidadesTotalesDescontadas || item.cantidad * unitsPerBox;
-
-      const prev = requiredByCode.get(code);
-      const detailPart =
-        mode === 'caja'
-          ? `${item.cantidad} ${item.cantidad === 1 ? 'caja' : 'cajas'} (${unitsRequired} und)`
-          : `${item.cantidad} ${item.cantidad === 1 ? 'unidad' : 'unidades'}`;
-
-      requiredByCode.set(code, {
-        totalUnits: (prev?.totalUnits || 0) + unitsRequired,
-        name: item.nombreArticulo,
-        detail: prev ? `${prev.detail} + ${detailPart}` : detailPart,
+  const uniqueKeys = new Map<string, { id: string; groupHint?: string }>();
+  for (const item of rawItems) {
+    const id = typeof item?.codArticuloFoxdata === 'string' ? item.codArticuloFoxdata.trim() : '';
+    if (!id) {
+      throw new OrderError('Código de producto inválido en el carrito.', 400);
+    }
+    if (!uniqueKeys.has(id)) {
+      uniqueKeys.set(id, {
+        id,
+        groupHint: typeof item.codGrupo === 'string' ? item.codGrupo.trim() : undefined,
       });
     }
-
-    for (const [code, reqInfo] of requiredByCode.entries()) {
-      const cmsCfg = cmsConfigsMap.get(code) ?? cmsConfigsMap.get(code.toLowerCase());
-      const allowBackorder =
-        typeof cmsCfg?.permitir_venta_sin_stock === 'boolean'
-          ? cmsCfg.permitir_venta_sin_stock
-          : globalAllowBackorder;
-
-      if (!allowBackorder) {
-        const stockActual = Math.max(0, Math.floor(existencias.get(code) ?? 0));
-        if (reqInfo.totalUnits > stockActual) {
-          throw new Error(
-            `Stock insuficiente para "${reqInfo.name}". Solicitaste ${reqInfo.detail} (${reqInfo.totalUnits} unidades en total), pero en inventario solo quedan ${stockActual} unidades disponibles.`
-          );
-        }
-      }
-    }
   }
 
-  const supabaseAdmin = getSupabaseAdmin();
-  const numeroOrden = `GC-${Math.floor(1000 + Math.random() * 9000)}`;
-  const orderId = crypto.randomUUID();
+  const productEntries = await Promise.all(
+    Array.from(uniqueKeys.values()).map(async ({ id, groupHint }) => {
+      const product = await fetchProductById(id, groupHint);
+      return [id, product] as const;
+    })
+  );
+  const productsById = new Map<string, Product>();
+  for (const [id, product] of productEntries) {
+    if (product) productsById.set(id, product);
+  }
 
-  const pedidoData: PedidoInsert = {
-    id: orderId,
-    numero_orden: numeroOrden,
-    usuario_id: payload.usuarioId || null,
-    cliente_nombre: payload.clienteNombre,
-    cliente_telefono: payload.clienteTelefono,
-    cliente_cedula: payload.clienteCedula,
-    cliente_email: payload.clienteEmail || null,
-    tipo_entrega: payload.tipoEntrega,
-    direccion_entrega: payload.direccionEntrega || null,
-    zona_barinas: payload.zonaBarinas || 'Barinas Centro / Alto Barinas',
-    subtotal_usd: payload.subtotalUsd,
-    subtotal_ves: payload.subtotalVes,
-    delivery_usd: payload.deliveryUsd,
-    delivery_ves: payload.deliveryVes,
-    total_usd: payload.totalUsd,
-    total_ves: payload.totalVes,
-    tasa_bcv: payload.tasaBcv,
-    estado_pedido: 'recibido',
-    estado_pago: 'pendiente',
-    notas: payload.notas || null,
-    latitud_entrega: payload.latitudEntrega ?? null,
-    longitud_entrega: payload.longitudEntrega ?? null,
-    distancia_km: payload.distanciaKm ?? null,
-    tipo_transporte: payload.tipoTransporte || (payload.tipoEntrega === 'pickup' ? 'pickup' : 'motorizado'),
-  };
+  const verifiedItemsData: Array<Omit<PedidoItemRow, 'id' | 'pedido_id' | 'created_at'>> = [];
+  const authoritativeCart: CartItem[] = [];
+  const totalUnitsByProduct = new Map<string, { product: Product; units: number }>();
 
-  const itemsData = payload.items.map((it) => {
-    const mode = it.modalidadCompra || 'unidad';
-    const unitsPerBox = mode === 'caja' ? Math.max(2, it.unidadesPorCaja || 12) : 1;
-    const totalDiscounted = it.unidadesTotalesDescontadas || it.cantidad * unitsPerBox;
-    const labelSuffix = mode === 'caja' ? ` [CAJA x${unitsPerBox}]` : '';
+  for (const rawItem of rawItems) {
+    const skuId = rawItem.codArticuloFoxdata.trim();
+    const product = productsById.get(skuId);
+    if (!product) {
+      throw new OrderError(`El producto ${skuId} no existe o no está disponible.`, 400);
+    }
+    if (product.hiddenFromStore) {
+      throw new OrderError(`El producto "${product.name}" fue ocultado del catálogo.`, 400);
+    }
 
-    return {
-      id: crypto.randomUUID(),
-      pedido_id: orderId,
-      cod_articulo_foxdata: it.codArticuloFoxdata,
-      nombre_articulo: it.nombreArticulo.includes('[CAJA')
-        ? it.nombreArticulo
-        : `${it.nombreArticulo}${labelSuffix}`,
-      cantidad: it.cantidad,
+    const quantity = Math.floor(Number(rawItem.cantidad));
+    if (!Number.isFinite(quantity) || quantity < 1 || quantity > 500) {
+      throw new OrderError(`Cantidad inválida para "${product.name}".`, 400);
+    }
+
+    const mode: PurchaseMode = rawItem.modalidadCompra === 'caja' ? 'caja' : 'unidad';
+    if (mode === 'unidad' && !canBuyUnit(product)) {
+      throw new OrderError(`"${product.name}" solo se comercializa por caja cerrada.`, 400);
+    }
+    if (mode === 'caja' && !canBuyBox(product)) {
+      throw new OrderError(`"${product.name}" solo se comercializa por unidad.`, 400);
+    }
+
+    const unitPriceUsd = Number(getEffectivePriceUsd(product, mode).toFixed(2));
+    if (!Number.isFinite(unitPriceUsd) || unitPriceUsd <= 0) {
+      throw new OrderError(`"${product.name}" no tiene un precio válido configurado.`, 400);
+    }
+
+    const unitsPerBox = getUnitsPerPurchaseMode(product, mode);
+    const totalUnits = quantity * unitsPerBox;
+    const prevCommitted = totalUnitsByProduct.get(product.id);
+    totalUnitsByProduct.set(product.id, {
+      product,
+      units: (prevCommitted?.units || 0) + totalUnits,
+    });
+
+    const unitPriceVes = convertUsdToVes(unitPriceUsd, tasaBcv);
+    const itemSubtotalUsd = Number((unitPriceUsd * quantity).toFixed(2));
+    const itemSubtotalVes = convertUsdToVes(itemSubtotalUsd, tasaBcv);
+
+    authoritativeCart.push({ product, quantity, purchaseMode: mode });
+    verifiedItemsData.push({
+      cod_articulo_foxdata: product.id,
+      nombre_articulo: product.name,
+      cantidad: quantity,
+      precio_unitario_usd: unitPriceUsd,
+      precio_unitario_ves: unitPriceVes,
+      subtotal_usd: itemSubtotalUsd,
+      subtotal_ves: itemSubtotalVes,
+      imagen_url: product.images[0] || null,
       modalidad_compra: mode,
       unidades_por_caja: unitsPerBox,
-      unidades_totales_descontadas: totalDiscounted,
-      precio_unitario_usd: it.precioUnitarioUsd,
-      precio_unitario_ves: it.precioUnitarioVes,
-      subtotal_usd: it.subtotalUsd,
-      subtotal_ves: it.subtotalVes,
-      imagen_url: it.imagenUrl || null,
-      created_at: new Date().toISOString(),
-    };
+      unidades_totales_descontadas: totalUnits,
+    });
+  }
+
+  for (const { product, units } of totalUnitsByProduct.values()) {
+    const stockAvailable = Math.max(0, Math.floor(product.stockQuantity || 0));
+    if (!product.allowBackorder && units > stockAvailable) {
+      throw new OrderError(
+        `Stock insuficiente para "${product.name}". Disponible: ${stockAvailable} uds.`,
+        400
+      );
+    }
+  }
+
+  const subtotalUsd = Number(
+    verifiedItemsData.reduce((sum, item) => sum + item.subtotal_usd, 0).toFixed(2)
+  );
+  const subtotalVes = convertUsdToVes(subtotalUsd, tasaBcv);
+
+  return { verifiedItemsData, authoritativeCart, subtotalUsd, subtotalVes };
+}
+
+/**
+ * Crea un pedido en Supabase bajo principio Zero Trust:
+ * todo precio, tasa BCV, stock y costo de envío se recalcula en el servidor.
+ */
+export async function createOrder(payload: CreateOrderPayload): Promise<PedidoConDetalles> {
+  const usuarioId = typeof payload.usuarioId === 'string' ? payload.usuarioId.trim() : '';
+  const clienteNombre = typeof payload.clienteNombre === 'string' ? payload.clienteNombre.trim() : '';
+  const clienteTelefono =
+    typeof payload.clienteTelefono === 'string' ? payload.clienteTelefono.trim() : '';
+  const clienteCedula =
+    typeof payload.clienteCedula === 'string' ? payload.clienteCedula.trim() : '';
+
+  if (!usuarioId) {
+    throw new OrderError('Sesión de usuario requerida para crear el pedido.', 401);
+  }
+  if (!clienteNombre || !clienteTelefono || !clienteCedula) {
+    throw new OrderError('Completa nombre, teléfono y cédula para procesar tu pedido.', 400);
+  }
+  if (payload.tipoEntrega !== 'delivery' && payload.tipoEntrega !== 'pickup') {
+    throw new OrderError('Tipo de entrega inválido.', 400);
+  }
+
+  const storeConfig = await fetchActiveStoreConfig();
+  assertPaymentMethodEnabled(payload.pago?.metodoPago, storeConfig);
+  const tasaBcv = await resolveAuthoritativeBcvRate(storeConfig);
+
+  const { verifiedItemsData, authoritativeCart, subtotalUsd, subtotalVes } =
+    await resolveAndValidateOrderItems(payload.items, tasaBcv);
+
+  const deliveryQuote = calculateSmartDeliveryQuote({
+    items: authoritativeCart,
+    subtotalUsd,
+    deliveryType: payload.tipoEntrega,
+    userLat: payload.latitudEntrega ?? null,
+    userLng: payload.longitudEntrega ?? null,
+    zonaBarinas: payload.zonaBarinas ?? undefined,
+    storeConfig,
   });
 
-  const pagoData = {
-    id: crypto.randomUUID(),
-    pedido_id: orderId,
-    metodo_pago: payload.pago.metodoPago,
-    monto_usd: payload.pago.montoUsd,
-    monto_ves: payload.pago.montoVes,
-    banco_origen: payload.pago.bancoOrigen || null,
-    telefono_origen: payload.pago.telefonoOrigen || null,
-    referencia: payload.pago.referencia || null,
-    comprobante_url: payload.pago.comprobanteUrl || null,
-    billete_pago_usd: payload.pago.billetePagoUsd || null,
-    vuelto_calculado_usd: payload.pago.vueltoCalculadoUsd || null,
-    estado: 'pendiente' as EstadoPago,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  };
+  const deliveryUsd =
+    payload.tipoEntrega === 'pickup' ? 0 : Number(deliveryQuote.shippingUsd.toFixed(2));
+  const deliveryVes = convertUsdToVes(deliveryUsd, tasaBcv);
+  const totalUsd = Number((subtotalUsd + deliveryUsd).toFixed(2));
+  const totalVes = convertUsdToVes(totalUsd, tasaBcv);
 
-  const initialMessage: PedidoMensajeRow = {
-    id: crypto.randomUUID(),
-    pedido_id: orderId,
-    remitente_id: null,
-    remitente_rol: 'sistema' as const,
-    remitente_nombre: 'Gran Catador Bot',
-    mensaje: `¡Hola ${payload.clienteNombre}! Hemos recibido tu pedido #${numeroOrden}. Un administrador de Gran Catador está verificando tu orden en este momento por esta vía.`,
-    adjunto_url: null,
-    tipo_mensaje: 'evento_estado' as const,
-    leido: false,
-    created_at: new Date().toISOString(),
-  };
-
-  // Intentar guardar en Supabase
-  try {
-    await supabaseAdmin.from('pedidos').insert(pedidoData);
-    await supabaseAdmin.from('pedido_items').insert(itemsData);
-    await supabaseAdmin.from('pagos_pedido').insert(pagoData);
-    await supabaseAdmin.from('pedido_mensajes').insert(initialMessage);
-  } catch (err) {
-    console.warn('Error guardando en Supabase remoto, usando almacenamiento local en memoria:', err);
+  let billetePagoUsd: number | null = null;
+  let vueltoCalculadoUsd: number | null = null;
+  if (payload.pago.metodoPago === 'efectivo_usd') {
+    const rawBill = payload.pago.billetePagoUsd;
+    if (typeof rawBill === 'number' && Number.isFinite(rawBill) && rawBill > 0) {
+      if (rawBill < totalUsd) {
+        throw new OrderError(
+          'El monto en efectivo indicado es inferior al total del pedido.',
+          400
+        );
+      }
+      billetePagoUsd = Number(rawBill.toFixed(2));
+      vueltoCalculadoUsd = Number(Math.max(0, billetePagoUsd - totalUsd).toFixed(2));
+    }
   }
 
-  const fullOrder: PedidoConDetalles = {
-    ...(pedidoData as PedidoRow),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-    items: itemsData as PedidoItemRow[],
-    pago: pagoData as PagoPedidoRow,
-    mensajes: [initialMessage],
+  const normalizedProofPath = normalizeOwnedProofPath(
+    payload.pago.comprobantePath,
+    usuarioId
+  );
+
+  const numeroOrden = `GC-${randomUUID().replace(/-/g, '').slice(0, 6).toUpperCase()}`;
+  const pedidoData: PedidoInsert = {
+    numero_orden: numeroOrden,
+    usuario_id: usuarioId,
+    guest_token: null,
+    cliente_nombre: clienteNombre,
+    cliente_telefono: clienteTelefono,
+    cliente_cedula: clienteCedula,
+    cliente_email: payload.clienteEmail?.trim() || null,
+    tipo_entrega: payload.tipoEntrega,
+    direccion_entrega:
+      payload.tipoEntrega === 'pickup'
+        ? storeConfig?.direccion_fisica || 'Retiro en Tienda - Gran Catador Barinas'
+        : payload.direccionEntrega?.trim() || null,
+    zona_barinas: payload.zonaBarinas?.trim() || null,
+    subtotal_usd: subtotalUsd,
+    subtotal_ves: subtotalVes,
+    delivery_usd: deliveryUsd,
+    delivery_ves: deliveryVes,
+    total_usd: totalUsd,
+    total_ves: totalVes,
+    tasa_bcv: tasaBcv,
+    estado_pedido: 'recibido',
+    estado_pago: 'pendiente',
+    notas: payload.notas?.trim() || null,
+    latitud_entrega: payload.latitudEntrega ?? null,
+    longitud_entrega: payload.longitudEntrega ?? null,
+    distancia_km:
+      payload.tipoEntrega === 'pickup' ? 0 : deliveryQuote.distanceKm,
+    tipo_transporte:
+      payload.tipoEntrega === 'pickup' ? 'pickup' : deliveryQuote.transportType,
   };
 
-  memoryOrders.set(orderId, fullOrder);
-  return fullOrder;
-}
-
-/**
- * Obtiene un pedido por su UUID
- */
-export async function getOrderById(id: string): Promise<PedidoConDetalles | null> {
   const supabaseAdmin = getSupabaseAdmin();
+  const { data: pedidoInserted, error: pedidoError } = await supabaseAdmin
+    .from('pedidos')
+    .insert(pedidoData)
+    .select()
+    .single();
+
+  if (pedidoError || !pedidoInserted) {
+    throw new OrderError(
+      `No se pudo registrar el pedido: ${pedidoError?.message || 'error interno'}`,
+      500
+    );
+  }
+
+  const createdOrderRow = pedidoInserted as PedidoRow;
+
   try {
-    const { data: pedido, error: pedidoError } = await supabaseAdmin
-      .from('pedidos')
-      .select('*')
-      .eq('id', id)
+    const itemsRows = verifiedItemsData.map((item) => ({
+      ...item,
+      pedido_id: createdOrderRow.id,
+    }));
+    const { data: insertedItems, error: itemsError } = await supabaseAdmin
+      .from('pedido_items')
+      .insert(itemsRows)
+      .select();
+
+    if (itemsError || !insertedItems) {
+      throw new Error(itemsError?.message || 'Error guardando los ítems del pedido');
+    }
+
+    const pagoData = {
+      pedido_id: createdOrderRow.id,
+      metodo_pago: payload.pago.metodoPago,
+      monto_usd: totalUsd,
+      monto_ves: totalVes,
+      banco_origen: payload.pago.bancoOrigen?.trim() || null,
+      telefono_origen: payload.pago.telefonoOrigen?.trim() || null,
+      referencia: payload.pago.referencia?.trim() || null,
+      comprobante_url: normalizedProofPath,
+      billete_pago_usd: billetePagoUsd,
+      vuelto_calculado_usd: vueltoCalculadoUsd,
+      estado: 'pendiente' as EstadoPago,
+    };
+
+    const { data: insertedPago, error: pagoError } = await supabaseAdmin
+      .from('pagos_pedido')
+      .insert(pagoData)
+      .select()
       .single();
 
-    if (!pedidoError && pedido) {
-      const [itemsRes, pagoRes, mensajesRes] = await Promise.all([
-        supabaseAdmin.from('pedido_items').select('*').eq('pedido_id', id),
-        supabaseAdmin.from('pagos_pedido').select('*').eq('pedido_id', id).single(),
-        supabaseAdmin.from('pedido_mensajes').select('*').eq('pedido_id', id).order('created_at', { ascending: true }),
-      ]);
-
-      const items = (itemsRes.data || []) as PedidoItemRow[];
-      const pago = (pagoRes.data || undefined) as PagoPedidoRow | undefined;
-      const mensajes = (mensajesRes.data || []) as PedidoConDetalles['mensajes'];
-
-      const orderResult: PedidoConDetalles = {
-        ...(pedido as PedidoRow),
-        items,
-        pago,
-        mensajes,
-      };
-
-      memoryOrders.set(id, orderResult);
-      return orderResult;
+    if (pagoError || !insertedPago) {
+      throw new Error(pagoError?.message || 'Error registrando el pago del pedido');
     }
-  } catch (err) {
-    console.warn('Error obteniendo orden de Supabase, consultando memoria:', err);
-  }
 
-  return memoryOrders.get(id) || null;
+    const initialMessage: PedidoMensajeInsert = {
+      pedido_id: createdOrderRow.id,
+      remitente_rol: 'sistema',
+      remitente_nombre: 'Gran Catador',
+      mensaje: `¡Pedido ${numeroOrden} recibido! Nuestro equipo ya está revisando tu orden y comprobante de pago.`,
+      tipo_mensaje: 'evento_estado',
+      leido: false,
+    };
+
+    const { data: insertedMessage, error: messageError } = await supabaseAdmin
+      .from('pedido_mensajes')
+      .insert(initialMessage)
+      .select()
+      .single();
+
+    if (messageError || !insertedMessage) {
+      throw new Error(messageError?.message || 'Error creando mensaje inicial del pedido');
+    }
+
+    const signedProofUrl = await resolveSignedPaymentProofUrl(normalizedProofPath);
+    const pagoHydrated: PagoPedidoRow = {
+      ...(insertedPago as PagoPedidoRow),
+      comprobante_url: signedProofUrl,
+    };
+
+    return {
+      ...createdOrderRow,
+      items: insertedItems as PedidoItemRow[],
+      pago: pagoHydrated,
+      mensajes: [insertedMessage as PedidoMensajeRow],
+    };
+  } catch (err) {
+    await rollbackOrderCascade(createdOrderRow.id);
+    const reason = err instanceof Error ? err.message : 'Fallo persistiendo detalle del pedido';
+    throw new OrderError(`No se pudo completar el registro del pedido: ${reason}`, 500);
+  }
 }
 
-/**
- * Obtiene todos los pedidos para la consola del Administrador
- */
-export async function getAllOrders(): Promise<PedidoConDetalles[]> {
+async function hydrateOrderDetails(
+  pedido: PedidoRow,
+  includeFullMessages: boolean
+): Promise<PedidoConDetalles> {
   const supabaseAdmin = getSupabaseAdmin();
-  try {
-    const { data: pedidos, error } = await supabaseAdmin
-      .from('pedidos')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const [itemsRes, pagoRes, messagesRes] = await Promise.all([
+    supabaseAdmin.from('pedido_items').select('*').eq('pedido_id', pedido.id),
+    supabaseAdmin.from('pagos_pedido').select('*').eq('pedido_id', pedido.id).maybeSingle(),
+    includeFullMessages
+      ? supabaseAdmin
+          .from('pedido_mensajes')
+          .select('*')
+          .eq('pedido_id', pedido.id)
+          .order('created_at', { ascending: true })
+      : supabaseAdmin
+          .from('pedido_mensajes')
+          .select('id', { count: 'exact', head: true })
+          .eq('pedido_id', pedido.id)
+          .eq('leido', false)
+          .neq('remitente_rol', 'admin'),
+  ]);
 
-    if (!error && Array.isArray(pedidos)) {
-      const fullList: PedidoConDetalles[] = [];
-      for (const p of pedidos) {
-        const [itemsRes, pagoRes, unreadRes] = await Promise.all([
-          supabaseAdmin.from('pedido_items').select('*').eq('pedido_id', p.id),
-          supabaseAdmin.from('pagos_pedido').select('*').eq('pedido_id', p.id).single(),
-          supabaseAdmin.from('pedido_mensajes').select('id', { count: 'exact' }).eq('pedido_id', p.id).eq('leido', false).neq('remitente_rol', 'admin'),
-        ]);
-
-        fullList.push({
-          ...(p as PedidoRow),
-          items: (itemsRes.data || []) as PedidoItemRow[],
-          pago: (pagoRes.data || undefined) as PagoPedidoRow | undefined,
-          mensajes_no_leidos: unreadRes.count || 0,
-        });
-      }
-      return fullList;
-    }
-  } catch (err) {
-    console.warn('Error listando órdenes de Supabase, usando memoria:', err);
+  if (itemsRes.error) {
+    throw new OrderError(`Error obteniendo ítems del pedido ${pedido.id}.`, 500);
   }
 
-  return Array.from(memoryOrders.values()).sort(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  let hydratedPago: PagoPedidoRow | undefined = (pagoRes.data as PagoPedidoRow | null) ?? undefined;
+  if (hydratedPago?.comprobante_url) {
+    const signedUrl = await resolveSignedPaymentProofUrl(hydratedPago.comprobante_url);
+    hydratedPago = { ...hydratedPago, comprobante_url: signedUrl };
+  }
+
+  return {
+    ...pedido,
+    items: (itemsRes.data || []) as PedidoItemRow[],
+    pago: hydratedPago,
+    ...(includeFullMessages
+      ? { mensajes: (messagesRes.data || []) as PedidoMensajeRow[] }
+      : { mensajes_no_leidos: messagesRes.count || 0 }),
+  };
+}
+
+export async function getOrderById(id: string): Promise<PedidoConDetalles | null> {
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data: pedido, error } = await supabaseAdmin
+    .from('pedidos')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    throw new OrderError(`Error consultando el pedido ${id}.`, 500);
+  }
+  if (!pedido) return null;
+
+  return hydrateOrderDetails(pedido as PedidoRow, true);
+}
+
+export async function getOrdersByUserId(usuarioId: string): Promise<PedidoConDetalles[]> {
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data: pedidos, error } = await supabaseAdmin
+    .from('pedidos')
+    .select('*')
+    .eq('usuario_id', usuarioId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new OrderError('Error consultando tus pedidos.', 500);
+  }
+  if (!pedidos || pedidos.length === 0) return [];
+
+  return Promise.all(
+    (pedidos as PedidoRow[]).map((pedido) => hydrateOrderDetails(pedido, false))
   );
 }
 
-/**
- * Actualiza el estado de la orden o del pago
- */
+export async function getAllOrders(): Promise<PedidoConDetalles[]> {
+  const supabaseAdmin = getSupabaseAdmin();
+  const { data: pedidos, error } = await supabaseAdmin
+    .from('pedidos')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new OrderError('Error consultando la lista de pedidos.', 500);
+  }
+  if (!pedidos || pedidos.length === 0) return [];
+
+  return Promise.all(
+    (pedidos as PedidoRow[]).map((pedido) => hydrateOrderDetails(pedido, false))
+  );
+}
+
 export async function updateOrderStatus(
   pedidoId: string,
   estadoPedido?: EstadoPedido,
   estadoPago?: EstadoPago
 ): Promise<boolean> {
   const supabaseAdmin = getSupabaseAdmin();
-  const updateData: Partial<PedidoRow> = {
-    updated_at: new Date().toISOString(),
-  };
+  const updateData: {
+    estado_pedido?: EstadoPedido;
+    estado_pago?: EstadoPago;
+    updated_at: string;
+  } = { updated_at: new Date().toISOString() };
 
   if (estadoPedido) updateData.estado_pedido = estadoPedido;
   if (estadoPago) updateData.estado_pago = estadoPago;
 
-  try {
-    await supabaseAdmin.from('pedidos').update(updateData).eq('id', pedidoId);
-    if (estadoPago) {
-      await supabaseAdmin.from('pagos_pedido').update({ estado: estadoPago }).eq('pedido_id', pedidoId);
-    }
-  } catch (err) {
-    console.warn('Error actualizando orden en Supabase:', err);
+  const { error: updateOrderError } = await supabaseAdmin
+    .from('pedidos')
+    .update(updateData)
+    .eq('id', pedidoId);
+
+  if (updateOrderError) {
+    throw new OrderError(
+      `Error actualizando estado del pedido: ${updateOrderError.message}`,
+      500
+    );
   }
 
-  const mem = memoryOrders.get(pedidoId);
-  if (mem) {
-    if (estadoPedido) mem.estado_pedido = estadoPedido;
-    if (estadoPago) {
-      mem.estado_pago = estadoPago;
-      if (mem.pago) mem.pago.estado = estadoPago;
+  if (estadoPago) {
+    const { error: updatePagoError } = await supabaseAdmin
+      .from('pagos_pedido')
+      .update({ estado: estadoPago, updated_at: new Date().toISOString() })
+      .eq('pedido_id', pedidoId);
+
+    if (updatePagoError) {
+      throw new OrderError(
+        `Error actualizando estado de pago: ${updatePagoError.message}`,
+        500
+      );
     }
-    mem.updated_at = new Date().toISOString();
   }
 
   return true;
 }
 
-/**
- * Elimina un pedido y sus registros asociados (items, pagos, mensajes)
- */
 export async function deleteOrder(pedidoId: string): Promise<boolean> {
   const supabaseAdmin = getSupabaseAdmin();
-  try {
-    await supabaseAdmin.from('pedido_mensajes').delete().eq('pedido_id', pedidoId);
-    await supabaseAdmin.from('pagos_pedido').delete().eq('pedido_id', pedidoId);
-    await supabaseAdmin.from('pedido_items').delete().eq('pedido_id', pedidoId);
-    await supabaseAdmin.from('pedidos').delete().eq('id', pedidoId);
-  } catch (err) {
-    console.warn('Error eliminando orden de Supabase:', err);
+  const [msgRes, pagoRes, itemsRes] = await Promise.all([
+    supabaseAdmin.from('pedido_mensajes').delete().eq('pedido_id', pedidoId),
+    supabaseAdmin.from('pagos_pedido').delete().eq('pedido_id', pedidoId),
+    supabaseAdmin.from('pedido_items').delete().eq('pedido_id', pedidoId),
+  ]);
+
+  if (msgRes.error || pagoRes.error || itemsRes.error) {
+    throw new OrderError('Error eliminando dependencias del pedido.', 500);
   }
 
-  memoryOrders.delete(pedidoId);
+  const { error: orderDeleteError } = await supabaseAdmin
+    .from('pedidos')
+    .delete()
+    .eq('id', pedidoId);
+
+  if (orderDeleteError) {
+    throw new OrderError(`Error eliminando el pedido: ${orderDeleteError.message}`, 500);
+  }
+
   return true;
 }

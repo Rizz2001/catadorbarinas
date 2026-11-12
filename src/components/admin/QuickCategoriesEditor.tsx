@@ -16,9 +16,17 @@ import {
 } from '@dnd-kit/sortable';
 import { Loader2, RefreshCw, Plus } from 'lucide-react';
 import { useQuickCategoriesAdmin } from '@/hooks/useQuickCategoriesAdmin';
+import { CatalogVisualGrid } from '@/components/catalog';
+import { DeviceSimulator } from './banners/DeviceSimulator';
 import { QuickCategoryCard } from './QuickCategoryCard';
 
-export function QuickCategoriesEditor() {
+interface QuickCategoriesEditorProps {
+  showWireframePreview?: boolean;
+}
+
+export function QuickCategoriesEditor({
+  showWireframePreview = false,
+}: QuickCategoriesEditorProps) {
   const dndId = useId();
   const {
     categories,
@@ -43,21 +51,34 @@ export function QuickCategoriesEditor() {
     return (
       <div className="p-8 flex items-center justify-center min-h-[30vh] gap-3">
         <Loader2 className="h-6 w-6 animate-spin text-catador-blue" strokeWidth={1.5} />
-        <span className="text-xs font-bold text-slate-500">Cargando Categorías Rápidas...</span>
+        <span className="text-xs font-bold text-slate-500">Cargando Categorías del Catálogo...</span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {showWireframePreview && (
+        <DeviceSimulator title="Vista Previa en Vivo (/catalogo)">
+          {(mode) => (
+            <div className="bg-[#F7F8FA] p-3 sm:p-4">
+              <CatalogVisualGrid
+                categories={categories}
+                forceMobileLayout={mode === 'mobile'}
+              />
+            </div>
+          )}
+        </DeviceSimulator>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
         <div>
           <h2 className="text-sm font-black text-slate-900 tracking-tight">
-            Categorías Rápidas de Portada (<code className="text-xs font-mono">icon_name</code> &amp;{' '}
-            <code className="text-xs font-mono">show_on_homepage</code>)
+            Tarjetas de Categoría (<code className="text-xs font-mono">image_url</code> &amp;{' '}
+            <code className="text-xs font-mono">is_featured</code>)
           </h2>
           <p className="text-xs text-slate-500">
-            Arrastra desde la esquina superior izquierda de cada tarjeta para reordenar los accesos en la portada.
+            Sube imágenes al bucket <code className="font-mono">category-images</code>, marca destacadas en ancho completo o arrastra para reordenar.
           </p>
         </div>
 
