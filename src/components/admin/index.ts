@@ -13,5 +13,7 @@ export * from './EditUserModal';
 export * from './DeleteUserModal';
 export * from './DeleteOrderModal';
 export * from './QuickDeliveryCalculatorModal';
+export * from './IconPicker';
 export * from './LucideIconField';
+export * from './banners';
 export * from './inicio';

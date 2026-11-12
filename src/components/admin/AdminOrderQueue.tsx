@@ -3,7 +3,7 @@
 import React from 'react';
 import { Clock, MessageSquare, MapPin, Inbox } from 'lucide-react';
 import { Badge } from '@astryxdesign/core/Badge';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { PedidoConDetalles, EstadoPedido } from '@/types';
 import { formatUsd } from '@/lib/currency';

@@ -1,10 +1,13 @@
 'use client';
 
-import { CheckCircle2, Loader2, Save, Trash2 } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { CheckCircle2, GripVertical, Loader2, Save, Trash2 } from 'lucide-react';
+import { Switch } from '@/components/admin/ui';
 import { QuickCategory } from '@/types';
 import { DynamicLucideIcon } from '@/components/ui';
 import { LucideIconField } from './LucideIconField';
+import { cn } from '@/lib/utils';
 
 interface QuickCategoryCardProps {
   category: QuickCategory;
@@ -16,7 +19,7 @@ interface QuickCategoryCardProps {
 }
 
 /**
- * Tarjeta individual editable para una categoría rápida de portada (icon_name + show_on_homepage).
+ * Tarjeta individual editable y ordenable por arrastre para una categoría rápida de portada.
  */
 export function QuickCategoryCard({
   category,
@@ -26,14 +29,39 @@ export function QuickCategoryCard({
   onSave,
   onDelete,
 }: QuickCategoryCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: category.id,
+  });
   const iconValue = category.icon_name ?? category.icono ?? 'Wine';
   const showOnHome = category.show_on_homepage ?? category.activo ?? true;
 
   return (
-    <div className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xs space-y-3 flex flex-col justify-between">
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+      className={cn(
+        'rounded-2xl border bg-white p-4 shadow-2xs space-y-3 flex flex-col justify-between transition-shadow',
+        isDragging
+          ? 'border-catador-blue ring-2 ring-catador-blue/30 shadow-xl z-20 opacity-95'
+          : 'border-slate-200/90'
+      )}
+    >
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-100">
           <div className="flex items-center gap-2 min-w-0">
+            <button
+              type="button"
+              title="Arrastrar para reordenar"
+              aria-label={`Arrastrar para reordenar ${category.nombre}`}
+              className="p-1 text-slate-400 hover:text-slate-700 cursor-grab active:cursor-grabbing shrink-0 rounded"
+              {...attributes}
+              {...listeners}
+            >
+              <GripVertical className="h-4 w-4" strokeWidth={1.5} />
+            </button>
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 border border-amber-200 text-[#8B3E03]">
               <DynamicLucideIcon
                 name={iconValue}

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Trash2, RefreshCw, Loader2, Search } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { Badge } from '@astryxdesign/core/Badge';
 import { AlertDialog } from '@astryxdesign/core/AlertDialog';

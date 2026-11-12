@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Plus, Trash2, Save } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import { StoreConfig, TrustBadgeNode } from '@/types';

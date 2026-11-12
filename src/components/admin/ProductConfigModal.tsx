@@ -5,7 +5,7 @@ import { Save, Package, EyeOff, Flame, TrendingUp, FileText } from 'lucide-react
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { Layout, LayoutContent, LayoutFooter } from '@astryxdesign/core/Layout';
 import { Button } from '@astryxdesign/core/Button';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductCmsConfig, SaleMode, TrendCategoryTab } from '@/types';
 import { upsertProductCmsConfig } from '@/services/cms.service';

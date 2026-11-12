@@ -5,7 +5,7 @@ import { Save, ShieldCheck, ExternalLink, MailCheck, AlertCircle } from 'lucide-
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { Layout, LayoutContent, LayoutFooter } from '@astryxdesign/core/Layout';
 import { Button } from '@astryxdesign/core/Button';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { Banner } from '@astryxdesign/core/Banner';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Database } from '@/types/supabase';

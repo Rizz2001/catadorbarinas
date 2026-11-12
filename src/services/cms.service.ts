@@ -47,8 +47,33 @@ export async function upsertBanner(banner: Partial<Banner>): Promise<Banner> {
     .select()
     .single();
 
-  if (error) throw error;
-  return data as Banner;
+  if (!error) return data as Banner;
+
+  const isMissingVisualColumn =
+    error.code === 'PGRST204' ||
+    error.code === '42703' ||
+    error.message?.includes('overlay_opacity') ||
+    error.message?.includes('object_position');
+
+  if (!isMissingVisualColumn) throw error;
+
+  // Fallback seguro si la migración SQL de overlay_opacity / object_position aún no se ejecuta
+  const legacyPayload = { ...payload };
+  delete legacyPayload.overlay_opacity;
+  delete legacyPayload.object_position;
+
+  const retry = await supabase
+    .from('banners')
+    .upsert(legacyPayload)
+    .select()
+    .single();
+
+  if (retry.error) throw retry.error;
+  return {
+    ...(retry.data as Banner),
+    overlay_opacity: banner.overlay_opacity ?? 85,
+    object_position: banner.object_position ?? 'center',
+  };
 }
 
 // ============================================================================

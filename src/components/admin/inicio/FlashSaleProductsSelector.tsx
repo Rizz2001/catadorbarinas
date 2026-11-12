@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Flame, Loader2, Search } from 'lucide-react';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductCmsConfig } from '@/types';
 import { DEFAULT_GROUPS } from '@/constants/fallback-products';

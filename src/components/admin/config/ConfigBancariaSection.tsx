@@ -1,7 +1,7 @@
 'use client';
 
 import { Smartphone, CreditCard, Building2 } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { StoreConfig } from '@/types';
 
 interface ConfigBancariaSectionProps {

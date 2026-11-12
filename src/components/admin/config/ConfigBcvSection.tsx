@@ -3,7 +3,7 @@
 import React from 'react';
 import { RefreshCw, Coins, AlertCircle } from 'lucide-react';
 import { Button } from '@astryxdesign/core/Button';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { StoreConfig } from '@/types';
 import { useBcvStore } from '@/store/useBcvStore';
 

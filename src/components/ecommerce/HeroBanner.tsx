@@ -8,7 +8,7 @@ import { getBanners, getQuickCategories } from '@/services/cms.service';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { convertUsdToVes, DEFAULT_BCV_RATE, formatVes } from '@/lib/currency';
-import { resolveHeroDisplay } from '@/lib/hero-config';
+import { buildHeroScrimGradient, resolveHeroDisplay } from '@/lib/hero-config';
 import { QuickCategoriesStrip } from './QuickCategoriesStrip';
 import { HeroBentoCards } from './HeroBentoCards';
 
@@ -86,13 +86,16 @@ export function HeroBanner({
             style={{ backgroundColor: hero.heroBgColor }}
           >
             <div
-              className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity"
-              style={{ backgroundImage: `url(${hero.bgImageUrl})` }}
+              className="absolute inset-0 bg-cover"
+              style={{
+                backgroundImage: `url(${hero.bgImageUrl})`,
+                backgroundPosition: hero.objectPosition,
+              }}
             />
             <div
               className="absolute inset-0"
               style={{
-                background: `linear-gradient(90deg, ${hero.heroBgColor}F2 0%, ${hero.heroBgColor}D9 50%, ${hero.heroBgColor}F2 100%)`,
+                background: buildHeroScrimGradient(hero.heroBgColor, hero.overlayOpacity),
               }}
             />
             <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[520px] rounded-full bg-[#EB9C53]/15 blur-3xl" />

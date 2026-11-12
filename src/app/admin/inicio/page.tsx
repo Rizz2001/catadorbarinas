@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { ExternalLink, Flame, LayoutGrid, Loader2, Tags } from 'lucide-react';
-import { TabList, Tab } from '@astryxdesign/core/TabList';
+import { TabList, Tab } from '@/components/admin/ui';
 import { buildHomeCmsPayload } from '@/adapters';
 import {
   BentoCardNode,

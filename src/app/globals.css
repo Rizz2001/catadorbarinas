@@ -107,13 +107,15 @@ h4 {
 
 /* Ocultar scrollbar en tiras horizontales táctiles */
 .scrollbar-none,
-.no-scrollbar {
+.no-scrollbar,
+.hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
 .scrollbar-none::-webkit-scrollbar,
-.no-scrollbar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar,
+.hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 

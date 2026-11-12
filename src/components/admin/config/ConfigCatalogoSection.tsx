@@ -1,7 +1,7 @@
 'use client';
 
 import { Tag, PackageX, LayoutTemplate } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { StoreConfig } from '@/types';
 
 interface ConfigCatalogoSectionProps {

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { Banner } from '@/types';
+import { buildPromoScrimGradient, resolveBannerImageVisual } from '@/lib/hero-config';
 
 interface PromoBannersGridProps {
   banners: Banner[];
@@ -17,54 +18,55 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
     (b) => b.tipo === 'promo_3' && b.activo !== false
   );
 
+  const buildCard = (
+    b: Banner | undefined,
+    fallbackOrder: number,
+    defaults: { id: string; image: string; title: string; subtitle: string; ctaText: string; ctaUrl: string }
+  ) => {
+    if (!b) return null;
+    const { overlayOpacity, objectPosition } = resolveBannerImageVisual(b, 85);
+    return {
+      id: b.id || defaults.id,
+      image: b.imagen_url || defaults.image,
+      title: b.titulo || defaults.title,
+      subtitle: b.subtitulo || defaults.subtitle,
+      badge: b.badge_texto,
+      ctaText: b.boton_texto || defaults.ctaText,
+      ctaUrl: b.boton_url || defaults.ctaUrl,
+      orden: b.orden ?? fallbackOrder,
+      overlayOpacity,
+      objectPosition,
+    };
+  };
+
   const activeCards = [
-    promo1 && {
-      id: promo1.id || 'promo-1',
-      image:
-        promo1.imagen_url ||
-        'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=800&q=80',
-      title: promo1.titulo || 'Whiskies Escoceses',
-      subtitle:
-        promo1.subtitulo ||
-        "Buchanan's, Old Parr, Chivas y Black Label al mejor precio oficial.",
-      badge: promo1.badge_texto,
-      ctaText: promo1.boton_texto || 'Ver selección',
-      ctaUrl: promo1.boton_url || '/catalogo/01/01',
-    },
-    promo2 && {
-      id: promo2.id || 'promo-2',
-      image:
-        promo2.imagen_url ||
-        'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=800&q=80',
-      title: promo2.titulo || 'Cervezas & Refrescos',
-      subtitle:
-        promo2.subtitulo || 'Polar Pilsen, Solera, Corona y combos con hielo.',
-      badge: promo2.badge_texto,
-      ctaText: promo2.boton_texto || 'Ver cervezas frías',
-      ctaUrl: promo2.boton_url || '/catalogo/09',
-    },
-    promo3 && {
-      id: promo3.id || 'promo-3',
-      image:
-        promo3.imagen_url ||
-        'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80',
-      title: promo3.titulo || 'Víveres & Despensa',
-      subtitle:
-        promo3.subtitulo ||
-        'Harina P.A.N., arroz, aceites de oliva y productos esenciales.',
-      badge: promo3.badge_texto,
-      ctaText: promo3.boton_texto || 'Explorar víveres',
-      ctaUrl: promo3.boton_url || '/catalogo/11',
-    },
-  ].filter(Boolean) as Array<{
-    id: string;
-    image: string;
-    title: string;
-    subtitle: string;
-    badge?: string | null;
-    ctaText: string;
-    ctaUrl: string;
-  }>;
+    buildCard(promo1, 1, {
+      id: 'promo-1',
+      image: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=800&q=80',
+      title: 'Whiskies Escoceses',
+      subtitle: "Buchanan's, Old Parr, Chivas y Black Label al mejor precio oficial.",
+      ctaText: 'Ver selección',
+      ctaUrl: '/catalogo/01/01',
+    }),
+    buildCard(promo2, 2, {
+      id: 'promo-2',
+      image: 'https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=800&q=80',
+      title: 'Cervezas & Refrescos',
+      subtitle: 'Polar Pilsen, Solera, Corona y combos con hielo.',
+      ctaText: 'Ver cervezas frías',
+      ctaUrl: '/catalogo/09',
+    }),
+    buildCard(promo3, 3, {
+      id: 'promo-3',
+      image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=800&q=80',
+      title: 'Víveres & Despensa',
+      subtitle: 'Harina P.A.N., arroz, aceites de oliva y productos esenciales.',
+      ctaText: 'Explorar víveres',
+      ctaUrl: '/catalogo/11',
+    }),
+  ]
+    .filter((item): item is NonNullable<typeof item> => Boolean(item))
+    .sort((a, b) => a.orden - b.orden);
 
   if (activeCards.length === 0) {
     return null;
@@ -88,9 +90,9 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
           href={card.ctaUrl}
           className="w-[78vw] min-w-[255px] max-w-[310px] shrink-0 snap-start md:w-auto md:min-w-0 md:max-w-none group relative overflow-hidden rounded-2xl p-4 sm:p-6 border border-slate-100 shadow-sm flex flex-col justify-between min-h-[146px] sm:min-h-[208px] transition-colors duration-150 hover:border-catador-blue"
           style={{
-            backgroundImage: `linear-gradient(to top, rgba(0, 23, 84, 0.94) 0%, rgba(0, 23, 84, 0.6) 60%, rgba(0, 23, 84, 0.25) 100%), url(${card.image})`,
+            backgroundImage: `${buildPromoScrimGradient(card.overlayOpacity)}, url(${card.image})`,
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            backgroundPosition: card.objectPosition,
           }}
         >
           <div className="flex items-start justify-between gap-2">

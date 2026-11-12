@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Flame, Save } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import { BentoCardNode, FlashSaleCampaign, StoreConfig } from '@/types';

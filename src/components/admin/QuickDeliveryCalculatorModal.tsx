@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Bike, Truck, Copy, Check, MessageCircle } from 'lucide-react';
 import { Dialog, DialogHeader } from '@astryxdesign/core/Dialog';
 import { Layout, LayoutContent, LayoutFooter } from '@astryxdesign/core/Layout';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import {

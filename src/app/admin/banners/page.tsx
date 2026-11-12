@@ -1,33 +1,41 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Save,
   Loader2,
-  Eye,
   LayoutTemplate,
   Tag,
   Wine,
   ShoppingBag,
   Grid,
 } from 'lucide-react';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
-import { TabList, Tab } from '@astryxdesign/core/TabList';
+import {
+  SegmentedControl,
+  SegmentedControlItem,
+  TabList,
+  Tab,
+  Switch,
+} from '@/components/admin/ui';
 import { Banner as AstryxBanner } from '@astryxdesign/core/Banner';
-import { Switch } from '@astryxdesign/core/Switch';
 import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Banner } from '@/types';
-import { getBanners, upsertBanner } from '@/services/cms.service';
+import { getBanners, upsertBanner, revalidateStorefrontCache } from '@/services/cms.service';
 import {
   BannerPreview,
   BannerImageUploader,
   PromoCardPreview,
   QuickCategoriesEditor,
+  DeviceSimulator,
+  ImageControls,
+  SortablePromoOrderBar,
+  type PromoSlotKey,
 } from '@/components/admin';
 
 type MainTab = 'banners' | 'quick_categories';
 type BannerSlot = 'hero' | 'promo_1' | 'promo_2' | 'promo_3';
+const PROMO_SLOTS: PromoSlotKey[] = ['promo_1', 'promo_2', 'promo_3'];
 
 const HERO_COLOR_PRESETS = [
   { label: 'Midnight Navy', hex: '#081229' },
@@ -99,6 +107,7 @@ export default function AdminBannersPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
   const [activeSlot, setActiveSlot] = useState<BannerSlot>('hero');
   const [banners, setBanners] = useState<Record<BannerSlot, Partial<Banner>>>(
     DEFAULT_BANNER_SLOTS
@@ -135,6 +144,54 @@ export default function AdminBannersPage() {
   }, []);
 
   const currentBanner = banners[activeSlot];
+
+  const promoOrderItems = useMemo(() => {
+    return PROMO_SLOTS.map((slot, idx) => ({
+      slot,
+      title: banners[slot]?.titulo || `Promo ${idx + 1}`,
+      orden: (banners[slot]?.orden ?? 0) > 0 ? Number(banners[slot]?.orden) : idx + 1,
+    })).sort((a, b) => a.orden - b.orden);
+  }, [banners]);
+
+  const handlePromoReorder = async (orderedSlots: PromoSlotKey[]) => {
+    setBanners((prev) => {
+      const next = { ...prev };
+      orderedSlots.forEach((slot, idx) => {
+        next[slot] = { ...next[slot], orden: idx + 1 };
+      });
+      return next;
+    });
+
+    setSavingOrder(true);
+    try {
+      const updatedList = await Promise.all(
+        orderedSlots.map((slot, idx) =>
+          upsertBanner({
+            ...banners[slot],
+            tipo: slot,
+            orden: idx + 1,
+          })
+        )
+      );
+
+      setBanners((prev) => {
+        const next = { ...prev };
+        orderedSlots.forEach((slot, idx) => {
+          if (updatedList[idx]) next[slot] = updatedList[idx];
+        });
+        return next;
+      });
+      await revalidateStorefrontCache();
+      showToast({ body: 'Orden de promociones actualizado en la portada.' });
+    } catch (err) {
+      showToast({
+        body: 'Error actualizando orden: ' + (err instanceof Error ? err.message : 'Intenta nuevamente'),
+        type: 'error',
+      });
+    } finally {
+      setSavingOrder(false);
+    }
+  };
 
   const updateCurrent = (patch: Partial<Banner>) => {
     setBanners((prev) => ({
@@ -249,6 +306,16 @@ export default function AdminBannersPage() {
             />
           </TabList>
 
+          {activeSlot !== 'hero' && (
+            <SortablePromoOrderBar
+              items={promoOrderItems}
+              activeSlot={activeSlot}
+              isSavingOrder={savingOrder}
+              onSelectSlot={(slot) => setActiveSlot(slot)}
+              onReorder={handlePromoReorder}
+            />
+          )}
+
           {saved && (
             <AstryxBanner
               status="success"
@@ -259,26 +326,33 @@ export default function AdminBannersPage() {
             />
           )}
 
-          <section className="space-y-2">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-              <Eye className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
-              <span>Vista Previa en Vivo ({activeSlot.toUpperCase()})</span>
-            </div>
-            {activeSlot === 'hero' ? (
-              <BannerPreview banner={currentBanner} />
-            ) : (
-              <PromoCardPreview banner={currentBanner} />
-            )}
-          </section>
+          <DeviceSimulator title={`Vista Previa en Vivo (${activeSlot.toUpperCase()})`}>
+            {(mode) =>
+              activeSlot === 'hero' ? (
+                <BannerPreview banner={currentBanner} previewMode={mode} />
+              ) : (
+                <PromoCardPreview banner={currentBanner} previewMode={mode} />
+              )
+            }
+          </DeviceSimulator>
 
           <form
             onSubmit={handleSave}
             className="space-y-6 text-xs bg-white p-6 rounded-xl border border-slate-200"
           >
-            <BannerImageUploader
-              imageUrl={currentBanner.imagen_url}
-              onImageChange={(url) => updateCurrent({ imagen_url: url })}
-            />
+            <div className="space-y-3">
+              <BannerImageUploader
+                imageUrl={currentBanner.imagen_url}
+                onImageChange={(url) => updateCurrent({ imagen_url: url })}
+              />
+
+              <ImageControls
+                overlayOpacity={currentBanner.overlay_opacity ?? 85}
+                objectPosition={currentBanner.object_position ?? 'center'}
+                onOverlayChange={(opacity) => updateCurrent({ overlay_opacity: opacity })}
+                onPositionChange={(pos) => updateCurrent({ object_position: pos })}
+              />
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

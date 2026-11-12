@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
-import { Switch } from '@astryxdesign/core/Switch';
+import { Switch } from '@/components/admin/ui';
 import { BentoCardKind, BentoCardNode } from '@/types';
 import { LucideIconField } from '../LucideIconField';
 

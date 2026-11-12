@@ -9,8 +9,11 @@ import {
   FileImage,
   FolderOpen,
 } from 'lucide-react';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
-import { Switch } from '@astryxdesign/core/Switch';
+import {
+  SegmentedControl,
+  SegmentedControlItem,
+  Switch,
+} from '@/components/admin/ui';
 import { Banner } from '@astryxdesign/core/Banner';
 import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 import { EmptyState } from '@astryxdesign/core/EmptyState';

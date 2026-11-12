@@ -99,6 +99,8 @@ export interface CartTotals {
 
 export type BannerType = 'hero' | 'promo_1' | 'promo_2' | 'promo_3' | 'promocion_grid' | 'secundario' | string;
 
+export type BannerObjectPosition = 'top' | 'center' | 'bottom';
+
 export interface Banner {
   id: string;
   titulo: string;
@@ -111,6 +113,8 @@ export interface Banner {
   boton_secundario_url?: string | null;
   color_fondo?: string | null;
   imagen_url?: string | null;
+  overlay_opacity?: number | null;
+  object_position?: BannerObjectPosition | null;
   tipo: BannerType;
   promo_titulo?: string | null;
   promo_precio?: number | null;

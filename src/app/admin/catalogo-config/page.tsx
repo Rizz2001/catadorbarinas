@@ -12,7 +12,7 @@ import {
   Loader2,
   PackageOpen,
 } from 'lucide-react';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { useToast } from '@astryxdesign/core/Toast';
 import { Product, ProductCmsConfig } from '@/types';
