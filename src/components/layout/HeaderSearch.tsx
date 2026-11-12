@@ -125,7 +125,7 @@ export function HeaderSearch() {
             className="p-2 text-slate-400 hover:text-slate-700 mr-0.5 cursor-pointer"
             aria-label="Limpiar búsqueda"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" strokeWidth={1.5}/>
           </button>
         )}
 
@@ -135,9 +135,9 @@ export function HeaderSearch() {
           aria-label="Buscar"
         >
           {isLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
           ) : (
-            <Search className="h-4 w-4 stroke-[2.5]" />
+            <Search className="h-4 w-4" strokeWidth={2}/>
           )}
         </button>
       </form>

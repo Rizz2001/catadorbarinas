@@ -32,7 +32,7 @@ export function AccountUnconfirmedBanner({ userEmail }: AccountUnconfirmedBanner
   return (
     <div className="rounded-2xl border border-catador-amber-oak/70 bg-catador-amber-soft p-4 space-y-2.5">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="h-5 w-5 text-catador-amber shrink-0 mt-0.5" />
+        <AlertTriangle className="h-5 w-5 text-catador-amber shrink-0 mt-0.5" strokeWidth={1.5}/>
         <div className="space-y-1">
           <h4 className="font-black text-xs text-[#8B3E03] uppercase tracking-wide">
             Correo Pendiente de Confirmación
@@ -50,7 +50,7 @@ export function AccountUnconfirmedBanner({ userEmail }: AccountUnconfirmedBanner
           disabled={resending}
           className="px-4 py-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark text-white font-extrabold text-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-60"
         >
-          {resending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mail className="h-3.5 w-3.5" />}
+          {resending ? <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5}/> : <Mail className="h-3.5 w-3.5" strokeWidth={1.5}/>}
           <span>{resending ? 'Enviando...' : 'Reenviar Confirmación'}</span>
         </button>
         {resendMsg && (

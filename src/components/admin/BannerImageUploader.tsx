@@ -50,7 +50,7 @@ export function BannerImageUploader({ imageUrl, onImageChange }: BannerImageUplo
             className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-100 transition-colors"
             title="Quitar imagen"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4" strokeWidth={1.5}/>
           </button>
         </div>
       ) : (
@@ -64,9 +64,9 @@ export function BannerImageUploader({ imageUrl, onImageChange }: BannerImageUplo
           />
           <div className="flex flex-col items-center justify-center gap-1">
             {uploading ? (
-              <Loader2 className="h-6 w-6 animate-spin text-catador-blue" />
+              <Loader2 className="h-6 w-6 animate-spin text-catador-blue" strokeWidth={1.5}/>
             ) : (
-              <Upload className="h-6 w-6 text-slate-400" />
+              <Upload className="h-6 w-6 text-slate-400" strokeWidth={1.5}/>
             )}
             <p className="text-xs font-bold text-slate-700">
               {uploading ? 'Subiendo imagen a Supabase...' : 'Haz clic o arrastra una imagen aquí'}

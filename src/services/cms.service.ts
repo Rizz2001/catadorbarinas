@@ -62,7 +62,11 @@ export async function getQuickCategories(onlyActive = true): Promise<QuickCatego
     }
     const { data, error } = await query;
     if (error) throw error;
-    return (data || []) as QuickCategory[];
+    return ((data || []) as QuickCategory[]).map((cat) => ({
+      ...cat,
+      icon_name: cat.icon_name || cat.icono || 'Wine',
+      show_on_homepage: cat.show_on_homepage ?? cat.activo ?? true,
+    }));
   } catch (err) {
     console.error('Error cargando categorías rápidas:', err);
     return [];
@@ -70,19 +74,72 @@ export async function getQuickCategories(onlyActive = true): Promise<QuickCatego
 }
 
 export async function upsertQuickCategory(item: Partial<QuickCategory>): Promise<QuickCategory> {
-  const payload: Record<string, unknown> = {
+  const resolvedIcon = (item.icon_name ?? item.icono ?? 'Wine').trim() || 'Wine';
+  const resolvedVisible = item.show_on_homepage ?? item.activo ?? true;
+  const now = new Date().toISOString();
+
+  const fullPayload: Record<string, unknown> = {
     ...item,
-    updated_at: new Date().toISOString(),
+    icono: resolvedIcon,
+    icon_name: resolvedIcon,
+    activo: resolvedVisible,
+    show_on_homepage: resolvedVisible,
+    updated_at: now,
   };
 
   const { data, error } = await supabase
     .from('categorias_rapidas')
-    .upsert(payload)
+    .upsert(fullPayload)
     .select()
     .single();
 
+  if (!error) return data as QuickCategory;
+
+  const isMissingSchemaColumn =
+    error.code === 'PGRST204' ||
+    error.code === '42703' ||
+    error.message?.includes('icon_name') ||
+    error.message?.includes('show_on_homepage');
+
+  if (!isMissingSchemaColumn) throw error;
+
+  // Fallback seguro si la migración SQL de icon_name / show_on_homepage aún no se ejecuta en Supabase
+  const legacyPayload: Record<string, unknown> = {
+    id: item.id,
+    nombre: item.nombre,
+    descripcion: item.descripcion ?? '',
+    url: item.url ?? '/catalogo',
+    icono: resolvedIcon,
+    orden: item.orden ?? 1,
+    activo: resolvedVisible,
+    updated_at: now,
+  };
+
+  const retry = await supabase
+    .from('categorias_rapidas')
+    .upsert(legacyPayload)
+    .select()
+    .single();
+
+  if (retry.error) throw retry.error;
+  return {
+    ...(retry.data as QuickCategory),
+    icon_name: resolvedIcon,
+    show_on_homepage: resolvedVisible,
+  };
+}
+
+export async function deleteQuickCategory(id: string): Promise<void> {
+  const { error } = await supabase.from('categorias_rapidas').delete().eq('id', id);
   if (error) throw error;
-  return data as QuickCategory;
+}
+
+export async function revalidateStorefrontCache(): Promise<void> {
+  try {
+    await fetch('/api/admin/revalidate', { method: 'POST' });
+  } catch {
+    // Revalidación silenciosa en background
+  }
 }
 
 // ============================================================================
@@ -129,7 +186,14 @@ export async function updateStoreConfig(config: Partial<StoreConfig>): Promise<S
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    if (error.code === 'PGRST204' || error.code === '42703') {
+      throw new Error(
+        `Falta aplicar la migración SQL en Supabase (supabase/migrations/20261112000001_home_appearance_cms.sql): ${error.message}`
+      );
+    }
+    throw error;
+  }
   return data as StoreConfig;
 }
 

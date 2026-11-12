@@ -34,9 +34,9 @@ export function CheckoutDeliveryQuoteCard({
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5 min-w-0">
           {deliveryQuote.transportType === 'vehiculo_carga' ? (
-            <Truck className="h-4 w-4 text-amber-600 shrink-0" />
+            <Truck className="h-4 w-4 text-amber-600 shrink-0" strokeWidth={1.5}/>
           ) : (
-            <Bike className="h-4 w-4 text-catador-blue shrink-0" />
+            <Bike className="h-4 w-4 text-catador-blue shrink-0" strokeWidth={1.5}/>
           )}
           <div className="min-w-0 tabular-nums">
             <span className="text-xs font-medium text-slate-600 block">Tarifa de Entrega</span>
@@ -65,9 +65,9 @@ export function CheckoutDeliveryQuoteCard({
           className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-lg border border-gray-200 bg-white hover:bg-slate-50 text-catador-blue font-bold text-xs transition-colors cursor-pointer shrink-0"
         >
           {locatingGps ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5}/>
           ) : (
-            <Navigation className="h-3.5 w-3.5" />
+            <Navigation className="h-3.5 w-3.5" strokeWidth={1.5}/>
           )}
           <span>{hasGps ? 'Recotizar delivery' : 'Cotizar delivery'}</span>
         </button>
@@ -83,7 +83,7 @@ export function CheckoutDeliveryQuoteCard({
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-catador-blue underline shrink-0"
             >
-              Ver mapa <ExternalLink className="h-3 w-3" />
+              Ver mapa <ExternalLink className="h-3 w-3" strokeWidth={1.5}/>
             </a>
           )}
         </div>
@@ -92,7 +92,7 @@ export function CheckoutDeliveryQuoteCard({
       <details className="group">
         <summary className="list-none inline-flex items-center gap-1 text-xs font-semibold text-catador-blue hover:underline cursor-pointer select-none">
           <span>Ver detalles de tarifa</span>
-          <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+          <ChevronDown className="h-3.5 w-3.5 transition-transform group-open:rotate-180" strokeWidth={1.5}/>
         </summary>
         <div className="mt-2.5 pt-2.5 border-t border-gray-200/70 space-y-2 text-[11px] text-slate-500 tabular-nums">
           <p>

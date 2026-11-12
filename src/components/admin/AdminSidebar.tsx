@@ -66,7 +66,7 @@ export function AdminSidebar() {
             className="md:hidden min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
             aria-label="Cerrar menú"
           >
-            <X className="h-6 w-6" />
+            <X className="h-6 w-6" strokeWidth={1.5}/>
           </button>
         </div>
 
@@ -75,7 +75,7 @@ export function AdminSidebar() {
           onClick={() => setDeliveryCalcOpen(true)}
           className="w-full min-h-[44px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-amber-500/15 border border-catador-amber-oak/40 text-catador-amber-oak hover:text-white hover:bg-amber-500/25 text-xs font-black transition-colors cursor-pointer"
         >
-          <Bike className="h-4 w-4 shrink-0" />
+          <Bike className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
           <span>Cotizador de Delivery</span>
         </button>
 
@@ -104,7 +104,7 @@ export function AdminSidebar() {
                           : 'border-transparent text-slate-300 hover:text-white hover:bg-white/5'
                       )}
                     >
-                      <Icon className={cn('h-4 w-4 shrink-0', isActive ? 'text-catador-amber-oak' : 'text-slate-400')} />
+                      <Icon className={cn('h-4 w-4 shrink-0', isActive ? 'text-catador-amber-oak' : 'text-slate-400')} strokeWidth={1.5}/>
                       <span className="truncate">{item.label}</span>
                     </Link>
                   );
@@ -121,7 +121,7 @@ export function AdminSidebar() {
           onClick={() => setMobileOpen(false)}
           className="flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] rounded-xl text-slate-200 hover:text-white hover:bg-white/5 font-bold transition-colors text-[13px]"
         >
-          <ArrowLeft className="h-4 w-4 text-catador-amber-oak" />
+          <ArrowLeft className="h-4 w-4 text-catador-amber-oak" strokeWidth={1.5}/>
           <span>Ver Tienda en Vivo</span>
         </Link>
 
@@ -130,7 +130,7 @@ export function AdminSidebar() {
           onClick={handleSignOut}
           className="w-full flex items-center gap-3 px-3.5 py-2.5 min-h-[44px] rounded-xl text-rose-300 hover:text-rose-100 hover:bg-rose-950/40 font-bold transition-colors cursor-pointer text-[13px]"
         >
-          <LogOut className="h-4 w-4 text-rose-400" />
+          <LogOut className="h-4 w-4 text-rose-400" strokeWidth={1.5}/>
           <span>Cerrar Sesión</span>
         </button>
       </div>
@@ -157,7 +157,7 @@ export function AdminSidebar() {
             href="/"
             className="flex items-center gap-1 px-2.5 py-1.5 min-h-[38px] rounded-lg bg-slate-800 text-slate-200 hover:text-white text-xs font-bold transition-colors"
           >
-            <Store className="h-3.5 w-3.5 text-catador-amber-oak" />
+            <Store className="h-3.5 w-3.5 text-catador-amber-oak" strokeWidth={1.5}/>
             <span>Tienda</span>
           </Link>
           <button
@@ -166,7 +166,7 @@ export function AdminSidebar() {
             className="min-h-[38px] min-w-[38px] flex items-center justify-center rounded-lg bg-slate-800 text-slate-200 hover:text-white transition-colors"
             aria-label="Abrir menú completo"
           >
-            <Menu className="h-5 w-5" />
+            <Menu className="h-5 w-5" strokeWidth={1.5}/>
           </button>
         </div>
       </div>

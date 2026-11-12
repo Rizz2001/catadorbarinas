@@ -26,7 +26,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-catador-blue text-white">
-            <FileText className="h-4 w-4" />
+            <FileText className="h-4 w-4" strokeWidth={1.5}/>
           </div>
           <div>
             <h3 className="text-sm font-extrabold text-slate-900">
@@ -65,7 +65,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
         <div>
           <span className="text-[10px] text-slate-400 uppercase font-bold block">Modalidad &amp; Destino</span>
           <div className="flex items-center gap-1 font-bold text-slate-800">
-            <MapPin className="h-3.5 w-3.5 text-catador-amber" />
+            <MapPin className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
             <span>{order.tipo_entrega === 'delivery' ? 'Delivery a Domicilio' : 'Retiro en Bodegón'}</span>
           </div>
           {order.direccion_entrega && (
@@ -131,7 +131,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
       {order.pago && (
         <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
           <div className="flex items-center gap-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-catador-blue" />
+            <CreditCard className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             <span>Método: <strong>{paymentLabels[order.pago.metodo_pago] || order.pago.metodo_pago}</strong></span>
           </div>
           {order.pago.referencia && (
@@ -141,7 +141,7 @@ export function OrderReceiptCard({ order }: OrderReceiptCardProps) {
       )}
 
       <div className="flex items-center gap-1 text-[11px] text-emerald-700 bg-emerald-50 p-2 rounded-lg">
-        <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
+        <ShieldCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
         <span>Garantía Gran Catador: Atención directa por el chat en vivo.</span>
       </div>
     </div>

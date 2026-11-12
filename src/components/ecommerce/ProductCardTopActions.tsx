@@ -33,7 +33,7 @@ export function ProductCardTopActions({
             : 'bg-white/95 border-slate-200 text-slate-400 hover:text-red-500'
         )}
       >
-        <Heart className={cn('h-3.5 w-3.5', isFav && 'fill-current')} />
+        <Heart className={cn('h-3.5 w-3.5', isFav && 'fill-current')} strokeWidth={1.5}/>
       </button>
 
       <button
@@ -52,9 +52,9 @@ export function ProductCardTopActions({
         )}
       >
         {isAdded ? (
-          <Check className="h-4 w-4 stroke-[3]" />
+          <Check className="h-4 w-4" strokeWidth={2}/>
         ) : (
-          <Plus className="h-4 w-4 stroke-[2.5]" />
+          <Plus className="h-4 w-4" strokeWidth={2}/>
         )}
       </button>
     </div>

@@ -54,7 +54,7 @@ export function PasswordUpdateForm() {
     return (
       <div className="space-y-4 py-2 text-center animate-in fade-in">
         <div className="h-12 w-12 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-          <CheckCircle2 className="h-6 w-6" />
+          <CheckCircle2 className="h-6 w-6" strokeWidth={1.5}/>
         </div>
         <div className="space-y-1">
           <h3 className="text-sm font-black text-slate-900">
@@ -65,7 +65,7 @@ export function PasswordUpdateForm() {
           </p>
         </div>
         <div className="pt-2">
-          <Loader2 className="h-5 w-5 animate-spin mx-auto text-catador-blue" />
+          <Loader2 className="h-5 w-5 animate-spin mx-auto text-catador-blue" strokeWidth={1.5}/>
         </div>
       </div>
     );
@@ -78,7 +78,7 @@ export function PasswordUpdateForm() {
           role="alert"
           className="flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium"
         >
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" strokeWidth={1.5}/>
           <span>{error}</span>
         </div>
       )}
@@ -88,7 +88,7 @@ export function PasswordUpdateForm() {
           Nueva Contraseña
         </label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+          <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type={showPassword ? 'text' : 'password'}
             required
@@ -105,7 +105,7 @@ export function PasswordUpdateForm() {
             className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
             aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? <EyeOff className="h-4 w-4" strokeWidth={1.5}/> : <Eye className="h-4 w-4" strokeWidth={1.5}/>}
           </button>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function PasswordUpdateForm() {
           Confirmar Nueva Contraseña
         </label>
         <div className="relative">
-          <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+          <Lock className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type={showConfirmPassword ? 'text' : 'password'}
             required
@@ -132,7 +132,7 @@ export function PasswordUpdateForm() {
             className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
             aria-label={showConfirmPassword ? 'Ocultar confirmación' : 'Ver confirmación'}
           >
-            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" strokeWidth={1.5}/> : <Eye className="h-4 w-4" strokeWidth={1.5}/>}
           </button>
         </div>
       </div>
@@ -144,13 +144,13 @@ export function PasswordUpdateForm() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             <span>Guardando nueva contraseña...</span>
           </>
         ) : (
           <>
             <span>Actualizar Contraseña y Entrar</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
           </>
         )}
       </button>

@@ -104,7 +104,7 @@ export function HeaderMain() {
                   'h-3 w-3 sm:h-3.5 sm:w-3.5 text-white/90 transition-transform shrink-0',
                   isLoading && 'animate-spin'
                 )}
-              />
+              strokeWidth={1.5}/>
             </button>
 
             <div className="hidden md:block">
@@ -116,7 +116,7 @@ export function HeaderMain() {
               className="relative flex items-center justify-center h-10 w-10 sm:h-11 sm:w-11 text-[#0F172A] hover:bg-[#F7F8FA] border border-transparent hover:border-slate-200 transition-colors cursor-pointer rounded-full"
               aria-label="Lista de Favoritos"
             >
-              <Heart className="h-5 w-5 stroke-[2]" />
+              <Heart className="h-5 w-5" strokeWidth={1.5}/>
               {favCount > 0 && (
                 <span className="absolute top-0.5 right-0.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-[#D99B38] text-[10px] font-black text-white tabular-nums">
                   {favCount}
@@ -129,7 +129,7 @@ export function HeaderMain() {
               className="hidden md:flex relative items-center gap-2 rounded-full bg-[#0F172A] hover:bg-[#001754] min-h-[44px] px-4 py-2 text-white transition-colors shrink-0 tabular-nums"
               aria-label="Ver Carrito de Compras"
             >
-              <ShoppingCart className="h-4 w-4 shrink-0 text-[#EB9C53]" />
+              <ShoppingCart className="h-4 w-4 shrink-0 text-[#EB9C53]" strokeWidth={1.5}/>
               <span className="text-[13px] font-black">
                 {totals.itemCount > 0 ? `(${totals.itemCount})` : '(0)'}
               </span>

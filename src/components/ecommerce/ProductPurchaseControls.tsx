@@ -135,7 +135,7 @@ export function ProductPurchaseControls({
             )}
             aria-label="Disminuir cantidad"
           >
-            <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <Minus className="h-3.5 w-3.5" strokeWidth={2}/>
           </button>
 
           <span className="px-1.5 sm:px-2 text-xs sm:text-[13px] font-black min-w-[20px] text-center select-none">
@@ -161,7 +161,7 @@ export function ProductPurchaseControls({
             )}
             aria-label="Aumentar cantidad"
           >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <Plus className="h-3.5 w-3.5" strokeWidth={2}/>
           </button>
         </div>
       </div>

@@ -130,7 +130,7 @@ export function ProductConfigModal({
               {/* 1. Modalidad de Venta (Unidad / Caja) */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <h4 className="font-black text-slate-900 flex items-center gap-1.5 uppercase">
-                  <Package className="h-4 w-4 text-catador-blue" />
+                  <Package className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
                   1. Configuración de Venta por Unidad o por Caja
                 </h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -201,7 +201,7 @@ export function ProductConfigModal({
                   <Switch
                     label="Ocultar / No Vender en Web"
                     description="Quita este artículo de la tienda aunque tenga existencia en FoxData"
-                    labelIcon={<EyeOff className="h-3.5 w-3.5 text-rose-600" />}
+                    labelIcon={<EyeOff className="h-3.5 w-3.5 text-rose-600" strokeWidth={1.5}/>}
                     labelPosition="start"
                     labelSpacing="spread"
                     value={ocultoEnWeb}
@@ -215,7 +215,7 @@ export function ProductConfigModal({
                 <div className="p-3.5 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-2.5">
                   <Switch
                     label="Incluir en «1. Tendencias»"
-                    labelIcon={<TrendingUp className="h-4 w-4 text-catador-blue" />}
+                    labelIcon={<TrendingUp className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>}
                     labelPosition="start"
                     labelSpacing="spread"
                     value={esTendencia}
@@ -237,7 +237,7 @@ export function ProductConfigModal({
                 <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-2.5">
                   <Switch
                     label="Incluir en «2. Ofertas del Día»"
-                    labelIcon={<Flame className="h-4 w-4 text-catador-amber" />}
+                    labelIcon={<Flame className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>}
                     labelPosition="start"
                     labelSpacing="spread"
                     value={esOferta}
@@ -270,7 +270,7 @@ export function ProductConfigModal({
               {/* 4. Descripción Personalizada del Artículo */}
               <div>
                 <label className="flex items-center gap-1.5 font-black text-slate-900 mb-1">
-                  <FileText className="h-4 w-4 text-catador-blue" />
+                  <FileText className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
                   Descripción Comercial del Artículo en la Tienda:
                 </label>
                 <textarea
@@ -298,7 +298,7 @@ export function ProductConfigModal({
                 form="product-config-form"
                 label="Guardar Configuración"
                 variant="primary"
-                icon={<Save className="h-4 w-4" />}
+                icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
                 isLoading={saving}
               />
             </div>

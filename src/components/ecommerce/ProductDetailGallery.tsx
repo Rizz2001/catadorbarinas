@@ -75,7 +75,7 @@ export function ProductDetailGallery({
           )}
           aria-label={isFav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
         >
-          <Heart className={cn('h-4 w-4', isFav && 'fill-current')} />
+          <Heart className={cn('h-4 w-4', isFav && 'fill-current')} strokeWidth={1.5}/>
         </button>
 
         <Image

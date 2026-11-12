@@ -101,7 +101,7 @@ export function UserNavMenu() {
         href="/login"
         className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-[#F7F8FA] px-3 sm:px-3.5 h-10 sm:min-h-[44px] text-xs font-extrabold text-slate-800 hover:border-catador-blue hover:text-catador-blue transition-colors"
       >
-        <User className="h-4 w-4 shrink-0" />
+        <User className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
         <span className="hidden sm:inline">Iniciar Sesión</span>
         <span className="sm:hidden text-xs">Entrar</span>
       </Link>
@@ -151,7 +151,7 @@ export function UserNavMenu() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] rounded-xl hover:bg-slate-50 text-slate-700 font-semibold transition-colors"
             >
-              <Settings className="h-4 w-4 text-slate-400" />
+              <Settings className="h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <span>Mi Perfil y Datos</span>
             </Link>
 
@@ -160,7 +160,7 @@ export function UserNavMenu() {
               onClick={() => setOpen(false)}
               className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] rounded-xl hover:bg-slate-50 text-slate-700 font-semibold transition-colors"
             >
-              <Package className="h-4 w-4 text-slate-400" />
+              <Package className="h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <span>Mis Pedidos en Vivo</span>
             </Link>
 
@@ -170,7 +170,7 @@ export function UserNavMenu() {
                 onClick={() => setOpen(false)}
                 className="flex items-center gap-2 px-3 py-2.5 min-h-[44px] rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold transition-colors border border-amber-200/60"
               >
-                <Shield className="h-4 w-4 text-catador-amber" />
+                <Shield className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
                 <span>Panel CMS Despacho</span>
               </Link>
             )}
@@ -181,7 +181,7 @@ export function UserNavMenu() {
                 onClick={handleSignOut}
                 className="w-full flex items-center gap-2 px-3 py-2.5 min-h-[44px] rounded-xl hover:bg-red-50 text-red-600 font-semibold transition-colors cursor-pointer"
               >
-                <LogOut className="h-4 w-4" />
+                <LogOut className="h-4 w-4" strokeWidth={1.5}/>
                 <span>Cerrar Sesión</span>
               </button>
             </div>

@@ -68,7 +68,9 @@ export async function getQuickCategoriesServer(): Promise<QuickCategory[]> {
       console.error('Error en getQuickCategoriesServer:', error);
       return [];
     }
-    const cats = (data || []) as QuickCategory[];
+    const cats = ((data || []) as QuickCategory[]).filter(
+      (cat) => (cat.show_on_homepage ?? cat.activo) !== false
+    );
     cachedQuickCats = { data: cats, expiresAt: now + 60000 };
     return cats;
   } catch (err) {

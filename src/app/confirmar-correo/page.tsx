@@ -147,7 +147,7 @@ function ConfirmarCorreoContent() {
       <div className="w-full max-w-md rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-xl text-center space-y-5">
         {loading && (
           <div className="space-y-4 py-6">
-            <Loader2 className="h-12 w-12 text-catador-blue animate-spin mx-auto" />
+            <Loader2 className="h-12 w-12 text-catador-blue animate-spin mx-auto" strokeWidth={1.5}/>
             <h1 className="text-base font-black text-slate-900">
               Verificando tu correo electrónico...
             </h1>
@@ -160,7 +160,7 @@ function ConfirmarCorreoContent() {
         {!loading && success && (
           <div className="space-y-5 py-2 animate-in fade-in duration-300">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-600">
-              <CheckCircle2 className="h-10 w-10 text-emerald-600" />
+              <CheckCircle2 className="h-10 w-10 text-emerald-600" strokeWidth={1.5}/>
             </div>
 
             <div className="space-y-2">
@@ -181,13 +181,13 @@ function ConfirmarCorreoContent() {
                 className="min-h-[44px] rounded-xl bg-catador-blue hover:bg-catador-blue-light text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all"
               >
                 <span>Ir al Carrito / Pagar</span>
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
               </Link>
               <Link
                 href="/"
                 className="min-h-[44px] rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
               >
-                <Store className="h-4 w-4 text-catador-blue" />
+                <Store className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
                 <span>Explorar Bodegón</span>
               </Link>
             </div>
@@ -197,7 +197,7 @@ function ConfirmarCorreoContent() {
         {!loading && !success && (
           <div className="space-y-5 py-2 animate-in fade-in duration-300">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
-              <AlertCircle className="h-10 w-10 text-amber-600" />
+              <AlertCircle className="h-10 w-10 text-amber-600" strokeWidth={1.5}/>
             </div>
 
             <div className="space-y-2">
@@ -233,9 +233,9 @@ function ConfirmarCorreoContent() {
                 className="w-full min-h-[44px] rounded-xl bg-catador-blue hover:bg-catador-blue-light text-white font-black text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer disabled:opacity-60"
               >
                 {resendLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
                 ) : (
-                  <Mail className="h-4 w-4" />
+                  <Mail className="h-4 w-4" strokeWidth={1.5}/>
                 )}
                 <span>
                   {resendLoading
@@ -271,7 +271,7 @@ export default function ConfirmarCorreoPage() {
     <Suspense
       fallback={
         <div className="min-h-[75vh] flex items-center justify-center">
-          <Loader2 className="h-8 w-8 text-catador-blue animate-spin" />
+          <Loader2 className="h-8 w-8 text-catador-blue animate-spin" strokeWidth={1.5}/>
         </div>
       }
     >

@@ -13,7 +13,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-6">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
         <div className="p-2 rounded-xl bg-catador-blue/10 text-catador-blue">
-          <Truck className="h-5 w-5" />
+          <Truck className="h-5 w-5" strokeWidth={1.5}/>
         </div>
         <div>
           <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider">
@@ -28,13 +28,13 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
       {/* Franjas Oficiales de Carreras */}
       <div>
         <h3 className="text-xs font-black uppercase text-slate-700 tracking-wider mb-2.5 flex items-center gap-1.5">
-          <Bike className="h-4 w-4 text-catador-blue" />
+          <Bike className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
           Tarifas por Franjas de Distancia (Barinas)
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5">
           <div className="p-3 rounded-xl border border-blue-100 bg-blue-50/40">
             <label className="flex items-center gap-1 font-bold text-slate-800 text-xs mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+              <DollarSign className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5}/>
               Carrera Corta (0-3 km) *
             </label>
             <input
@@ -51,7 +51,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
           <div className="p-3 rounded-xl border border-blue-100 bg-blue-50/40">
             <label className="flex items-center gap-1 font-bold text-slate-800 text-xs mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+              <DollarSign className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5}/>
               Carrera Media (3-6 km) *
             </label>
             <input
@@ -68,7 +68,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
           <div className="p-3 rounded-xl border border-blue-100 bg-blue-50/40">
             <label className="flex items-center gap-1 font-bold text-slate-800 text-xs mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+              <DollarSign className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5}/>
               Carrera Larga (6-9 km) *
             </label>
             <input
@@ -85,7 +85,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
           <div className="p-3 rounded-xl border border-blue-100 bg-blue-50/40">
             <label className="flex items-center gap-1 font-bold text-slate-800 text-xs mb-1">
-              <DollarSign className="h-3.5 w-3.5 text-blue-600" />
+              <DollarSign className="h-3.5 w-3.5 text-blue-600" strokeWidth={1.5}/>
               Carrera Extra Larga (9-12 km) *
             </label>
             <input
@@ -106,7 +106,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 pt-1">
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Navigation className="h-3.5 w-3.5 text-catador-blue" />
+            <Navigation className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             Carrera Foránea por Km ($ USD) *
           </label>
           <input
@@ -123,7 +123,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Truck className="h-3.5 w-3.5 text-rose-600" />
+            <Truck className="h-3.5 w-3.5 text-rose-600" strokeWidth={1.5}/>
             Recargo Vehículo de Carga ($ USD) *
           </label>
           <input
@@ -142,7 +142,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Gift className="h-3.5 w-3.5 text-emerald-600" />
+            <Gift className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5}/>
             Mínimo Delivery Gratis ($ USD) *
           </label>
           <input
@@ -159,7 +159,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Bike className="h-3.5 w-3.5 text-amber-600" />
+            <Bike className="h-3.5 w-3.5 text-amber-600" strokeWidth={1.5}/>
             Máx. Cajas en Motorizado *
           </label>
           <input
@@ -176,7 +176,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Bike className="h-3.5 w-3.5 text-amber-600" />
+            <Bike className="h-3.5 w-3.5 text-amber-600" strokeWidth={1.5}/>
             Máx. Botellas/Unidades en Moto *
           </label>
           <input
@@ -195,7 +195,7 @@ export function ConfigDeliverySection({ form, onChange }: ConfigDeliverySectionP
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1 text-xs">
-            <Compass className="h-3.5 w-3.5 text-catador-blue" />
+            <Compass className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             Coordenadas Sede Gran Catador (GPS)
           </label>
           <div className="grid grid-cols-2 gap-2">

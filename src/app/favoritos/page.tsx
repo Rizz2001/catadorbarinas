@@ -13,7 +13,7 @@ export default function FavoritosPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-red-500">
-            <Heart className="h-6 w-6 fill-current" />
+            <Heart className="h-6 w-6 fill-current" strokeWidth={1.5}/>
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
@@ -31,7 +31,7 @@ export default function FavoritosPage() {
             onClick={clearFavorites}
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-rose-200 bg-rose-50 hover:bg-rose-100 text-xs font-extrabold text-rose-700 transition-colors cursor-pointer self-start sm:self-auto"
           >
-            <Trash2 className="h-3.5 w-3.5" /> Limpiar Favoritos
+            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/> Limpiar Favoritos
           </button>
         )}
       </div>
@@ -39,7 +39,7 @@ export default function FavoritosPage() {
       {items.length === 0 ? (
         <div className="rounded-2xl bg-white border border-slate-200 p-10 sm:p-14 text-center space-y-4">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#F7F8FA] text-slate-400">
-            <ShoppingBag className="h-8 w-8" />
+            <ShoppingBag className="h-8 w-8" strokeWidth={1.5}/>
           </div>
           <div className="space-y-1">
             <h2 className="text-lg font-black text-slate-900">Aún no tienes favoritos guardados</h2>
@@ -51,7 +51,7 @@ export default function FavoritosPage() {
             href="/catalogo"
             className="inline-flex items-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-6 py-3 text-xs font-black text-white transition-colors"
           >
-            <ArrowLeft className="h-4 w-4" /> Explorar Catálogo Completo
+            <ArrowLeft className="h-4 w-4" strokeWidth={1.5}/> Explorar Catálogo Completo
           </Link>
         </div>
       ) : (

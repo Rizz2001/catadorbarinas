@@ -28,7 +28,7 @@ export function CheckoutSummaryOverviewCards({
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
           <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 text-catador-blue" />
+            <MapPin className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             Cliente y Entrega
           </span>
           <button
@@ -36,7 +36,7 @@ export function CheckoutSummaryOverviewCards({
             onClick={() => onEditStep(1)}
             className="text-xs font-semibold text-catador-blue hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <Edit3 className="h-3 w-3" /> Editar
+            <Edit3 className="h-3 w-3" strokeWidth={1.5}/> Editar
           </button>
         </div>
         <div className="text-xs text-slate-600 space-y-1">
@@ -57,7 +57,7 @@ export function CheckoutSummaryOverviewCards({
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm space-y-2">
         <div className="flex items-center justify-between border-b border-gray-100 pb-2">
           <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-            <CreditCard className="h-3.5 w-3.5 text-catador-amber" />
+            <CreditCard className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
             Método de Pago
           </span>
           <button
@@ -65,7 +65,7 @@ export function CheckoutSummaryOverviewCards({
             onClick={() => onEditStep(2)}
             className="text-xs font-semibold text-catador-blue hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <Edit3 className="h-3 w-3" /> Editar
+            <Edit3 className="h-3 w-3" strokeWidth={1.5}/> Editar
           </button>
         </div>
         <div className="text-xs text-slate-600 space-y-1">

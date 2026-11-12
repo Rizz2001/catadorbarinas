@@ -15,7 +15,7 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
       {/* Regla Global de Venta Sin Stock */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-amber-50/70 border border-amber-200">
         <div className="flex items-start gap-2.5">
-          <PackageX className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" />
+          <PackageX className="h-5 w-5 text-amber-700 shrink-0 mt-0.5" strokeWidth={1.5}/>
           <div>
             <h3 className="text-xs font-black text-slate-900 uppercase">
               Configuración Global: Vender Artículos Sin Stock (Activar / Desactivar)
@@ -39,7 +39,7 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
       {/* Personalización de Todas las Secciones del Inicio */}
       <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-catador-blue/10 text-catador-blue">
-          <LayoutTemplate className="h-4 w-4" />
+          <LayoutTemplate className="h-4 w-4" strokeWidth={1.5}/>
         </div>
         <div>
           <h2 className="text-sm font-extrabold text-slate-900 tracking-tight">
@@ -219,7 +219,7 @@ export function ConfigCatalogoSection({ form, onChange }: ConfigCatalogoSectionP
         {/* 4. Catálogo en Vivo */}
         <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-2.5">
           <div className="flex items-center gap-1.5">
-            <Tag className="h-3.5 w-3.5 text-catador-blue" />
+            <Tag className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             <span className="font-black text-slate-900 text-xs">4. Encabezado del Catálogo en Vivo</span>
           </div>
           <input

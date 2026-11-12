@@ -153,7 +153,7 @@ export default function AdminCatalogoConfigPage() {
       <div className="bg-white rounded-xl border border-slate-200/90 p-3.5 space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
           <div className="md:col-span-4 relative">
-            <Search className="h-4 w-4 text-slate-400 absolute left-3 top-2.5" />
+            <Search className="h-4 w-4 text-slate-400 absolute left-3 top-2.5" strokeWidth={1.5}/>
             <input
               type="text"
               value={searchQuery}
@@ -201,13 +201,13 @@ export default function AdminCatalogoConfigPage() {
       {/* Tabla Operativa de Reglas de Artículos */}
       {loading ? (
         <div className="p-12 flex items-center justify-center gap-2 text-sm font-bold text-slate-500">
-          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
           <span>Cargando inventario y reglas del CMS...</span>
         </div>
       ) : filteredProducts.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8">
           <EmptyState
-            icon={<PackageOpen className="h-10 w-10 text-slate-400" />}
+            icon={<PackageOpen className="h-10 w-10 text-slate-400" strokeWidth={1.5}/>}
             title="Sin artículos en este filtro"
             description="Cambia el departamento o selecciona otra pestaña de visualización."
           />
@@ -240,7 +240,7 @@ export default function AdminCatalogoConfigPage() {
                         Stock: {product.stockQuantity} und
                       </span>
                       <span className="text-xs font-black px-2.5 py-0.5 rounded-md bg-blue-50 text-catador-blue border border-blue-200">
-                        <Package className="h-3.5 w-3.5 inline mr-1" />
+                        <Package className="h-3.5 w-3.5 inline mr-1" strokeWidth={1.5}/>
                         {saleMode === 'solo_unidad'
                           ? 'Solo Unidad'
                           : saleMode === 'solo_caja'
@@ -270,7 +270,7 @@ export default function AdminCatalogoConfigPage() {
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      <TrendingUp className="h-4 w-4 shrink-0" />
+                      <TrendingUp className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                       <span>1. Tendencia</span>
                     </button>
 
@@ -284,7 +284,7 @@ export default function AdminCatalogoConfigPage() {
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      <Flame className="h-4 w-4 shrink-0" />
+                      <Flame className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                       <span>2. Oferta</span>
                     </button>
 
@@ -298,7 +298,7 @@ export default function AdminCatalogoConfigPage() {
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       )}
                     >
-                      {isHidden ? <EyeOff className="h-4 w-4 shrink-0" /> : <Eye className="h-4 w-4 shrink-0" />}
+                      {isHidden ? <EyeOff className="h-4 w-4 shrink-0" strokeWidth={1.5}/> : <Eye className="h-4 w-4 shrink-0" strokeWidth={1.5}/>}
                       <span>{isHidden ? 'Oculto' : 'Visible'}</span>
                     </button>
 
@@ -307,7 +307,7 @@ export default function AdminCatalogoConfigPage() {
                       onClick={() => setEditingProduct(product)}
                       className="flex items-center justify-center gap-1.5 min-h-[44px] px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black shadow-xs cursor-pointer"
                     >
-                      <Edit3 className="h-4 w-4 shrink-0" />
+                      <Edit3 className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                       <span>Caja / Ficha</span>
                     </button>
                   </div>

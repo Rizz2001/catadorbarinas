@@ -91,7 +91,7 @@ export function CartPageItemRow({
                       : 'text-slate-600 hover:text-slate-900 cursor-pointer'
                   )}
                 >
-                  <Package className="h-3 w-3" />
+                  <Package className="h-3 w-3" strokeWidth={1.5}/>
                   Caja x{unitsPerBox}
                 </button>
               </div>
@@ -127,7 +127,7 @@ export function CartPageItemRow({
             className="h-9 w-9 sm:h-8 sm:w-8 flex items-center justify-center text-white hover:bg-white/15 transition-colors rounded-full cursor-pointer"
             aria-label="Disminuir cantidad"
           >
-            <Minus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <Minus className="h-3.5 w-3.5" strokeWidth={2}/>
           </button>
           <span className="w-7 text-center text-xs font-black">{quantity}</span>
           <button
@@ -140,7 +140,7 @@ export function CartPageItemRow({
               canAddMore ? 'text-white hover:bg-white/15 cursor-pointer' : 'text-white/40 cursor-not-allowed'
             )}
           >
-            <Plus className="h-3.5 w-3.5 stroke-[2.5]" />
+            <Plus className="h-3.5 w-3.5" strokeWidth={2}/>
           </button>
         </div>
 
@@ -155,7 +155,7 @@ export function CartPageItemRow({
           className="h-10 w-10 sm:h-9 sm:w-9 flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors cursor-pointer"
           aria-label={`Eliminar ${product.name}`}
         >
-          <Trash2 className="h-4 w-4" />
+          <Trash2 className="h-4 w-4" strokeWidth={1.5}/>
         </button>
       </div>
 

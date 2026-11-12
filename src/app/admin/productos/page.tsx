@@ -354,7 +354,7 @@ export default function AdminProductosPage() {
         </div>
 
         <div className="flex items-center gap-2 text-xs font-extrabold text-slate-700 bg-white border border-slate-200/90 px-3 py-1.5 rounded-lg tabular-nums self-start">
-          <FileImage className="h-4 w-4 text-catador-amber" />
+          <FileImage className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
           <span>{images.length} Fotos Totales en Nube</span>
         </div>
       </div>
@@ -385,7 +385,7 @@ export default function AdminProductosPage() {
               1. Categoría de Productos
             </label>
             <div className="relative">
-              <FolderOpen className="h-4 w-4 text-catador-blue absolute left-3 top-2.5 pointer-events-none" />
+              <FolderOpen className="h-4 w-4 text-catador-blue absolute left-3 top-2.5 pointer-events-none" strokeWidth={1.5}/>
               <select
                 value={selectedGroup}
                 onChange={(e) => {
@@ -412,7 +412,7 @@ export default function AdminProductosPage() {
               2. Buscar Producto o Código
             </label>
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <input
                 type="text"
                 placeholder="Buscar por nombre (ej: Cacique, Polar) o código..."
@@ -487,12 +487,12 @@ export default function AdminProductosPage() {
               >
                 <SegmentedControlItem
                   value="missing"
-                  icon={<Camera className="h-3.5 w-3.5" />}
+                  icon={<Camera className="h-3.5 w-3.5" strokeWidth={1.5}/>}
                   label={`Faltan por Foto (${stats.missing})`}
                 />
                 <SegmentedControlItem
                   value="assigned"
-                  icon={<CheckCircle2 className="h-3.5 w-3.5" />}
+                  icon={<CheckCircle2 className="h-3.5 w-3.5" strokeWidth={1.5}/>}
                   label={`Con Foto (${stats.assigned})`}
                 />
                 <SegmentedControlItem value="all" label={`Todos (${stats.total})`} />
@@ -527,7 +527,7 @@ export default function AdminProductosPage() {
       {/* Grilla de Productos / Fotografías */}
       {loading ? (
         <div className="p-12 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
-          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
           <span>Sincronizando productos y fotografías de la categoría...</span>
         </div>
       ) : selectedGroup === 'GLOBAL_UPLOADED' ? (
@@ -546,7 +546,7 @@ export default function AdminProductosPage() {
       ) : displayedProducts.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-white p-10">
           <EmptyState
-            icon={<Camera className="h-10 w-10 text-slate-400" />}
+            icon={<Camera className="h-10 w-10 text-slate-400" strokeWidth={1.5}/>}
             title={
               statusTab === 'missing'
                 ? '¡Excelente! No hay productos pendientes por fotografía con este filtro'

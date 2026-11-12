@@ -16,14 +16,14 @@ export default function PrivacidadPage() {
           href="/"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver a la Tienda
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Volver a la Tienda
         </Link>
       </div>
 
       <article className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-xs space-y-6 text-slate-700 text-xs sm:text-sm leading-relaxed">
         <header className="border-b border-slate-100 pb-6 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-catador-blue bg-blue-50 px-3 py-1 rounded-full">
-            <ShieldCheck className="h-4 w-4" /> Marco Legal y Protección al Consumidor
+            <ShieldCheck className="h-4 w-4" strokeWidth={1.5}/> Marco Legal y Protección al Consumidor
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Políticas de Privacidad, Datos Personales y Cookies
@@ -35,7 +35,7 @@ export default function PrivacidadPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <Lock className="h-4 w-4 text-catador-blue" />
+            <Lock className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
             1. Información que Recopilamos y Finalidad Comercial
           </h2>
           <p>
@@ -56,7 +56,7 @@ export default function PrivacidadPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-catador-amber" />
+            <MapPin className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
             2. Uso de Ubicación GPS para Cotización de Delivery
           </h2>
           <p>
@@ -71,7 +71,7 @@ export default function PrivacidadPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <Cookie className="h-4 w-4 text-emerald-600" />
+            <Cookie className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
             3. Política de Cookies y Almacenamiento Local
           </h2>
           <p>

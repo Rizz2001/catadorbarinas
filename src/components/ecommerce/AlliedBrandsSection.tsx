@@ -32,7 +32,7 @@ export function AlliedBrandsSection({
           className="text-xs sm:text-sm font-extrabold text-catador-blue hover:text-catador-blue-dark inline-flex items-center gap-1 self-start sm:self-auto"
         >
           <span>Explorar catálogo</span>
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" strokeWidth={1.5}/>
         </Link>
       </div>
 

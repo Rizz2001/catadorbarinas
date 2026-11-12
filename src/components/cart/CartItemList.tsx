@@ -38,7 +38,7 @@ export function CartItemList() {
     return (
       <div className="rounded-2xl border border-slate-100 bg-white shadow-sm p-6 sm:p-8 md:p-12 text-center">
         <div className="mx-auto flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-[#F7F8FA] text-slate-400 mb-3.5 sm:mb-4">
-          <ShoppingBag className="h-7 w-7 sm:h-8 sm:w-8" />
+          <ShoppingBag className="h-7 w-7 sm:h-8 sm:w-8" strokeWidth={1.5}/>
         </div>
         <h2 className="text-base sm:text-lg font-black text-slate-900">Tu carrito está vacío</h2>
         <p className="text-[13px] text-slate-500 mt-1 max-w-sm mx-auto">
@@ -48,7 +48,7 @@ export function CartItemList() {
           href="/catalogo"
           className="mt-5 sm:mt-6 inline-flex min-h-[44px] items-center gap-2 rounded-full bg-catador-blue px-6 py-2.5 text-xs font-extrabold text-white hover:bg-catador-blue-dark transition-colors"
         >
-          <ArrowLeft className="h-4 w-4" /> Ir al Catálogo
+          <ArrowLeft className="h-4 w-4" strokeWidth={1.5}/> Ir al Catálogo
         </Link>
       </div>
     );
@@ -65,13 +65,13 @@ export function CartItemList() {
           onClick={clearCart}
           className="min-h-[36px] px-2 text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1 transition-colors cursor-pointer"
         >
-          <Trash2 className="h-3.5 w-3.5" /> Vaciar
+          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/> Vaciar
         </button>
       </div>
 
       {lastStockWarning && (
         <div className="mx-3.5 sm:mx-4 mt-3 p-3 rounded-xl bg-catador-amber-soft/70 flex items-center gap-2 text-xs font-semibold text-[#8B3E03]">
-          <AlertTriangle className="h-4 w-4 text-catador-amber shrink-0" />
+          <AlertTriangle className="h-4 w-4 text-catador-amber shrink-0" strokeWidth={1.5}/>
           <span>{lastStockWarning}</span>
         </div>
       )}
@@ -93,7 +93,7 @@ export function CartItemList() {
 
       <div className="p-4 bg-slate-50/70 border-t border-gray-100">
         <Link href="/catalogo" className="inline-flex items-center gap-1.5 text-xs font-extrabold text-catador-blue hover:text-catador-blue-dark transition-colors">
-          <ArrowLeft className="h-3.5 w-3.5" /> Seguir Comprando
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Seguir Comprando
         </Link>
       </div>
     </div>

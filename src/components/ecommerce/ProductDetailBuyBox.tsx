@@ -59,7 +59,7 @@ export function ProductDetailBuyBox({
               className="h-8 w-8 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 transition-all cursor-pointer"
               aria-label="Disminuir cantidad"
             >
-              <Minus className="h-4 w-4 stroke-[2.5]" />
+              <Minus className="h-4 w-4" strokeWidth={2}/>
             </button>
             <span className="w-9 text-center text-sm font-black text-white select-none">
               {safeQuantity}
@@ -71,7 +71,7 @@ export function ProductDetailBuyBox({
               className="h-8 w-8 flex items-center justify-center rounded-full text-white hover:bg-white/15 active:scale-95 disabled:opacity-40 transition-all cursor-pointer"
               aria-label="Aumentar cantidad"
             >
-              <Plus className="h-4 w-4 stroke-[2.5]" />
+              <Plus className="h-4 w-4" strokeWidth={2}/>
             </button>
           </div>
 
@@ -99,7 +99,7 @@ export function ProductDetailBuyBox({
 
       {feedbackMsg && (
         <div className="flex items-center gap-2 text-xs font-bold text-[#8B3E03] bg-catador-amber-soft border border-catador-amber-oak/60 rounded-xl px-3 py-2">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-catador-amber" />
+          <AlertTriangle className="h-4 w-4 shrink-0 text-catador-amber" strokeWidth={1.5}/>
           <span>{feedbackMsg}</span>
         </div>
       )}
@@ -118,7 +118,7 @@ export function ProductDetailBuyBox({
               : 'bg-[#0F172A] hover:bg-[#001754] text-white cursor-pointer shadow-xs'
           )}
         >
-          {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4 text-[#EB9C53]" />}
+          {isAdded ? <Check className="h-4 w-4" strokeWidth={1.5}/> : <ShoppingCart className="h-4 w-4 text-[#EB9C53]" strokeWidth={1.5}/>}
           <span>
             {isOutOfStock
               ? 'Agotado en Bodegón'
@@ -139,7 +139,7 @@ export function ProductDetailBuyBox({
               : 'bg-[#FEF3C7]/60 hover:bg-[#FEF3C7] text-[#8B3E03] border-[#EB9C53]/70 cursor-pointer'
           )}
         >
-          <Zap className="h-4 w-4 text-[#D99B38]" />
+          <Zap className="h-4 w-4 text-[#D99B38]" strokeWidth={1.5}/>
           <span>{isOutOfStock ? 'Sin Existencias' : 'Comprar ahora directo'}</span>
         </button>
       </div>
@@ -164,7 +164,7 @@ export function ProductDetailBuyBox({
               : 'bg-[#0F172A] text-white shadow-sm'
           )}
         >
-          {isAdded ? <Check className="h-4 w-4" /> : <ShoppingCart className="h-4 w-4 text-[#EB9C53]" />}
+          {isAdded ? <Check className="h-4 w-4" strokeWidth={1.5}/> : <ShoppingCart className="h-4 w-4 text-[#EB9C53]" strokeWidth={1.5}/>}
           <span>{isOutOfStock ? 'Agotado' : isAdded ? '¡Agregado!' : 'Agregar'}</span>
         </button>
       </div>

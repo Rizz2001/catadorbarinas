@@ -241,7 +241,7 @@ export function QuickDeliveryCalculatorModal({
                       : 'border-slate-200 bg-white/60 text-slate-600'
                   }`}
                 >
-                  <Bike className="h-4 w-4 shrink-0 text-catador-blue" />
+                  <Bike className="h-4 w-4 shrink-0 text-catador-blue" strokeWidth={1.5}/>
                   <div>
                     <span className="font-extrabold block text-xs">Motorizado Express</span>
                     <span className="text-[10px] text-slate-500 block">
@@ -259,7 +259,7 @@ export function QuickDeliveryCalculatorModal({
                       : 'border-slate-200 bg-white/60 text-slate-600'
                   }`}
                 >
-                  <Truck className="h-4 w-4 shrink-0 text-amber-600" />
+                  <Truck className="h-4 w-4 shrink-0 text-amber-600" strokeWidth={1.5}/>
                   <div>
                     <span className="font-extrabold block text-xs">
                       Vehículo de Carga (+$
@@ -345,9 +345,9 @@ export function QuickDeliveryCalculatorModal({
                 width="100%"
                 icon={
                   copied ? (
-                    <Check className="h-4 w-4 text-emerald-600" />
+                    <Check className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
                   ) : (
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-4 w-4" strokeWidth={1.5}/>
                   )
                 }
                 onClick={handleCopy}
@@ -356,7 +356,7 @@ export function QuickDeliveryCalculatorModal({
                 label="Abrir en WhatsApp"
                 variant="primary"
                 width="100%"
-                icon={<MessageCircle className="h-4 w-4" />}
+                icon={<MessageCircle className="h-4 w-4" strokeWidth={1.5}/>}
                 onClick={handleOpenWhatsApp}
               />
             </div>

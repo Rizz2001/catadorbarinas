@@ -24,7 +24,7 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="flex items-center gap-2">
-          <Coins className="h-4 w-4 text-catador-amber" />
+          <Coins className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
           <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider">
             Control de Tasa Oficial BCV
           </h2>
@@ -34,7 +34,7 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
           label="Sincronizar DolarApi"
           variant="secondary"
           size="sm"
-          icon={<RefreshCw className="h-3.5 w-3.5" />}
+          icon={<RefreshCw className="h-3.5 w-3.5" strokeWidth={1.5}/>}
           isLoading={isLoading}
           onClick={() => fetchRate(true)}
         />
@@ -75,7 +75,7 @@ export function ConfigBcvSection({ form, onChange }: ConfigBcvSectionProps) {
                 placeholder="Ej: 885.50"
               />
               <p className="flex items-center gap-1 text-[10px] text-amber-700 font-medium">
-                <AlertCircle className="h-3 w-3 shrink-0" />
+                <AlertCircle className="h-3 w-3 shrink-0" strokeWidth={1.5}/>
                 Al activar esto, la tienda usará esta tasa fija en lugar de la consulta automática.
               </p>
             </div>

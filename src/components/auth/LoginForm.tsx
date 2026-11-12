@@ -74,7 +74,7 @@ export function LoginForm() {
           role="alert"
           className="flex items-start gap-2.5 rounded-2xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-semibold"
         >
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" strokeWidth={1.5}/>
           <span>{error}</span>
         </div>
       )}
@@ -84,7 +84,7 @@ export function LoginForm() {
           Correo Electrónico
         </label>
         <div className="relative">
-          <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+          <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="email"
             required
@@ -108,7 +108,7 @@ export function LoginForm() {
           </Link>
         </div>
         <div className="relative">
-          <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+          <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type={showPassword ? 'text' : 'password'}
             required
@@ -124,7 +124,7 @@ export function LoginForm() {
             className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
             aria-label={showPassword ? 'Ocultar contraseña' : 'Ver contraseña'}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? <EyeOff className="h-4 w-4" strokeWidth={1.5}/> : <Eye className="h-4 w-4" strokeWidth={1.5}/>}
           </button>
         </div>
       </div>
@@ -136,13 +136,13 @@ export function LoginForm() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             <span>Verificando credenciales...</span>
           </>
         ) : (
           <>
             <span>Iniciar Sesión</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
           </>
         )}
       </button>

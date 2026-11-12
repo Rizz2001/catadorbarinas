@@ -85,7 +85,7 @@ export function CheckoutPaymentForm({
                 : 'border-gray-200 bg-white text-slate-500 hover:bg-slate-50'
             )}
           >
-            <Icon className="h-4 w-4 mb-1 shrink-0" />
+            <Icon className="h-4 w-4 mb-1 shrink-0" strokeWidth={1.5}/>
             <div>
               <span className="text-xs font-bold text-slate-900 block leading-tight">{label}</span>
               <span className="text-[11px] text-slate-500 block leading-tight mt-0.5">{sub}</span>

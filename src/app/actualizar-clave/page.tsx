@@ -18,7 +18,7 @@ export default function ActualizarClavePage() {
           href="/login"
           className="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver al inicio de sesión
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Volver al inicio de sesión
         </Link>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm space-y-5">
@@ -37,7 +37,7 @@ export default function ActualizarClavePage() {
           <PasswordUpdateForm />
 
           <div className="pt-2 border-t border-slate-100 flex items-center justify-center gap-1.5 text-xs text-slate-500">
-            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5}/>
             <span>Encriptación Segura · EL CATADOR. Barinas</span>
           </div>
         </div>

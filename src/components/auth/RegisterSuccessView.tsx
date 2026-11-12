@@ -81,7 +81,7 @@ export function RegisterSuccessView({
   return (
     <div className="space-y-5 text-center py-2 animate-in fade-in duration-300">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-catador-blue/10 text-catador-blue border border-catador-blue/20">
-        <Mail className="h-8 w-8 text-catador-blue" />
+        <Mail className="h-8 w-8 text-catador-blue" strokeWidth={1.5}/>
       </div>
 
       <div className="space-y-2">
@@ -120,7 +120,7 @@ export function RegisterSuccessView({
 
       {/* Aviso de política de compra */}
       <div className="rounded-2xl bg-amber-50/90 border border-amber-200 p-3.5 text-left text-xs text-amber-950 flex items-start gap-2.5">
-        <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+        <ShieldAlert className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" strokeWidth={1.5}/>
         <p className="text-[11px] text-amber-900 leading-relaxed">
           <strong>Importante:</strong> Ya hemos iniciado tu sesión para que puedas entrar a tu cuenta y explorar el catálogo, pero{' '}
           <strong>no podrás procesar pedidos</strong> hasta que confirmes tu correo electrónico.
@@ -136,9 +136,9 @@ export function RegisterSuccessView({
           className="w-full min-h-[44px] rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-60"
         >
           {resendLoading ? (
-            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" />
+            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" strokeWidth={1.5}/>
           ) : (
-            <Mail className="h-4 w-4 text-catador-blue" />
+            <Mail className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
           )}
           <span>
             {resendLoading
@@ -158,9 +158,9 @@ export function RegisterSuccessView({
             }`}
           >
             {resendFeedback.type === 'success' ? (
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.5}/>
             ) : (
-              <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" />
+              <AlertCircle className="h-4 w-4 shrink-0 text-rose-500" strokeWidth={1.5}/>
             )}
             <span>{resendFeedback.text}</span>
           </div>
@@ -172,14 +172,14 @@ export function RegisterSuccessView({
             className="w-full min-h-[44px] rounded-xl bg-catador-blue hover:bg-catador-blue-light text-white font-black text-xs flex items-center justify-center gap-1.5 shadow-xs transition-all"
           >
             <span>{redirectParam === '/checkout' ? 'Volver al Checkout' : 'Ir a Mi Cuenta'}</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
           </Link>
 
           <Link
             href="/"
             className="w-full min-h-[44px] rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-all"
           >
-            <Store className="h-4 w-4 text-catador-blue" />
+            <Store className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
             <span>Explorar la Tienda</span>
           </Link>
         </div>

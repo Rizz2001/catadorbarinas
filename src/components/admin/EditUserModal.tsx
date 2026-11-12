@@ -171,14 +171,14 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1 font-extrabold text-catador-blue hover:underline text-[11px]"
                 >
-                  <ExternalLink className="h-3 w-3" /> Ver en Google Maps
+                  <ExternalLink className="h-3 w-3" strokeWidth={1.5}/> Ver en Google Maps
                 </a>
               </div>
             )}
 
             <div>
               <label className="font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <ShieldCheck className="h-4 w-4 text-catador-blue" />
+                <ShieldCheck className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
                 <span>Rol y Permisos en el Sistema</span>
               </label>
               <select
@@ -208,9 +208,9 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
                 }
                 labelIcon={
                   correoConfirmado ? (
-                    <MailCheck className="h-4 w-4 text-emerald-600" />
+                    <MailCheck className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
                   ) : (
-                    <AlertCircle className="h-4 w-4 text-amber-600" />
+                    <AlertCircle className="h-4 w-4 text-amber-600" strokeWidth={1.5}/>
                   )
                 }
                 labelPosition="start"
@@ -262,7 +262,7 @@ function UserEditForm({ user, onClose, onSaveSuccess }: UserFormProps) {
               form="edit-user-form"
               label="Guardar Cambios"
               variant="primary"
-              icon={<Save className="h-4 w-4" />}
+              icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
               isLoading={saving}
             />
           </div>

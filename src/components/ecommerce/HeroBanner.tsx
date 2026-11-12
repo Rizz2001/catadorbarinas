@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { Banner, Product, QuickCategory } from '@/types';
+import { Banner, BentoCardNode, CategoryPillNode, Product } from '@/types';
 import { getBanners, getQuickCategories } from '@/services/cms.service';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
@@ -14,20 +14,22 @@ import { HeroBentoCards } from './HeroBentoCards';
 
 interface HeroBannerProps {
   initialBanner?: Banner | null;
-  initialQuickCategories?: QuickCategory[];
+  initialQuickCategories?: CategoryPillNode[];
+  bentoCards: BentoCardNode[];
   starProduct?: Product;
   heroProducts?: Product[];
 }
 
 export function HeroBanner({
   initialBanner,
-  initialQuickCategories,
+  initialQuickCategories = [],
+  bentoCards,
   starProduct,
   heroProducts = [],
 }: HeroBannerProps) {
   const [banner, setBanner] = useState<Banner | null>(initialBanner || null);
-  const [quickCategories, setQuickCategories] = useState<QuickCategory[]>(
-    initialQuickCategories || []
+  const [quickCategories, setQuickCategories] = useState<CategoryPillNode[]>(
+    initialQuickCategories
   );
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -134,7 +136,7 @@ export function HeroBanner({
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#D99B38] hover:bg-[#C88A28] active:scale-[0.98] text-white min-h-[42px] px-5 sm:px-6 py-2 text-[13px] sm:text-sm font-black transition-all shadow-xs"
                 >
                   <span>{hero.botonTexto}</span>
-                  <ArrowRight className="h-4 w-4 shrink-0" />
+                  <ArrowRight className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                 </Link>
                 {hero.secondaryBtnText && (
                   <Link
@@ -150,6 +152,7 @@ export function HeroBanner({
         )}
 
         <HeroBentoCards
+          cards={storeConfig?.bento_cards && storeConfig.bento_cards.length > 0 ? storeConfig.bento_cards : bentoCards}
           slides={slides}
           activeIndex={activeIndex}
           onPrevSlide={() =>

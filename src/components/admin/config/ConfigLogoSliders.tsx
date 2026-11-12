@@ -71,7 +71,7 @@ export function ConfigLogoSliders({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-slate-700 flex items-center gap-1.5">
-              <Sliders className="h-3.5 w-3.5 text-catador-amber" />
+              <Sliders className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
               Altura en Cabecera
             </span>
             <div className="flex items-center gap-1.5">
@@ -81,7 +81,7 @@ export function ConfigLogoSliders({
                 className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
                 title="Reducir altura 2px"
               >
-                <Minus className="h-3 w-3" />
+                <Minus className="h-3 w-3" strokeWidth={2}/>
               </button>
               <span className="font-extrabold text-catador-blue bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 font-mono text-[11px]">
                 {currentHeight} px
@@ -92,7 +92,7 @@ export function ConfigLogoSliders({
                 className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
                 title="Aumentar altura 2px"
               >
-                <Plus className="h-3 w-3" />
+                <Plus className="h-3 w-3" strokeWidth={2}/>
               </button>
             </div>
           </div>
@@ -116,7 +116,7 @@ export function ConfigLogoSliders({
         <div className="space-y-2">
           <div className="flex items-center justify-between text-xs">
             <span className="font-bold text-slate-700 flex items-center gap-1.5">
-              <Maximize2 className="h-3.5 w-3.5 text-catador-amber" />
+              <Maximize2 className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
               Ancho Máximo en Cabecera
             </span>
             <span className="font-extrabold text-catador-blue bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 font-mono text-[11px]">
@@ -149,7 +149,7 @@ export function ConfigLogoSliders({
             onClick={onDirectSave}
             className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 px-4 py-2 text-xs font-bold text-white shadow-xs transition-all active:scale-98 cursor-pointer"
           >
-            {savingQuick ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
+            {savingQuick ? <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5}/> : <Save className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             <span>{savingQuick ? 'Guardando...' : 'Aplicar y Guardar Tamaño del Logo'}</span>
           </button>
         </div>

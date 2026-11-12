@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import { RefreshCw, ArrowLeft, Volume2, VolumeX, Bike } from 'lucide-react';
+import { RefreshCw, ArrowLeft, Volume2, VolumeX, Bike, Package, FileText, MessageSquare } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { AdminOrderQueue, AdminOrderDetail, QuickDeliveryCalculatorModal } from '@/components/admin';
@@ -180,7 +180,7 @@ export default function AdminPedidosCommandCenterPage() {
             onClick={() => setDeliveryCalcOpen(true)}
             className="flex items-center gap-1.5 rounded-lg border border-amber-500/40 bg-amber-50 min-h-[36px] px-3 py-1.5 text-xs font-black text-amber-900 hover:bg-amber-100 transition-colors cursor-pointer shadow-2xs"
           >
-            <Bike className="h-3.5 w-3.5 text-amber-700" />
+            <Bike className="h-3.5 w-3.5 text-amber-700" strokeWidth={1.5}/>
             <span>Cotizar Delivery</span>
           </button>
 
@@ -190,9 +190,9 @@ export default function AdminPedidosCommandCenterPage() {
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
             {soundEnabled ? (
-              <Volume2 className="h-3.5 w-3.5 text-emerald-600" />
+              <Volume2 className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5}/>
             ) : (
-              <VolumeX className="h-3.5 w-3.5 text-slate-400" />
+              <VolumeX className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             )}
             <span>{soundEnabled ? 'Alertas Sonoras' : 'Silenciado'}</span>
           </button>
@@ -202,7 +202,7 @@ export default function AdminPedidosCommandCenterPage() {
             onClick={() => loadOrders()}
             className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-3.5 w-3.5" strokeWidth={1.5}/>
             <span>Sincronizar</span>
           </button>
 
@@ -210,7 +210,7 @@ export default function AdminPedidosCommandCenterPage() {
             href="/"
             className="inline-flex items-center gap-1 rounded-lg bg-catador-blue min-h-[36px] px-3.5 py-1.5 text-xs font-bold text-white hover:bg-catador-blue-light transition-colors"
           >
-            <ArrowLeft className="h-3.5 w-3.5" />
+            <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/>
             <span>Tienda</span>
           </Link>
         </div>
@@ -276,7 +276,10 @@ export default function AdminPedidosCommandCenterPage() {
               : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>📦 Órdenes</span>
+          <span>
+            <Package className="w-3.5 h-3.5 inline mr-1" strokeWidth={1.5} />
+            Órdenes
+          </span>
           <span className="text-[11px] opacity-80">({orders.length})</span>
         </button>
         <button
@@ -288,7 +291,10 @@ export default function AdminPedidosCommandCenterPage() {
               : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>📄 {selectedOrder ? `#${selectedOrder.numero_orden}` : 'Detalle'}</span>
+          <span className="inline-flex items-center gap-1">
+            <FileText className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+            {selectedOrder ? `#${selectedOrder.numero_orden}` : 'Detalle'}
+          </span>
         </button>
         <button
           type="button"
@@ -299,7 +305,10 @@ export default function AdminPedidosCommandCenterPage() {
               : 'text-slate-700 hover:text-slate-900'
           }`}
         >
-          <span>💬 Chat</span>
+          <span className="inline-flex items-center gap-1">
+            <MessageSquare className="w-3.5 h-3.5 shrink-0" strokeWidth={1.5} />
+            Chat
+          </span>
           {(selectedOrder?.mensajes_no_leidos || 0) > 0 && (
             <span className="h-5 min-w-[20px] px-1 rounded-full bg-catador-discount text-white text-[11px] font-black flex items-center justify-center animate-pulse">
               {selectedOrder?.mensajes_no_leidos}
@@ -344,8 +353,8 @@ export default function AdminPedidosCommandCenterPage() {
                 onClick={() => setMobilePanel('detalle')}
                 className="lg:hidden flex items-center gap-1.5 px-3 py-2 min-h-[42px] rounded-xl bg-slate-200/80 hover:bg-slate-300 text-slate-800 font-extrabold text-xs w-full transition-colors cursor-pointer"
               >
-                <ArrowLeft className="h-4 w-4" />
-                <span>← Volver al Detalle del Pedido #{selectedOrder.numero_orden}</span>
+                <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+                <span>Volver al Detalle del Pedido #{selectedOrder.numero_orden}</span>
               </button>
               <OrderLiveChat
                 pedidoId={selectedOrder.id}

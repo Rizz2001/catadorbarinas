@@ -13,3 +13,5 @@ export * from './EditUserModal';
 export * from './DeleteUserModal';
 export * from './DeleteOrderModal';
 export * from './QuickDeliveryCalculatorModal';
+export * from './LucideIconField';
+export * from './inicio';

@@ -144,7 +144,7 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
                 title="Compartir por WhatsApp"
                 className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1.5 min-h-[36px] text-xs font-extrabold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
               >
-                <Share2 className="h-3.5 w-3.5 text-catador-blue" />
+                <Share2 className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
                 <span className="hidden sm:inline">Compartir</span>
               </button>
             </div>
@@ -156,12 +156,12 @@ export function ProductDetailView({ product, relatedProducts = [] }: ProductDeta
             </h1>
             {product.inStock ? (
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-extrabold tabular-nums">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={1.5}/>
                 <span>{product.stockQuantity} {product.unit.toLowerCase()}s disponibles en Barinas</span>
               </div>
             ) : (
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold">
-                <XCircle className="h-4 w-4 text-slate-400 shrink-0" />
+                <XCircle className="h-4 w-4 text-slate-400 shrink-0" strokeWidth={1.5}/>
                 <span>Agotado temporalmente</span>
               </div>
             )}

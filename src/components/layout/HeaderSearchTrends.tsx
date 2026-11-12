@@ -40,7 +40,7 @@ export function HeaderSearchTrends() {
                   aria-label={`Quitar ${term}`}
                   className="text-slate-400 hover:text-rose-600 p-0.5 transition-colors cursor-pointer"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3 w-3" strokeWidth={1.5}/>
                 </button>
               </span>
               {idx < displayRecent.length - 1 && (

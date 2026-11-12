@@ -117,7 +117,7 @@ export default function AdminBusquedasPage() {
             label="Actualizar"
             variant="secondary"
             size="sm"
-            icon={<RefreshCw className="h-3.5 w-3.5" />}
+            icon={<RefreshCw className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             isLoading={loading}
             onClick={() => void loadLogs()}
           />
@@ -127,7 +127,7 @@ export default function AdminBusquedasPage() {
               label="Limpiar"
               variant="destructive"
               size="sm"
-              icon={<Trash2 className="h-3.5 w-3.5" />}
+              icon={<Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/>}
               onClick={() => setConfirmClearOpen(true)}
             />
           )}
@@ -221,14 +221,14 @@ export default function AdminBusquedasPage() {
 
         {loading ? (
           <div className="p-10 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
-            <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+            <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
             <span>Cargando bitácora...</span>
           </div>
         ) : filteredLogs.length === 0 ? (
           <div className="p-8">
             <EmptyState
               isCompact
-              icon={<Search className="h-8 w-8 text-slate-400" />}
+              icon={<Search className="h-8 w-8 text-slate-400" strokeWidth={1.5}/>}
               title="No hay registros de búsquedas"
               description="No se encontraron términos registrados para el filtro seleccionado."
             />

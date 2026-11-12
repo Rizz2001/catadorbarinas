@@ -106,7 +106,7 @@ export function RegisterForm() {
     <form onSubmit={handleSubmit} className="space-y-4 text-xs">
       {error && (
         <div role="alert" className="flex items-start gap-2.5 rounded-2xl bg-red-50 border border-red-200 p-3 text-red-700 font-semibold">
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" strokeWidth={1.5}/>
           <span>{error}</span>
         </div>
       )}
@@ -145,13 +145,13 @@ export function RegisterForm() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             <span>Registrando tu cuenta...</span>
           </>
         ) : (
           <>
             <span>Crear cuenta y comprar</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
           </>
         )}
       </button>

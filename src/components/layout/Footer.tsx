@@ -66,17 +66,17 @@ export function Footer() {
 
           <div className="rounded-2xl bg-white/5 border border-white/10 p-3.5 sm:p-4 space-y-2 sm:space-y-2.5 text-[13px] sm:text-sm text-slate-200">
             <div className="flex items-start gap-2.5">
-              <MapPin className="h-4 w-4 text-catador-amber-oak shrink-0 mt-0.5" />
+              <MapPin className="h-4 w-4 text-catador-amber-oak shrink-0 mt-0.5" strokeWidth={1.5}/>
               <span>{storeConfig?.direccion_fisica || APP_CONFIG.address}</span>
             </div>
             <div className="flex items-center gap-2.5 tabular-nums">
-              <Phone className="h-4 w-4 text-catador-amber-oak shrink-0" />
+              <Phone className="h-4 w-4 text-catador-amber-oak shrink-0" strokeWidth={1.5}/>
               <span className="font-semibold text-white">
                 {storeConfig?.telefono_atencion || APP_CONFIG.phone}
               </span>
             </div>
             <div className="flex items-center gap-2.5 pt-2 border-t border-white/10 text-slate-300">
-              <Clock className="h-4 w-4 text-catador-amber-oak shrink-0" />
+              <Clock className="h-4 w-4 text-catador-amber-oak shrink-0" strokeWidth={1.5}/>
               <span>
                 {storeConfig?.horario_despacho || 'Lunes a Domingo: 8:00 AM - 9:00 PM'}
               </span>

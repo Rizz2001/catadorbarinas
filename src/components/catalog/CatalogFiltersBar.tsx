@@ -68,7 +68,7 @@ export function CatalogFiltersBar({
                 : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
             )}
           >
-            <Percent className="h-3.5 w-3.5 shrink-0" />
+            <Percent className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
             <span>Solo Ofertas</span>
           </button>
         )}
@@ -84,7 +84,7 @@ export function CatalogFiltersBar({
                 : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
             )}
           >
-            <Package className="h-3.5 w-3.5 shrink-0" />
+            <Package className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
             <span>Disponible por Caja</span>
           </button>
         )}
@@ -99,7 +99,7 @@ export function CatalogFiltersBar({
               : 'bg-[#F7F8FA] text-slate-700 border-slate-200 hover:border-[#0F172A]'
           )}
         >
-          <PackageCheck className="h-3.5 w-3.5 shrink-0" />
+          <PackageCheck className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
           <span>En Stock</span>
         </button>
 
@@ -111,7 +111,7 @@ export function CatalogFiltersBar({
       <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 min-w-0">
         {onPriceRangeChange && (
           <div className="flex items-center gap-1.5 border border-slate-200 bg-[#F7F8FA] px-3 py-1 min-h-[40px] rounded-full min-w-0">
-            <DollarSign className="h-3.5 w-3.5 text-[#D99B38] shrink-0" />
+            <DollarSign className="h-3.5 w-3.5 text-[#D99B38] shrink-0" strokeWidth={1.5}/>
             <select
               value={priceRange}
               onChange={(e) => onPriceRangeChange(e.target.value as PriceRangeFilter)}
@@ -128,7 +128,7 @@ export function CatalogFiltersBar({
         )}
 
         <div className="flex items-center gap-1.5 border border-slate-200 bg-[#F7F8FA] px-3 py-1 min-h-[40px] rounded-full min-w-0">
-          <ArrowUpDown className="h-3.5 w-3.5 text-slate-500 shrink-0" />
+          <ArrowUpDown className="h-3.5 w-3.5 text-slate-500 shrink-0" strokeWidth={1.5}/>
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
@@ -148,7 +148,7 @@ export function CatalogFiltersBar({
           title="Compartir esta categoría por WhatsApp"
           className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 min-h-[40px] rounded-full bg-[#0F172A] hover:bg-[#001754] text-white text-xs font-extrabold transition-colors cursor-pointer"
         >
-          <Share2 className="h-3.5 w-3.5 shrink-0 text-[#EB9C53]" />
+          <Share2 className="h-3.5 w-3.5 shrink-0 text-[#EB9C53]" strokeWidth={1.5}/>
           <span>Compartir</span>
         </button>
 
@@ -157,7 +157,7 @@ export function CatalogFiltersBar({
           onClick={handleCopyLink}
           className="hidden sm:flex items-center justify-center px-3.5 py-1.5 min-h-[40px] rounded-full border border-slate-200 bg-white hover:border-[#0F172A] text-xs font-bold text-slate-700 transition-colors cursor-pointer"
         >
-          {copied ? <Check className="h-3.5 w-3.5 text-[#D99B38]" /> : 'Copiar URL'}
+          {copied ? <Check className="h-3.5 w-3.5 text-[#D99B38]" strokeWidth={1.5}/> : 'Copiar URL'}
         </button>
       </div>
     </div>

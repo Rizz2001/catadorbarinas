@@ -103,14 +103,14 @@ export default async function ProductPage({ params, searchParams }: ProductPageP
         <Link href="/" className="hover:text-catador-blue transition-colors">
           Inicio
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5}/>
         <Link
           href={product.codGrupo ? `/catalogo/${product.codGrupo}` : '/catalogo'}
           className="hover:text-catador-blue transition-colors"
         >
           {product.category}
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5}/>
         <span className="font-bold text-slate-800 truncate">{product.name}</span>
       </nav>
 

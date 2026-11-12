@@ -13,6 +13,7 @@ import {
   fetchSubgruposInv,
   fetchHomeCuratedSections,
 } from '@/services/foxdata.service';
+import { buildHomeCmsPayload } from '@/adapters';
 import {
   getAllBannersServer,
   getQuickCategoriesServer,
@@ -49,6 +50,7 @@ export default async function HomePage() {
   const starProduct = deriveStarProduct(allProducts);
   const leanInitialProducts = allProducts.slice(0, 40);
   const heroBanner = allBanners.find((b) => b.tipo === 'hero') || null;
+  const cmsSections = buildHomeCmsPayload(storeConfig, quickCategories);
 
   // Armamos la lista de 3 a 5 productos destacados/ofertas para el carrusel del Hero
   const heroCarouselCandidates = [
@@ -75,37 +77,26 @@ export default async function HomePage() {
       {/* 1. Hero Banner Principal + 4 Bento Cards + Píldoras de Categorías Rápidas */}
       <HeroBanner
         initialBanner={heroBanner}
-        initialQuickCategories={quickCategories}
+        initialQuickCategories={cmsSections.quickCategories}
+        bentoCards={cmsSections.bentoCards}
         starProduct={starProduct}
         heroProducts={heroProducts}
       />
 
-      {/* 2. Selección del Catador · Por Unidad o Caja (Contenedor Blanco Opción C) */}
-      {storeConfig?.seccion_tendencias_activa !== false && (
-        <WeeklyTrendsBento
-          products={weeklyTrends}
-          starProduct={starProduct}
-          customTitle={storeConfig?.seccion_tendencias_titulo}
-          customSubtitle={storeConfig?.seccion_tendencias_subtitulo}
-        />
-      )}
+      {/* 2. Selección del Catador · Por Unidad o Caja */}
+      <WeeklyTrendsBento products={weeklyTrends} config={cmsSections.weeklyTrends} />
 
       {/* 3. Ofertas Destacadas del Día con Contador Regresivo Tabular */}
-      {storeConfig?.seccion_ofertas_activa !== false && (
-        <div id="ofertas" className="scroll-mt-44">
-          <FeaturedDealsBox
-            products={featuredDeals}
-            customTitle={storeConfig?.seccion_ofertas_titulo}
-          />
-        </div>
-      )}
+      <div id="ofertas" className="scroll-mt-44">
+        <FeaturedDealsBox products={featuredDeals} campaign={cmsSections.flashSaleCampaign} />
+      </div>
 
       {/* 4. Colecciones Destacadas del Bodegón (Editables en CMS) */}
       <PromoBannersGrid banners={banners} />
 
       {/* 5. Banda Arquitectónica de Garantías y Métricas */}
       <TrustValueBar
-        initialMetrics={storeConfig?.metricas_confianza}
+        badges={cmsSections.trustBadges}
         active={storeConfig?.seccion_confianza_activa}
       />
 

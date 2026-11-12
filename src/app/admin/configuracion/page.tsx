@@ -97,7 +97,7 @@ export default function AdminConfiguracionPage() {
 
       {isLoading && !form.id ? (
         <div className="p-12 flex items-center justify-center gap-3">
-          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
           <span className="text-xs font-bold text-slate-500">Cargando configuración...</span>
         </div>
       ) : (
@@ -118,7 +118,7 @@ export default function AdminConfiguracionPage() {
               label={saving ? 'Guardando...' : 'Guardar Toda la Configuración'}
               variant="primary"
               size="lg"
-              icon={<Save className="h-4 w-4" />}
+              icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
               isLoading={saving}
             />
           </div>

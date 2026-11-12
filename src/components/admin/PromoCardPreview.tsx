@@ -31,7 +31,7 @@ export function PromoCardPreview({ banner }: PromoCardPreviewProps) {
             <span />
           )}
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0F172A] text-white">
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" strokeWidth={1.5}/>
           </span>
         </div>
 

@@ -27,13 +27,13 @@ export default function PreguntasFrecuentesPage() {
           href="/"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver al Inicio
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Volver al Inicio
         </Link>
       </div>
 
       <header className="rounded-3xl bg-gradient-to-br from-catador-blue to-slate-900 p-6 sm:p-10 text-white space-y-3 shadow-lg">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-black text-amber-300">
-          <HelpCircle className="h-4 w-4" /> CENTRO DE AYUDA AL CLIENTE
+          <HelpCircle className="h-4 w-4" strokeWidth={1.5}/> CENTRO DE AYUDA AL CLIENTE
         </div>
         <h1 className="text-2xl sm:text-4xl font-black tracking-tight">
           Ayuda y Preguntas Frecuentes
@@ -69,7 +69,7 @@ export default function PreguntasFrecuentesPage() {
                     'h-5 w-5 text-slate-400 shrink-0 transition-transform duration-200',
                     isOpen && 'rotate-180 text-catador-blue'
                   )}
-                />
+                strokeWidth={1.5}/>
               </button>
 
               {isOpen && (
@@ -95,7 +95,7 @@ export default function PreguntasFrecuentesPage() {
           href="/catalogo"
           className="inline-flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light px-5 py-3 text-xs font-black text-white shadow-sm shrink-0"
         >
-          <MessageCircle className="h-4 w-4" /> Ir a Comprar en Línea
+          <MessageCircle className="h-4 w-4" strokeWidth={1.5}/> Ir a Comprar en Línea
         </Link>
       </section>
     </main>

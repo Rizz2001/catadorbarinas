@@ -51,7 +51,7 @@ export function CheckoutStepLiveChat({
       <div className="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50/70 p-4 sm:p-5 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3">
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm">
-            <CheckCircle2 className="h-6 w-6" />
+            <CheckCircle2 className="h-6 w-6" strokeWidth={1.5}/>
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -77,13 +77,13 @@ export function CheckoutStepLiveChat({
             className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-white hover:bg-emerald-50 px-3.5 py-2.5 text-xs font-extrabold text-emerald-800 transition-colors shadow-2xs"
           >
             <span>Ver Recibo Completo</span>
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5}/>
           </Link>
           <Link
             href="/catalogo"
             className="inline-flex items-center gap-1.5 rounded-xl bg-catador-blue hover:bg-catador-blue-light px-3.5 py-2.5 text-xs font-extrabold text-white transition-colors shadow-2xs"
           >
-            <ShoppingBag className="h-3.5 w-3.5" />
+            <ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.5}/>
             <span className="hidden xs:inline">Catálogo</span>
           </Link>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Save, HelpCircle, Loader2, Award } from 'lucide-react';
+import { Plus, Trash2, Save, HelpCircle, Loader2, Award, Check } from 'lucide-react';
 import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Button } from '@astryxdesign/core/Button';
@@ -142,7 +142,7 @@ export default function AdminAliadosFaqPage() {
 
       {loading ? (
         <div className="p-12 flex items-center justify-center gap-2 text-xs font-bold text-slate-500">
-          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" />
+          <Loader2 className="h-5 w-5 animate-spin text-catador-blue" strokeWidth={1.5}/>
           <span>Cargando registros...</span>
         </div>
       ) : activeTab === 'brands' ? (
@@ -153,7 +153,7 @@ export default function AdminAliadosFaqPage() {
             className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 shadow-2xs"
           >
             <h2 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
-              <Plus className="h-4 w-4 text-catador-blue" /> Agregar Empresa / Marca Aliada
+              <Plus className="h-4 w-4 text-catador-blue" strokeWidth={2}/> Agregar Empresa / Marca Aliada
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               <input
@@ -185,8 +185,15 @@ export default function AdminAliadosFaqPage() {
                   onChange={(e) => setBrandColor(e.target.value)}
                   className="h-10 w-12 rounded-lg border border-slate-200 cursor-pointer"
                 />
-                <label className="flex-1 flex items-center justify-center px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:bg-slate-50 cursor-pointer font-bold text-slate-700 truncate">
-                  <span>{brandLogo ? 'Logo Listo ✓' : 'Subir Logo'}</span>
+                <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-dashed border-slate-300 hover:bg-slate-50 cursor-pointer font-bold text-slate-700 truncate">
+                  {brandLogo ? (
+                    <>
+                      <span>Logo Listo</span>
+                      <Check className="w-4 h-4 text-emerald-600 shrink-0" strokeWidth={2} />
+                    </>
+                  ) : (
+                    <span>Subir Logo</span>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -206,7 +213,7 @@ export default function AdminAliadosFaqPage() {
               type="submit"
               label="Guardar Aliado Comercial"
               variant="primary"
-              icon={<Save className="h-4 w-4" />}
+              icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
             />
           </form>
 
@@ -214,7 +221,7 @@ export default function AdminAliadosFaqPage() {
           {brands.length === 0 ? (
             <div className="rounded-2xl bg-white border border-slate-200 p-8">
               <EmptyState
-                icon={<Award className="h-8 w-8 text-slate-400" />}
+                icon={<Award className="h-8 w-8 text-slate-400" strokeWidth={1.5}/>}
                 title="Aún no hay empresas aliadas registradas"
                 description="Agrega marcas comerciales usando el formulario superior (se muestran en portada al tener 6 o más)."
               />
@@ -248,7 +255,7 @@ export default function AdminAliadosFaqPage() {
                   }}
                   className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" strokeWidth={1.5}/>
                 </button>
               </div>
             ))}
@@ -262,7 +269,7 @@ export default function AdminAliadosFaqPage() {
             className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 shadow-2xs"
           >
             <h2 className="text-sm font-black text-slate-900 flex items-center gap-1.5">
-              <HelpCircle className="h-4 w-4 text-catador-blue" /> Agregar Pregunta Frecuente
+              <HelpCircle className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/> Agregar Pregunta Frecuente
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <input
@@ -293,7 +300,7 @@ export default function AdminAliadosFaqPage() {
               type="submit"
               label="Publicar Pregunta"
               variant="primary"
-              icon={<Save className="h-4 w-4" />}
+              icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
             />
           </form>
 
@@ -318,7 +325,7 @@ export default function AdminAliadosFaqPage() {
                   }}
                   className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer shrink-0"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-4 w-4" strokeWidth={1.5}/>
                 </button>
               </div>
             ))}

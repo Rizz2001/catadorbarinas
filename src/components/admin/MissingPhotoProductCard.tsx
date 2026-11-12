@@ -55,7 +55,7 @@ export function MissingPhotoProductCard({
         {/* Cabecera: Estado y Stock */}
         <div className="flex items-center justify-between gap-1.5 flex-wrap">
           <span className="inline-flex items-center gap-1 rounded-md bg-amber-50 border border-amber-200 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-800">
-            <Camera className="h-3 w-3 text-amber-600" />
+            <Camera className="h-3 w-3 text-amber-600" strokeWidth={1.5}/>
             <span>Sin Foto</span>
           </span>
 
@@ -66,7 +66,7 @@ export function MissingPhotoProductCard({
                 : 'bg-slate-100 text-slate-500 border border-slate-200'
             }`}
           >
-            <Package className="h-3 w-3" />
+            <Package className="h-3 w-3" strokeWidth={1.5}/>
             <span>Stock: {product.stockQuantity}</span>
           </span>
         </div>
@@ -78,13 +78,13 @@ export function MissingPhotoProductCard({
         >
           {isUploading ? (
             <div className="flex flex-col items-center gap-1.5 text-catador-blue">
-              <Loader2 className="h-7 w-7 animate-spin" />
+              <Loader2 className="h-7 w-7 animate-spin" strokeWidth={1.5}/>
               <span className="text-[11px] font-extrabold">Subiendo foto...</span>
             </div>
           ) : (
             <>
               <div className="h-10 w-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-                <Camera className="h-5 w-5" />
+                <Camera className="h-5 w-5" strokeWidth={1.5}/>
               </div>
               <span className="text-[11px] font-black text-amber-950">
                 Pendiente por Fotografiar
@@ -98,7 +98,7 @@ export function MissingPhotoProductCard({
 
         {/* Categoría y Subcategoría */}
         <div className="flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 truncate">
-          <Tag className="h-3 w-3 text-catador-amber shrink-0" />
+          <Tag className="h-3 w-3 text-catador-amber shrink-0" strokeWidth={1.5}/>
           <span className="truncate">{categoryLabel}</span>
         </div>
 
@@ -106,7 +106,7 @@ export function MissingPhotoProductCard({
         <div className="space-y-1">
           <div className="flex items-center justify-between gap-1 bg-slate-50 border border-slate-200/80 rounded-lg px-2 py-1">
             <div className="flex items-center gap-1.5 text-catador-blue min-w-0">
-              <Barcode className="h-3.5 w-3.5 shrink-0" />
+              <Barcode className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
               <span className="font-mono text-xs font-black tracking-wide truncate">
                 {product.id}
               </span>
@@ -119,12 +119,12 @@ export function MissingPhotoProductCard({
             >
               {copied ? (
                 <>
-                  <Check className="h-3 w-3 text-emerald-600" />
+                  <Check className="h-3 w-3 text-emerald-600" strokeWidth={1.5}/>
                   <span className="text-emerald-700">Copiado</span>
                 </>
               ) : (
                 <>
-                  <Copy className="h-3 w-3" />
+                  <Copy className="h-3 w-3" strokeWidth={1.5}/>
                   <span>Copiar</span>
                 </>
               )}
@@ -157,9 +157,9 @@ export function MissingPhotoProductCard({
           className="w-full min-h-[40px] rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
         >
           {isUploading ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5}/>
           ) : (
-            <Upload className="h-3.5 w-3.5" />
+            <Upload className="h-3.5 w-3.5" strokeWidth={1.5}/>
           )}
           <span>{isUploading ? 'Subiendo...' : 'Agregar Fotografía'}</span>
         </button>

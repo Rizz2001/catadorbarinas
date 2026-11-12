@@ -38,7 +38,7 @@ export function PasswordResetRequestForm() {
     return (
       <div className="space-y-4 py-2 text-center animate-in fade-in">
         <div className="h-12 w-12 mx-auto rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
-          <CheckCircle2 className="h-6 w-6" />
+          <CheckCircle2 className="h-6 w-6" strokeWidth={1.5}/>
         </div>
         <div className="space-y-1.5">
           <h3 className="text-sm font-black text-slate-900">
@@ -70,7 +70,7 @@ export function PasswordResetRequestForm() {
           role="alert"
           className="flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium"
         >
-          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" strokeWidth={1.5}/>
           <span>{error}</span>
         </div>
       )}
@@ -80,7 +80,7 @@ export function PasswordResetRequestForm() {
           Correo Electrónico Registrado
         </label>
         <div className="relative">
-          <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+          <Mail className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="email"
             required
@@ -100,13 +100,13 @@ export function PasswordResetRequestForm() {
       >
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             <span>Enviando instrucciones...</span>
           </>
         ) : (
           <>
             <span>Enviar Enlace de Recuperación</span>
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
           </>
         )}
       </button>

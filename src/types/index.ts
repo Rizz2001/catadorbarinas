@@ -122,23 +122,17 @@ export interface Banner {
   updated_at?: string;
 }
 
-export interface QuickCategory {
-  id: string;
-  nombre: string;
-  descripcion: string;
-  url: string;
-  icono: string;
-  orden: number;
-  activo: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+export * from './cms-home';
+import type {
+  BentoCardNode,
+  CategoryPillNode,
+  FlashSaleCampaign,
+  TrustBadgeNode,
+  WeeklyTrendsCmsConfig,
+} from './cms-home';
 
-export interface TrustMetricItem {
-  figura: string;
-  titulo: string;
-  subtitulo: string;
-}
+export type QuickCategory = CategoryPillNode;
+export type TrustMetricItem = TrustBadgeNode;
 
 export interface StoreConfig {
   id: string;
@@ -188,6 +182,9 @@ export interface StoreConfig {
   seccion_ofertas_titulo?: string | null;
   seccion_aliados_activa?: boolean;
   seccion_aliados_titulo?: string | null;
+  bento_cards?: BentoCardNode[] | null;
+  flash_sale_campaign?: Partial<FlashSaleCampaign> | null;
+  weekly_trends_config?: Partial<WeeklyTrendsCmsConfig> | null;
   footer_descripcion?: string | null;
   footer_transparencia_texto?: string | null;
   footer_subdireccion?: string | null;

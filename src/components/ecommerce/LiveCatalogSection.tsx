@@ -147,7 +147,7 @@ export function LiveCatalogSection({
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white border border-slate-200 hover:border-catador-blue px-6 py-2.5 min-h-[44px] text-[13px] sm:text-sm font-black text-slate-800 hover:text-catador-blue transition-colors cursor-pointer tabular-nums"
               >
                 <span>Cargar más (+{Math.min(PAGE_INCREMENT, totalAvailableCount - visibleCount)})</span>
-                <ChevronDown className="h-4 w-4" />
+                <ChevronDown className="h-4 w-4" strokeWidth={1.5}/>
               </button>
             )}
 
@@ -156,7 +156,7 @@ export function LiveCatalogSection({
               className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-6 py-2.5 min-h-[44px] text-[13px] sm:text-sm font-extrabold text-white transition-colors"
             >
               <span>Ver departamento {currentGroupName}</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" strokeWidth={1.5}/>
             </Link>
           </div>
         </>

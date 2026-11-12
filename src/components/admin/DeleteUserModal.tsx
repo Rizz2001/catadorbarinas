@@ -104,7 +104,7 @@ export function DeleteUserModal({
               <Button
                 label="Sí, Eliminar Usuario"
                 variant="destructive"
-                icon={<Trash2 className="h-4 w-4" />}
+                icon={<Trash2 className="h-4 w-4" strokeWidth={1.5}/>}
                 isLoading={loading}
                 onClick={() => void handleDelete()}
               />

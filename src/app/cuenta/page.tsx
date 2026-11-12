@@ -214,7 +214,7 @@ function CuentaContent() {
   if (loading) {
     return (
       <main className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-catador-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-catador-blue" strokeWidth={1.5}/>
         <p className="text-xs font-bold text-slate-500">Cargando tu cuenta...</p>
       </main>
     );
@@ -225,10 +225,10 @@ function CuentaContent() {
       {/* Migas de Pan (Breadcrumbs) */}
       <nav aria-label="Navegación" className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
         <Link href="/" className="hover:text-catador-blue flex items-center gap-1">
-          <Home className="h-3.5 w-3.5" />
+          <Home className="h-3.5 w-3.5" strokeWidth={1.5}/>
           <span>Inicio</span>
         </Link>
-        <ChevronRight className="h-3 w-3" />
+        <ChevronRight className="h-3 w-3" strokeWidth={1.5}/>
         <span className="text-slate-700 font-bold">Mi Cuenta</span>
       </nav>
 
@@ -246,7 +246,7 @@ function CuentaContent() {
               : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
-          <User className="h-4 w-4 shrink-0" />
+          <User className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
           <span>Mi Perfil y GPS</span>
         </button>
 
@@ -259,7 +259,7 @@ function CuentaContent() {
               : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
-          <Package className="h-4 w-4 shrink-0" />
+          <Package className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
           <span>Mis Pedidos</span>
           {userOrders.length > 0 && (
             <span
@@ -283,7 +283,7 @@ function CuentaContent() {
               : 'text-slate-700 hover:text-catador-blue'
           }`}
         >
-          <Shield className="h-4 w-4 shrink-0" />
+          <Shield className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
           <span>Seguridad</span>
         </button>
       </div>
@@ -317,7 +317,7 @@ export default function CuentaPage() {
     <Suspense
       fallback={
         <main className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[60vh] gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-catador-blue" />
+          <Loader2 className="h-8 w-8 animate-spin text-catador-blue" strokeWidth={1.5}/>
           <p className="text-xs font-bold text-slate-500">Cargando...</p>
         </main>
       }

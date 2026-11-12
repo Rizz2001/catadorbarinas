@@ -43,7 +43,7 @@ export function LiveCatalogFilterBar({
           aria-label="Desplazar departamentos a la izquierda"
           className="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-4 w-4" strokeWidth={1.5}/>
         </button>
 
         <div className="relative flex-1 min-w-0 overflow-hidden">
@@ -79,7 +79,7 @@ export function LiveCatalogFilterBar({
           aria-label="Desplazar departamentos a la derecha"
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors cursor-pointer"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="h-4 w-4" strokeWidth={1.5}/>
         </button>
       </div>
 
@@ -91,7 +91,7 @@ export function LiveCatalogFilterBar({
             aria-label="Subcategorías anteriores"
             className="hidden sm:flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 hover:text-catador-blue hover:bg-slate-200/60 cursor-pointer"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4" strokeWidth={1.5}/>
           </button>
 
           <div className="relative flex-1 min-w-0 overflow-hidden">
@@ -139,7 +139,7 @@ export function LiveCatalogFilterBar({
             aria-label="Más subcategorías"
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-500 hover:text-catador-blue hover:bg-slate-200/60 cursor-pointer"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-4 w-4" strokeWidth={1.5}/>
           </button>
         </div>
       )}

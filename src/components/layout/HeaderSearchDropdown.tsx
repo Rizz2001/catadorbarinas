@@ -121,9 +121,9 @@ export function HeaderSearchDropdown({
                   )}
                 >
                   {isItemAdded ? (
-                    <Check className="h-4 w-4 stroke-[3]" />
+                    <Check className="h-4 w-4" strokeWidth={2}/>
                   ) : (
-                    <Plus className="h-4 w-4 stroke-[2.5]" />
+                    <Plus className="h-4 w-4" strokeWidth={2}/>
                   )}
                 </button>
               </Link>
@@ -139,7 +139,7 @@ export function HeaderSearchDropdown({
             onClick={onViewAll}
             className="w-full min-h-[40px] flex items-center justify-center gap-1.5 py-1.5 text-[13px] font-extrabold text-catador-blue hover:text-catador-blue-dark transition-colors cursor-pointer"
           >
-            Ver todos los {totalMatches} resultados <ArrowRight className="h-3.5 w-3.5" />
+            Ver todos los {totalMatches} resultados <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5}/>
           </button>
         </div>
       )}

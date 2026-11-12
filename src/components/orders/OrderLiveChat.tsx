@@ -74,7 +74,7 @@ export function OrderLiveChat({
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="relative shrink-0">
             <div className="h-9 w-9 rounded-xl bg-catador-amber flex items-center justify-center font-bold text-xs text-white shadow-xs">
-              {usuarioRol === 'cliente' ? <Shield className="h-4 w-4" /> : <User className="h-4 w-4" />}
+              {usuarioRol === 'cliente' ? <Shield className="h-4 w-4" strokeWidth={1.5}/> : <User className="h-4 w-4" strokeWidth={1.5}/>}
             </div>
             <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-catador-blue animate-pulse" />
           </div>
@@ -105,7 +105,7 @@ export function OrderLiveChat({
           disabled={enviando}
           className="shrink-0 inline-flex items-center gap-1 rounded-xl bg-white/15 hover:bg-white/25 px-2.5 py-1.5 text-[10px] font-extrabold text-white transition-colors cursor-pointer"
         >
-          <ImagePlus className="h-3.5 w-3.5 text-amber-300" />
+          <ImagePlus className="h-3.5 w-3.5 text-amber-300" strokeWidth={1.5}/>
           <span className="hidden xs:inline">Enviar Capture</span>
         </button>
       </div>
@@ -114,12 +114,12 @@ export function OrderLiveChat({
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/80 text-xs">
         {cargando ? (
           <div className="h-full flex items-center justify-center text-slate-400 gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" />
+            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" strokeWidth={1.5}/>
             <span>Conectando con administración...</span>
           </div>
         ) : mensajes.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 space-y-1.5">
-            <Bot className="h-9 w-9 text-catador-amber mb-1" />
+            <Bot className="h-9 w-9 text-catador-amber mb-1" strokeWidth={1.5}/>
             <p className="font-bold text-slate-700">¡Canal de atención en vivo activo!</p>
             <p className="text-[11px] text-slate-500 max-w-xs">
               Escríbenos cualquier indicación de entrega o adjunta el comprobante de tu pago aquí.
@@ -215,7 +215,7 @@ export function OrderLiveChat({
           aria-label="Adjuntar foto o capture de pago"
           className="h-10 w-10 flex items-center justify-center rounded-xl text-slate-500 hover:text-catador-blue hover:bg-blue-50 transition-colors cursor-pointer shrink-0 border border-slate-200"
         >
-          <ImagePlus className="h-5 w-5" />
+          <ImagePlus className="h-5 w-5" strokeWidth={1.5}/>
         </button>
 
         <input
@@ -232,7 +232,7 @@ export function OrderLiveChat({
           aria-label="Enviar mensaje"
           className="flex items-center justify-center h-10 w-10 shrink-0 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-200 text-white transition-colors cursor-pointer shadow-xs"
         >
-          {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+          {enviando ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/> : <Send className="h-4 w-4" strokeWidth={1.5}/>}
         </button>
       </form>
     </div>

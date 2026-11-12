@@ -68,14 +68,14 @@ export function AccountProfileTab({
 
       {saveSuccess && (
         <div className="flex items-center gap-2.5 rounded-2xl bg-emerald-50 border border-emerald-200 p-3.5 text-xs text-emerald-800 font-bold">
-          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+          <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={1.5}/>
           <span>¡Tus datos han sido actualizados con éxito!</span>
         </div>
       )}
 
       {saveError && (
         <div className="flex items-center gap-2.5 rounded-2xl bg-rose-50 border border-rose-200 p-3.5 text-xs text-rose-800 font-bold">
-          <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" />
+          <AlertCircle className="h-4 w-4 text-rose-600 shrink-0" strokeWidth={1.5}/>
           <span>Error al guardar los datos: {saveError}</span>
         </div>
       )}
@@ -85,7 +85,7 @@ export function AccountProfileTab({
           <div>
             <label className="block text-xs font-extrabold text-slate-700 mb-1.5">Nombre Completo</label>
             <div className="relative">
-              <User className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <User className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <input
                 type="text"
                 required
@@ -100,7 +100,7 @@ export function AccountProfileTab({
           <div>
             <label className="block text-xs font-extrabold text-slate-700 mb-1.5">Cédula o RIF</label>
             <div className="relative">
-              <CreditCard className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <CreditCard className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <input
                 type="text"
                 required
@@ -116,7 +116,7 @@ export function AccountProfileTab({
         <div>
           <label className="block text-xs font-extrabold text-slate-700 mb-1.5">Teléfono WhatsApp</label>
           <div className="relative">
-            <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+            <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
             <input
               type="tel"
               required
@@ -169,7 +169,7 @@ export function AccountProfileTab({
               </span>
             </div>
             <div className="relative">
-              <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+              <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <textarea
                 rows={2}
                 value={formData.direccion}
@@ -197,7 +197,7 @@ export function AccountProfileTab({
             disabled={saving}
             className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark disabled:bg-slate-300 px-7 py-3 min-h-[46px] font-extrabold text-sm text-white transition-colors cursor-pointer"
           >
-            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/> : <Save className="h-4 w-4" strokeWidth={1.5}/>}
             <span>{saving ? 'Guardando...' : 'Guardar Cambios'}</span>
           </button>
         </div>

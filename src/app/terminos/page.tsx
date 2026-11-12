@@ -16,14 +16,14 @@ export default function TerminosPage() {
           href="/"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver a la Tienda
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Volver a la Tienda
         </Link>
       </div>
 
       <article className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-10 shadow-xs space-y-6 text-slate-700 text-xs sm:text-sm leading-relaxed">
         <header className="border-b border-slate-100 pb-6 space-y-2">
           <div className="inline-flex items-center gap-1.5 text-xs font-black uppercase text-catador-amber bg-amber-50 px-3 py-1 rounded-full">
-            <FileCheck className="h-4 w-4" /> Condiciones Comerciales Oficiales
+            <FileCheck className="h-4 w-4" strokeWidth={1.5}/> Condiciones Comerciales Oficiales
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
             Términos y Condiciones de Compra y Despacho
@@ -35,7 +35,7 @@ export default function TerminosPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <Package className="h-4 w-4 text-catador-blue" />
+            <Package className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
             1. Ventas por Unidad, por Caja y Disponibilidad de Stock
           </h2>
           <p>
@@ -45,7 +45,7 @@ export default function TerminosPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <DollarSign className="h-4 w-4 text-emerald-600" />
+            <DollarSign className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
             2. Precios Bimonetarios ($ USD y Bs. BCV)
           </h2>
           <p>
@@ -55,7 +55,7 @@ export default function TerminosPage() {
 
         <section className="space-y-2">
           <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-            <Truck className="h-4 w-4 text-catador-amber" />
+            <Truck className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
             3. Tarifas de Delivery por Distancia y Volumen de Carga
           </h2>
           <p>

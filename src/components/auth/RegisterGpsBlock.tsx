@@ -30,7 +30,7 @@ export function RegisterGpsBlock({
           Dirección en Barinas <span className="text-slate-400 font-normal">(Opcional)</span>
         </label>
         <div className="relative">
-          <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+          <MapPin className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="text"
             autoComplete="street-address"
@@ -46,7 +46,7 @@ export function RegisterGpsBlock({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
           <div className="min-w-0">
             <span className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-              <Navigation className="h-3.5 w-3.5 text-catador-blue shrink-0" />
+              <Navigation className="h-3.5 w-3.5 text-catador-blue shrink-0" strokeWidth={1.5}/>
               <span>Ubicación GPS para Delivery Exacto</span>
             </span>
             <p className="text-[11px] text-slate-600 mt-0.5">
@@ -62,12 +62,12 @@ export function RegisterGpsBlock({
           >
             {locatingGps ? (
               <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" strokeWidth={1.5}/>
                 <span>Ubicando...</span>
               </>
             ) : (
               <>
-                <Crosshair className="h-3.5 w-3.5" />
+                <Crosshair className="h-3.5 w-3.5" strokeWidth={1.5}/>
                 <span>{latitud ? 'Recotizar delivery (GPS)' : 'Cotizar delivery'}</span>
               </>
             )}
@@ -89,7 +89,7 @@ export function RegisterGpsBlock({
                 rel="noopener noreferrer"
                 className="text-xs font-bold text-catador-blue hover:underline flex items-center gap-1"
               >
-                <ExternalLink className="h-3 w-3" /> Ver Mapa
+                <ExternalLink className="h-3 w-3" strokeWidth={1.5}/> Ver Mapa
               </a>
               <button
                 type="button"

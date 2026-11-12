@@ -25,7 +25,7 @@ export function RegisterIdentityFields({
       <div>
         <label className="block font-extrabold text-slate-700 mb-1.5">Nombre y Apellido *</label>
         <div className="relative">
-          <User className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+          <User className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="text"
             required
@@ -58,7 +58,7 @@ export function RegisterIdentityFields({
               ))}
             </div>
             <div className="relative flex-1 min-w-0">
-              <IdCard className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+              <IdCard className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
               <input
                 type="text"
                 inputMode="numeric"
@@ -75,7 +75,7 @@ export function RegisterIdentityFields({
         <div>
           <label className="block font-extrabold text-slate-700 mb-1.5">Teléfono Móvil *</label>
           <div className="relative">
-            <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+            <Phone className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
             <input
               type="tel"
               required

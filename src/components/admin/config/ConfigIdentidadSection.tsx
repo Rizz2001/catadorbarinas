@@ -14,7 +14,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-2xs space-y-4">
       <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
-        <Store className="h-4 w-4 text-catador-blue" />
+        <Store className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
         <h2 className="text-xs font-black uppercase text-slate-900 tracking-wider">
           Identidad y Datos del Negocio
         </h2>
@@ -33,7 +33,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <Store className="h-3.5 w-3.5 text-slate-400" />
+            <Store className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             Nombre Comercial *
           </label>
           <input
@@ -47,7 +47,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <Building className="h-3.5 w-3.5 text-slate-400" />
+            <Building className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             Razón Social Legal *
           </label>
           <input
@@ -61,7 +61,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <FileText className="h-3.5 w-3.5 text-slate-400" />
+            <FileText className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             RIF del Negocio *
           </label>
           <input
@@ -75,7 +75,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
 
         <div>
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <Phone className="h-3.5 w-3.5 text-slate-400" />
+            <Phone className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             Teléfono de Atención / WhatsApp *
           </label>
           <input
@@ -89,7 +89,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
 
         <div className="md:col-span-2">
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <Clock className="h-3.5 w-3.5 text-slate-400" />
+            <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             Horario de Despacho y Tienda *
           </label>
           <input
@@ -103,7 +103,7 @@ export function ConfigIdentidadSection({ form, onChange, onQuickSave }: ConfigId
 
         <div className="md:col-span-3">
           <label className="flex items-center gap-1 font-bold text-slate-700 mb-1">
-            <MapPin className="h-3.5 w-3.5 text-slate-400" />
+            <MapPin className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             Dirección Física en Barinas *
           </label>
           <input

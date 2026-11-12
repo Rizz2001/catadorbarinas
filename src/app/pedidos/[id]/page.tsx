@@ -79,7 +79,7 @@ export default function OrderLiveRoomPage() {
   if (loading) {
     return (
       <main className="container mx-auto px-4 py-20 flex flex-col items-center justify-center space-y-3">
-        <Loader2 className="h-8 w-8 animate-spin text-catador-blue" />
+        <Loader2 className="h-8 w-8 animate-spin text-catador-blue" strokeWidth={1.5}/>
         <p className="text-xs font-bold text-slate-600">Conectando a la Sala en Vivo de tu Pedido...</p>
       </main>
     );
@@ -89,7 +89,7 @@ export default function OrderLiveRoomPage() {
     return (
       <main className="container mx-auto px-4 py-16 max-w-md text-center space-y-4">
         <div className="h-12 w-12 rounded-full bg-red-50 text-red-500 mx-auto flex items-center justify-center">
-          <AlertCircle className="h-6 w-6" />
+          <AlertCircle className="h-6 w-6" strokeWidth={1.5}/>
         </div>
         <h1 className="text-lg font-black text-slate-900">Pedido no encontrado</h1>
         <p className="text-xs text-slate-500">{error || 'No pudimos localizar la información de este pedido.'}</p>
@@ -109,11 +109,11 @@ export default function OrderLiveRoomPage() {
         <Link href="/" className="hover:text-catador-blue transition-colors">
           Inicio
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
+        <ChevronRight className="h-3.5 w-3.5 text-slate-300" strokeWidth={1.5}/>
         <Link href="/catalogo" className="hover:text-catador-blue transition-colors">
           Catálogo
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300" />
+        <ChevronRight className="h-3.5 w-3.5 text-slate-300" strokeWidth={1.5}/>
         <span className="font-bold text-slate-800">Sala en Vivo #{order.numero_orden}</span>
       </nav>
 
@@ -130,7 +130,7 @@ export default function OrderLiveRoomPage() {
           href="/catalogo"
           className="inline-flex items-center gap-1.5 text-xs font-bold text-catador-blue hover:text-catador-blue-light"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Seguir Comprando
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Seguir Comprando
         </Link>
       </div>
 
@@ -146,7 +146,7 @@ export default function OrderLiveRoomPage() {
               : 'text-slate-600 hover:text-slate-900'
           )}
         >
-          <MessageSquareText className="h-4 w-4" />
+          <MessageSquareText className="h-4 w-4" strokeWidth={1.5}/>
           <span>Chat en Vivo</span>
         </button>
         <button
@@ -159,7 +159,7 @@ export default function OrderLiveRoomPage() {
               : 'text-slate-600 hover:text-slate-900'
           )}
         >
-          <ReceiptText className="h-4 w-4" />
+          <ReceiptText className="h-4 w-4" strokeWidth={1.5}/>
           <span>Estado y Recibo</span>
         </button>
       </div>

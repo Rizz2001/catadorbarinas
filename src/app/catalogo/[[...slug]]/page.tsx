@@ -72,13 +72,13 @@ export default async function CatalogoPage({ params }: CatalogPageProps) {
         <Link href="/" className="hover:text-catador-blue transition-colors">
           Inicio
         </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5}/>
         <Link href="/catalogo" className="hover:text-catador-blue transition-colors">
           Catálogo
         </Link>
         {activeGroup && (
           <>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5}/>
             <Link
               href={`/catalogo/${activeGroup.CodGrupo}`}
               className={activeSub ? 'hover:text-catador-blue transition-colors' : 'font-bold text-slate-800'}
@@ -89,7 +89,7 @@ export default async function CatalogoPage({ params }: CatalogPageProps) {
         )}
         {activeSub && (
           <>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" />
+            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5}/>
             <span className="font-bold text-slate-800 truncate">{activeSub.Nombre}</span>
           </>
         )}
@@ -99,7 +99,7 @@ export default async function CatalogoPage({ params }: CatalogPageProps) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 pb-3.5 sm:pb-4">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Tag className="h-4 w-4 sm:h-5 sm:w-5" />
+            <Tag className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5}/>
           </div>
           <div className="min-w-0">
             <h1 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight truncate">

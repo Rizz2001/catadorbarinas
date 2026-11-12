@@ -150,7 +150,7 @@ export default function AdminUsuariosPage() {
         </div>
 
         <div className="relative w-full sm:w-72">
-          <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="text"
             placeholder="Buscar por nombre, cédula o teléfono..."
@@ -212,13 +212,13 @@ export default function AdminUsuariosPage() {
       <div className="rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
         {loading ? (
           <div className="p-12 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" />
+            <Loader2 className="h-4 w-4 animate-spin text-catador-blue" strokeWidth={1.5}/>
             <span>Cargando lista de usuarios...</span>
           </div>
         ) : filteredUsers.length === 0 ? (
           <div className="p-10">
             <EmptyState
-              icon={<Users className="h-9 w-9 text-slate-400" />}
+              icon={<Users className="h-9 w-9 text-slate-400" strokeWidth={1.5}/>}
               title="No se encontraron usuarios coincidentes"
               description="Intenta buscar con otro nombre, cédula o número telefónico."
             />
@@ -257,9 +257,9 @@ export default function AdminUsuariosPage() {
                           variant={u.correo_confirmado ? 'success' : 'warning'}
                           icon={
                             u.correo_confirmado ? (
-                              <MailCheck className="h-3 w-3" />
+                              <MailCheck className="h-3 w-3" strokeWidth={1.5}/>
                             ) : (
-                              <AlertCircle className="h-3 w-3" />
+                              <AlertCircle className="h-3 w-3" strokeWidth={1.5}/>
                             )
                           }
                           label={u.correo_confirmado ? 'Verificado' : 'Sin Confirmar'}
@@ -297,7 +297,7 @@ export default function AdminUsuariosPage() {
                           <option value="admin">Administrador (CMS Total)</option>
                           <option value="repartidor">Repartidor (Despacho)</option>
                         </select>
-                        {isUpdating && <Loader2 className="h-4 w-4 animate-spin text-catador-blue" />}
+                        {isUpdating && <Loader2 className="h-4 w-4 animate-spin text-catador-blue" strokeWidth={1.5}/>}
                       </div>
                     </div>
 
@@ -308,7 +308,7 @@ export default function AdminUsuariosPage() {
                         onClick={() => setEditingUser(u)}
                         className="flex items-center justify-center gap-1.5 min-h-[44px] rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-catador-blue font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
                       >
-                        <Edit3 className="h-4 w-4 shrink-0" />
+                        <Edit3 className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                         <span>Modificar</span>
                       </button>
 
@@ -324,12 +324,12 @@ export default function AdminUsuariosPage() {
                       >
                         {u.suspendido ? (
                           <>
-                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" strokeWidth={1.5}/>
                             <span>Reactivar</span>
                           </>
                         ) : (
                           <>
-                            <Ban className="h-4 w-4 shrink-0 text-amber-700" />
+                            <Ban className="h-4 w-4 shrink-0 text-amber-700" strokeWidth={1.5}/>
                             <span>Suspender</span>
                           </>
                         )}
@@ -340,7 +340,7 @@ export default function AdminUsuariosPage() {
                         onClick={() => setDeletingUser(u)}
                         className="flex items-center justify-center gap-1.5 min-h-[44px] rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
                       >
-                        <Trash2 className="h-4 w-4 shrink-0" />
+                        <Trash2 className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
                         <span>Eliminar</span>
                       </button>
                     </div>
@@ -385,20 +385,20 @@ export default function AdminUsuariosPage() {
                               variant={u.suspendido ? 'error' : 'success'}
                               icon={
                                 u.suspendido ? (
-                                  <Ban className="h-3 w-3" />
+                                  <Ban className="h-3 w-3" strokeWidth={1.5}/>
                                 ) : (
-                                  <CheckCircle2 className="h-3 w-3" />
+                                  <CheckCircle2 className="h-3 w-3" strokeWidth={1.5}/>
                                 )
                               }
                               label={u.suspendido ? 'Suspendido' : 'Activo'}
                             />
                             {u.correo_confirmado ? (
                               <span className="inline-flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
-                                <MailCheck className="h-3 w-3 text-emerald-600" /> Correo verificado
+                                <MailCheck className="h-3 w-3 text-emerald-600" strokeWidth={1.5}/> Correo verificado
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 text-[10px] text-amber-700 font-bold">
-                                <AlertCircle className="h-3 w-3 text-amber-600" /> Correo sin verificar
+                                <AlertCircle className="h-3 w-3 text-amber-600" strokeWidth={1.5}/> Correo sin verificar
                               </span>
                             )}
                           </div>
@@ -415,7 +415,7 @@ export default function AdminUsuariosPage() {
                               <option value="admin">Administrador (CMS Total)</option>
                               <option value="repartidor">Repartidor (Despacho)</option>
                             </select>
-                            {isUpdating && <Loader2 className="h-3.5 w-3.5 animate-spin text-catador-blue" />}
+                            {isUpdating && <Loader2 className="h-3.5 w-3.5 animate-spin text-catador-blue" strokeWidth={1.5}/>}
                           </div>
                         </td>
                         <td className="p-3.5 text-right">
@@ -426,7 +426,7 @@ export default function AdminUsuariosPage() {
                               className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-catador-blue text-slate-700 hover:text-catador-blue font-bold text-xs bg-white shadow-2xs transition-colors cursor-pointer"
                               title="Modificar datos del usuario"
                             >
-                              <Edit3 className="h-3.5 w-3.5" />
+                              <Edit3 className="h-3.5 w-3.5" strokeWidth={1.5}/>
                               <span>Editar</span>
                             </button>
                             <button
@@ -440,7 +440,7 @@ export default function AdminUsuariosPage() {
                               }`}
                               title={u.suspendido ? 'Reactivar cuenta' : 'Suspender cuenta'}
                             >
-                              {u.suspendido ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Ban className="h-3.5 w-3.5" />}
+                              {u.suspendido ? <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={1.5}/> : <Ban className="h-3.5 w-3.5" strokeWidth={1.5}/>}
                               <span>{u.suspendido ? 'Reactivar' : 'Suspender'}</span>
                             </button>
                             <button
@@ -449,7 +449,7 @@ export default function AdminUsuariosPage() {
                               className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs shadow-2xs transition-colors cursor-pointer"
                               title="Eliminar usuario permanentemente"
                             >
-                              <Trash2 className="h-3.5 w-3.5" />
+                              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/>
                             </button>
                           </div>
                         </td>

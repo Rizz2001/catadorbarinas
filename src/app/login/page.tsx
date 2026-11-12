@@ -69,7 +69,7 @@ export default async function LoginPage({
           replace
           className="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-3.5 py-1.5 text-xs font-extrabold text-slate-700 hover:border-catador-blue hover:text-catador-blue transition-colors"
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> Volver a la tienda
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={1.5}/> Volver a la tienda
         </Link>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8 space-y-5 shadow-xs">
@@ -96,7 +96,7 @@ export default async function LoginPage({
           </Suspense>
 
           <div className="pt-3 border-t border-slate-100 flex items-center justify-center gap-1.5 text-xs text-slate-500 font-medium">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+            <ShieldCheck className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
             <span>Plataforma Segura · EL CATADOR. Barinas</span>
           </div>
         </div>

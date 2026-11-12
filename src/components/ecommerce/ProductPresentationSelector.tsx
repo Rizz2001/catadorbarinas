@@ -48,7 +48,7 @@ export function ProductPresentationSelector({
             )}
           >
             <span className="inline-flex items-center gap-2 text-xs font-black text-slate-900 min-w-0">
-              <Box className="h-4 w-4 text-catador-blue shrink-0" />
+              <Box className="h-4 w-4 text-catador-blue shrink-0" strokeWidth={1.5}/>
               <span className="truncate">Unidad (1 {product.unit.toLowerCase()})</span>
             </span>
             <span className="text-sm font-black text-catador-blue tabular-nums shrink-0">
@@ -72,7 +72,7 @@ export function ProductPresentationSelector({
             )}
           >
             <div className="flex items-center gap-2 min-w-0">
-              <Package className="h-4 w-4 text-catador-amber shrink-0" />
+              <Package className="h-4 w-4 text-catador-amber shrink-0" strokeWidth={1.5}/>
               <div className="min-w-0">
                 <span className="text-xs font-black text-slate-900 block truncate">
                   {product.boxUnitLabel || 'Caja'} x{unitsPerBox}

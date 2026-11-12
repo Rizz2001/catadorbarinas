@@ -9,6 +9,7 @@ import { getDefaultPurchaseMode, getEffectivePriceUsd } from '@/lib/inventory';
 import { cn } from '@/lib/utils';
 
 interface HeroFeaturedBentoProps {
+  label: string;
   slides: Product[];
   activeIndex: number;
   onPrevSlide: () => void;
@@ -19,6 +20,7 @@ interface HeroFeaturedBentoProps {
 }
 
 export function HeroFeaturedBento({
+  label,
   slides,
   activeIndex,
   onPrevSlide,
@@ -44,7 +46,7 @@ export function HeroFeaturedBento({
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <span className="text-xs font-extrabold text-catador-blue uppercase tracking-wide block">
-            Edición Destacada
+            {label}
           </span>
           <Link
             href={`/producto/${currentSlide.id}`}
@@ -58,7 +60,7 @@ export function HeroFeaturedBento({
           aria-label={`Ver ${currentSlide.name}`}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white hover:bg-catador-blue-dark transition-colors"
         >
-          <ChevronRight className="h-4 w-4" />
+          <ChevronRight className="w-4 h-4" strokeWidth={1.5} />
         </Link>
       </div>
 
@@ -90,7 +92,7 @@ export function HeroFeaturedBento({
               aria-label="Destacado anterior"
               className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-catador-blue cursor-pointer"
             >
-              <ChevronLeft className="h-3.5 w-3.5" />
+              <ChevronLeft className="w-3.5 h-3.5" strokeWidth={1.5} />
             </button>
             <button
               type="button"
@@ -98,7 +100,7 @@ export function HeroFeaturedBento({
               aria-label="Siguiente destacado"
               className="h-7 w-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:text-catador-blue cursor-pointer"
             >
-              <ChevronRight className="h-3.5 w-3.5" />
+              <ChevronRight className="w-3.5 h-3.5" strokeWidth={1.5} />
             </button>
           </div>
         )}
@@ -106,4 +108,3 @@ export function HeroFeaturedBento({
     </div>
   );
 }
-

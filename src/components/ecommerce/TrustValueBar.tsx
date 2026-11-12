@@ -1,40 +1,16 @@
 'use client';
 
-import { Truck, RefreshCw, ShieldCheck, CreditCard } from 'lucide-react';
+import Link from 'next/link';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
-import { TrustMetricItem } from '@/types';
+import { TrustBadgeNode } from '@/types';
+import { DynamicLucideIcon } from '@/components/ui';
 
 interface TrustValueBarProps {
-  initialMetrics?: TrustMetricItem[];
+  badges: TrustBadgeNode[];
   active?: boolean;
 }
 
-const DEFAULT_METRICS: TrustMetricItem[] = [
-  {
-    figura: '< 45 min',
-    titulo: 'Despacho Express en Barinas',
-    subtitulo: 'Alto Barinas, Centro, Palma Sola y Varyná en motorizado o carga',
-  },
-  {
-    figura: 'Tasa BCV',
-    titulo: 'Cotización Bimonetaria Exacta',
-    subtitulo: 'Precios sincronizados al día en Dólares ($ USD) y Bolívares',
-  },
-  {
-    figura: 'Stock Garantizado',
-    titulo: 'Inventario Real por Unidad o Caja',
-    subtitulo: 'Licores con precinto oficial y víveres directo de nuestro almacén',
-  },
-  {
-    figura: 'Bs. / $ USD',
-    titulo: 'Pago Móvil, Zelle y Efectivo',
-    subtitulo: 'Verificación inmediata y atención directa en nuestro Chat en Vivo',
-  },
-];
-
-const METRIC_ICONS = [Truck, RefreshCw, ShieldCheck, CreditCard];
-
-export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarProps) {
+export function TrustValueBar({ badges, active = true }: TrustValueBarProps) {
   const storeConfig = useStoreConfigStore((state) => state.config);
 
   const isVisible =
@@ -44,29 +20,32 @@ export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarPr
 
   if (isVisible === false) return null;
 
-  const metrics =
+  const resolvedBadges: TrustBadgeNode[] =
     storeConfig?.metricas_confianza && storeConfig.metricas_confianza.length > 0
-      ? storeConfig.metricas_confianza
-      : initialMetrics && initialMetrics.length > 0
-      ? initialMetrics
-      : DEFAULT_METRICS;
+      ? storeConfig.metricas_confianza.map((item, idx) => ({
+          ...item,
+          icon: item.icon || badges[idx % Math.max(badges.length, 1)]?.icon,
+        }))
+      : badges;
 
-  /* Pre-emit critique: P5 H5 E5 S5 R5 V5 D5 */
+  if (resolvedBadges.length === 0) return null;
+
   return (
     <section
       aria-label="Garantías operativas de EL CATADOR."
       className="rounded-2xl sm:rounded-3xl bg-white border border-slate-100 sm:border-slate-200/90 shadow-sm overflow-hidden"
     >
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 p-2.5 sm:p-0 sm:gap-0 sm:divide-x divide-slate-200/70">
-        {metrics.map((item, idx) => {
-          const Icon = METRIC_ICONS[idx % METRIC_ICONS.length];
-          return (
-            <div
-              key={idx}
-              className="p-3 sm:p-5 rounded-xl sm:rounded-none bg-[#F7F8FA]/80 sm:bg-white flex flex-col sm:flex-row items-start gap-2.5 sm:gap-3.5 min-w-0 hover:bg-[#F7F8FA]/60 transition-colors"
-            >
+        {resolvedBadges.map((item, idx) => {
+          const content = (
+            <>
               <div className="flex h-9 w-9 sm:h-11 sm:w-11 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-[#FEF3C7]/80 border border-[#EB9C53]/60 text-[#0F172A] shadow-2xs">
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <DynamicLucideIcon
+                  name={item.icon}
+                  fallback="ShieldCheck"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  strokeWidth={1.5}
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white sm:bg-[#F7F8FA] border border-slate-200 px-2 py-0.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-[#0F172A] tabular-nums">
@@ -80,6 +59,27 @@ export function TrustValueBar({ initialMetrics, active = true }: TrustValueBarPr
                   {item.subtitulo}
                 </p>
               </div>
+            </>
+          );
+
+          const cardClass =
+            'p-3 sm:p-5 rounded-xl sm:rounded-none bg-[#F7F8FA]/80 sm:bg-white flex flex-col sm:flex-row items-start gap-2.5 sm:gap-3.5 min-w-0 hover:bg-[#F7F8FA]/60 transition-colors';
+
+          if (item.href?.trim()) {
+            return (
+              <Link
+                key={item.id || `${item.titulo}-${idx}`}
+                href={item.href.trim()}
+                className={cardClass}
+              >
+                {content}
+              </Link>
+            );
+          }
+
+          return (
+            <div key={item.id || `${item.titulo}-${idx}`} className={cardClass}>
+              {content}
             </div>
           );
         })}

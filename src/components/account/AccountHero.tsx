@@ -51,17 +51,17 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
 
               {perfil?.rol === 'admin' ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-catador-amber-soft border border-catador-amber-oak/70 px-2.5 py-0.5 text-xs font-black text-[#8B3E03]">
-                  <ShieldCheck className="h-3.5 w-3.5 text-catador-amber" />
+                  <ShieldCheck className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
                   <span>Admin CMS</span>
                 </span>
               ) : perfil?.rol === 'repartidor' ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-xs font-black text-catador-blue">
-                  <Bike className="h-3.5 w-3.5" />
+                  <Bike className="h-3.5 w-3.5" strokeWidth={1.5}/>
                   <span>Repartidor</span>
                 </span>
               ) : perfil?.correo_confirmado ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-xs font-bold text-emerald-800">
-                  <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  <UserCheck className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5}/>
                   <span>Correo Confirmado</span>
                 </span>
               ) : (
@@ -85,7 +85,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
               href="/admin/pedidos"
               className="inline-flex items-center gap-1.5 rounded-full bg-catador-amber-soft hover:bg-[#FDE68A] border border-catador-amber-oak/70 text-[#8B3E03] font-extrabold text-xs px-4 py-2 min-h-[42px] transition-colors cursor-pointer"
             >
-              <Sliders className="h-4 w-4" />
+              <Sliders className="h-4 w-4" strokeWidth={1.5}/>
               <span>Consola CMS</span>
             </Link>
           )}
@@ -96,7 +96,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
             className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-[#F7F8FA] hover:bg-rose-50 hover:border-rose-200 hover:text-rose-700 text-slate-700 font-bold text-xs px-4 py-2 min-h-[42px] transition-colors cursor-pointer"
             title="Cerrar sesión segura"
           >
-            <LogOut className="h-4 w-4 shrink-0" />
+            <LogOut className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
             <span>Cerrar Sesión</span>
           </button>
         </div>
@@ -105,7 +105,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
       <div className="grid grid-cols-3 rounded-2xl bg-[#F7F8FA] border border-slate-200 divide-x divide-slate-200 tabular-nums">
         <div className="p-3 sm:px-4 text-center sm:text-left">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center sm:justify-start gap-1">
-            <Package className="h-3.5 w-3.5 text-slate-400" />
+            <Package className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             <span className="hidden sm:inline">Historial</span> Pedidos
           </span>
           <span className="text-lg sm:text-xl font-black text-slate-900 block mt-0.5">
@@ -115,7 +115,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
 
         <div className="p-3 sm:px-4 text-center sm:text-left">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center sm:justify-start gap-1">
-            <Truck className="h-3.5 w-3.5 text-catador-blue" />
+            <Truck className="h-3.5 w-3.5 text-catador-blue" strokeWidth={1.5}/>
             <span className="hidden sm:inline">Despachos</span> Activos
           </span>
           <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-0.5">
@@ -130,7 +130,7 @@ export function AccountHero({ user, perfil, orders }: AccountHeroProps) {
 
         <div className="p-3 sm:px-4 text-center sm:text-left">
           <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-center sm:justify-start gap-1">
-            <MapPin className="h-3.5 w-3.5 text-catador-amber" />
+            <MapPin className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
             <span>Barinas</span>
           </span>
           <span className="text-xs sm:text-sm font-bold text-slate-800 block truncate mt-1">

@@ -1,25 +1,19 @@
 'use client';
 
-import { useCartOrderQuote } from '@/hooks/useCartOrderQuote';
-import { CartDeliveryAddressBox } from './CartDeliveryAddressBox';
+import { useCartStore } from '@/store/useCartStore';
+import { useBcvStore } from '@/store/useBcvStore';
+import { useCartTotals } from '@/hooks/useCartTotals';
 import { CartPriceSummaryRows } from './CartPriceSummaryRows';
 
+/**
+ * Resumen financiero limpio del carrito: únicamente costo de productos, ahorro y total BCV.
+ */
 export function CartOrderSummary() {
-  const {
-    totals,
-    bcvRate,
-    deliveryQuote,
-    totalConDeliveryUsd,
-    totalConDeliveryVes,
-    isAuthenticated,
-    profileAddress,
-    userLocation,
-  } = useCartOrderQuote(true);
+  const items = useCartStore((state) => state.items);
+  const bcvRate = useBcvStore((state) => state.rateInfo.rate);
+  const totals = useCartTotals();
 
-  const deliveryLabel =
-    userLocation.deliveryType === 'pickup'
-      ? 'Retiro Pick-Up'
-      : `Delivery (${deliveryQuote.tierBadge}${userLocation.latitud ? ` · ${deliveryQuote.distanceKm} km` : ''})`;
+  if (items.length === 0) return null;
 
   return (
     <div className="rounded-2xl border border-gray-100 bg-white shadow-sm p-4 sm:p-5 space-y-4">
@@ -27,22 +21,14 @@ export function CartOrderSummary() {
         Resumen de la Orden
       </h3>
 
-      <CartDeliveryAddressBox
-        isAuthenticated={isAuthenticated}
-        profileAddress={profileAddress}
-        variant="page"
-      />
-
       <CartPriceSummaryRows
         subtotalUsd={totals.subtotalUsd}
         subtotalVes={totals.subtotalVes}
         discountUsd={totals.discountUsd}
         discountVes={totals.discountVes}
-        deliveryLabel={deliveryLabel}
-        shippingUsd={deliveryQuote.shippingUsd}
         bcvRate={bcvRate}
-        totalUsd={totalConDeliveryUsd}
-        totalVes={totalConDeliveryVes}
+        totalUsd={totals.subtotalUsd}
+        totalVes={totals.subtotalVes}
       />
     </div>
   );

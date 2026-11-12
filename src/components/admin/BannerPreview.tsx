@@ -60,7 +60,7 @@ export function BannerPreview({ banner }: BannerPreviewProps) {
 
         <div className="pt-1 flex flex-wrap items-center justify-center gap-2.5">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-[#D99B38] px-4 py-2 text-xs font-black text-white">
-            {hero.botonTexto} <ArrowRight className="h-3.5 w-3.5" />
+            {hero.botonTexto} <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5}/>
           </span>
           {hero.secondaryBtnText && (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/25 px-4 py-2 text-xs font-extrabold text-white">

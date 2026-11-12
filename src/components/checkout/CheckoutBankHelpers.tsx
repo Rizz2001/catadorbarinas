@@ -68,9 +68,9 @@ export function CopyableFieldsBox({
                 aria-label={`Copiar ${field.label}`}
               >
                 {copiedField === field.id ? (
-                  <Check className="h-3.5 w-3.5 text-emerald-600" />
+                  <Check className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5}/>
                 ) : (
-                  <Copy className="h-3.5 w-3.5" />
+                  <Copy className="h-3.5 w-3.5" strokeWidth={1.5}/>
                 )}
               </button>
             )}
@@ -139,7 +139,7 @@ export function ReferenceAndReceiptFields({
             onChange={onFileChange}
             className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
           />
-          <UploadCloud className="h-5 w-5 text-catador-blue mx-auto mb-1" />
+          <UploadCloud className="h-5 w-5 text-catador-blue mx-auto mb-1" strokeWidth={1.5}/>
           <p className="text-xs font-semibold text-slate-700 truncate">
             {paymentData.comprobanteFile
               ? paymentData.comprobanteFile.name

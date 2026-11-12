@@ -3,6 +3,7 @@
 import { create } from 'zustand';
 import { StoreConfig } from '@/types';
 import { APP_CONFIG } from '@/constants/config';
+import { MOCK_HOME_CMS_RESPONSE } from '@/constants/home-cms.mock';
 import { getStoreConfig, updateStoreConfig as updateStoreConfigService } from '@/services/cms.service';
 
 export const DEFAULT_STORE_CONFIG: StoreConfig = {
@@ -43,28 +44,7 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   catalogo_titulo: 'Catálogo General Bodegón',
   catalogo_subtitulo: 'Inventario en tiempo real sincronizado con precios oficiales en $ USD y Bs. BCV',
   seccion_confianza_activa: true,
-  metricas_confianza: [
-    {
-      figura: '< 45 min',
-      titulo: 'Despacho Express en Barinas',
-      subtitulo: 'Alto Barinas, Centro, Palma Sola y Varyná en motorizado o carga',
-    },
-    {
-      figura: 'Tasa BCV',
-      titulo: 'Cotización Bimonetaria Exacta',
-      subtitulo: 'Precios sincronizados al día en Dólares ($ USD) y Bolívares',
-    },
-    {
-      figura: 'Stock Garantizado',
-      titulo: 'Inventario Real por Unidad o Caja',
-      subtitulo: 'Licores con precinto oficial y víveres directo de nuestro almacén',
-    },
-    {
-      figura: 'Bs. / $ USD',
-      titulo: 'Pago Móvil, Zelle y Efectivo',
-      subtitulo: 'Verificación inmediata y atención directa en nuestro Chat en Vivo',
-    },
-  ],
+  metricas_confianza: MOCK_HOME_CMS_RESPONSE.trustBadges,
   footer_descripcion:
     'Distribuidora y bodegón en Barinas con venta al detal por unidad y al mayor por caja cerrada con despacho express.',
   footer_transparencia_texto:

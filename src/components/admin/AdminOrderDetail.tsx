@@ -87,8 +87,8 @@ export function AdminOrderDetail({
             onClick={onBackToList}
             className="lg:hidden flex items-center gap-1.5 px-3 py-2 min-h-[42px] rounded-xl bg-slate-200/80 hover:bg-slate-300 text-slate-800 font-extrabold text-xs w-full transition-colors cursor-pointer"
           >
-            <ArrowLeft className="h-4 w-4" />
-            <span>← Volver a la Lista de Pedidos</span>
+            <ArrowLeft className="w-4 h-4" strokeWidth={1.5} />
+            <span>Volver a la Lista de Pedidos</span>
           </button>
         )}
 
@@ -128,7 +128,7 @@ export function AdminOrderDetail({
             rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white min-h-[46px] px-4 py-2 font-black text-sm shadow-sm transition-colors cursor-pointer"
           >
-            <Phone className="h-4 w-4 shrink-0" />
+            <Phone className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
             <span>Chatear por WhatsApp ({order.cliente_telefono})</span>
           </a>
         )}
@@ -144,7 +144,7 @@ export function AdminOrderDetail({
               onClick={() => setShowDeleteModal(true)}
               className="inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 hover:text-rose-800 p-1 cursor-pointer"
             >
-              <Trash2 className="h-3.5 w-3.5" />
+              <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/>
               <span>Eliminar Pedido</span>
             </button>
           </div>
@@ -156,7 +156,7 @@ export function AdminOrderDetail({
               onClick={() => onUpdateStatus(undefined, 'verificado')}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <CheckCircle className="h-4 w-4 shrink-0" />
+              <CheckCircle className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>Pago OK</span>
             </button>
 
@@ -166,7 +166,7 @@ export function AdminOrderDetail({
               onClick={() => onUpdateStatus(undefined, 'rechazado')}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <AlertTriangle className="h-4 w-4 shrink-0" />
+              <AlertTriangle className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>Rechazar</span>
             </button>
 
@@ -176,7 +176,7 @@ export function AdminOrderDetail({
               onClick={() => onUpdateStatus('preparando')}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-catador-blue hover:bg-catador-blue-light disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <PackageCheck className="h-4 w-4 shrink-0" />
+              <PackageCheck className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>Bodegón</span>
             </button>
 
@@ -186,7 +186,7 @@ export function AdminOrderDetail({
               onClick={() => onUpdateStatus('en_camino')}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-catador-amber hover:bg-catador-amber-dark disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <Bike className="h-4 w-4 shrink-0" />
+              <Bike className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>En Ruta</span>
             </button>
 
@@ -196,7 +196,7 @@ export function AdminOrderDetail({
               onClick={() => onUpdateStatus('entregado')}
               className="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 min-h-[44px] px-2 py-1.5 text-white font-extrabold text-xs shadow-xs transition-colors cursor-pointer"
             >
-              <CheckCheck className="h-4 w-4 shrink-0" />
+              <CheckCheck className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>Entregado</span>
             </button>
           </div>
@@ -236,9 +236,9 @@ export function AdminOrderDetail({
           <div className="flex items-center justify-between gap-2">
             <span className="flex items-center gap-2 font-extrabold text-slate-900 text-sm">
               {order.tipo_transporte === 'vehiculo_carga' ? (
-                <Truck className="h-5 w-5 text-catador-amber shrink-0" />
+                <Truck className="h-5 w-5 text-catador-amber shrink-0" strokeWidth={1.5}/>
               ) : (
-                <MapPin className="h-5 w-5 text-catador-blue shrink-0" />
+                <MapPin className="h-5 w-5 text-catador-blue shrink-0" strokeWidth={1.5}/>
               )}
               <span>
                 {order.tipo_entrega === 'pickup'
@@ -274,7 +274,7 @@ export function AdminOrderDetail({
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1.5 min-h-[42px] px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-catador-blue font-extrabold text-xs border border-blue-200 transition-colors"
             >
-              <ExternalLink className="h-4 w-4 shrink-0" />
+              <ExternalLink className="h-4 w-4 shrink-0" strokeWidth={1.5}/>
               <span>Abrir Ubicación en Google Maps (GPS)</span>
             </a>
           )}
@@ -320,9 +320,9 @@ export function AdminOrderDetail({
                     title="Copiar referencia"
                   >
                     {copiedRef ? (
-                      <Check className="h-4 w-4 text-emerald-600" />
+                      <Check className="h-4 w-4 text-emerald-600" strokeWidth={1.5}/>
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Copy className="h-4 w-4" strokeWidth={1.5}/>
                     )}
                   </button>
                 </div>
@@ -356,7 +356,7 @@ export function AdminOrderDetail({
                     onClick={() => setShowProofModal(true)}
                     className="absolute bottom-2 right-2 bg-slate-900/90 text-white min-h-[38px] px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md"
                   >
-                    <ExternalLink className="h-3.5 w-3.5" />
+                    <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5}/>
                     <span>Ampliar Comprobante</span>
                   </button>
                 </div>

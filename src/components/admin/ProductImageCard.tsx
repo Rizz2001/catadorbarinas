@@ -52,7 +52,7 @@ export function ProductImageCard({
                   : 'bg-slate-50 text-slate-400 border border-slate-200'
               }`}
             >
-              <Package className="h-3 w-3" />
+              <Package className="h-3 w-3" strokeWidth={1.5}/>
               <span>Stock: {stockQuantity}</span>
             </span>
           )}
@@ -75,7 +75,7 @@ export function ProductImageCard({
         {/* Etiqueta de Categoría */}
         {categoryLabel && (
           <div className="flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500 truncate">
-            <Tag className="h-3 w-3 text-catador-blue shrink-0" />
+            <Tag className="h-3 w-3 text-catador-blue shrink-0" strokeWidth={1.5}/>
             <span className="truncate">{categoryLabel}</span>
           </div>
         )}
@@ -83,7 +83,7 @@ export function ProductImageCard({
         {/* Datos del Producto */}
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-catador-blue">
-            <Barcode className="h-3.5 w-3.5 shrink-0" />
+            <Barcode className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
             <span className="font-mono text-xs font-black tracking-wide truncate">
               {item.codigo_articulo}
             </span>
@@ -103,7 +103,7 @@ export function ProductImageCard({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-catador-blue transition-colors"
           >
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-3 w-3" strokeWidth={1.5}/>
             <span>Ver</span>
           </a>
 
@@ -125,9 +125,9 @@ export function ProductImageCard({
                 title="Cambiar fotografía"
               >
                 {isReplacing ? (
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-3 w-3 animate-spin" strokeWidth={1.5}/>
                 ) : (
-                  <RefreshCw className="h-3 w-3" />
+                  <RefreshCw className="h-3 w-3" strokeWidth={1.5}/>
                 )}
                 <span>Cambiar</span>
               </button>
@@ -142,7 +142,7 @@ export function ProductImageCard({
           className="inline-flex items-center gap-1 text-[11px] font-bold text-red-600 hover:text-red-700 hover:bg-red-50 p-1.5 rounded-lg transition-colors cursor-pointer"
           title="Eliminar foto"
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/>
           <span>Eliminar</span>
         </button>
       </div>

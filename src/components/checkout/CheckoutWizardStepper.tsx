@@ -18,7 +18,7 @@ const WIZARD_STEPS: Array<{
   shortTitle: string;
   icon: React.ElementType;
 }> = [
-  { step: 1, title: 'Datos y Entrega', shortTitle: 'Datos', icon: MapPin },
+  { step: 1, title: 'Datos y Ubicación', shortTitle: 'Ubicación', icon: MapPin },
   { step: 2, title: 'Método de Pago', shortTitle: 'Pago', icon: CreditCard },
   { step: 3, title: 'Resumen de Orden', shortTitle: 'Resumen', icon: ClipboardCheck },
   { step: 4, title: 'Chat en Vivo', shortTitle: 'Chat', icon: MessageSquareText },
@@ -72,9 +72,9 @@ export function CheckoutWizardStepper({
               )}
             >
               {currentStep > step ? (
-                <Check className="h-3.5 w-3.5 shrink-0" />
+                <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
               ) : (
-                <Icon className="h-3.5 w-3.5 shrink-0" />
+                <Icon className="h-3.5 w-3.5 shrink-0" strokeWidth={1.5}/>
               )}
               <span className="truncate">{shortTitle}</span>
             </button>

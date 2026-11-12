@@ -102,7 +102,7 @@ export function PromoBannersGrid({ banners }: PromoBannersGridProps) {
               <span />
             )}
             <span className="flex h-9 w-9 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-catador-blue text-white group-hover:bg-white group-hover:text-catador-blue transition-colors shadow-xs">
-              <ChevronRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" strokeWidth={1.5}/>
             </span>
           </div>
 

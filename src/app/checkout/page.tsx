@@ -33,6 +33,7 @@ export default function CheckoutPage() {
   const baseTotals = useCartTotals();
 
   const [userId, setUserId] = useState<string | null>(null);
+  const [profileAddress, setProfileAddress] = useState<string | null>(null);
   const [authChecking, setAuthChecking] = useState<boolean>(true);
   const [currentStep, setCurrentStep] = useState<CheckoutWizardStep>(1);
   const [createdOrder, setCreatedOrder] = useState<PedidoConDetalles | null>(null);
@@ -74,9 +75,29 @@ export default function CheckoutPage() {
         setIsEmailConfirmed(Boolean(confirmed));
 
         const deliveryStore = useDeliveryStore.getState();
+        let savedDireccion = typeof perfil?.direccion === 'string' ? perfil.direccion.trim() : '';
+
+        if (!savedDireccion) {
+          const { data: ultimoPedido } = await supabase
+            .from('pedidos')
+            .select('direccion_entrega')
+            .eq('user_id', user.id)
+            .not('direccion_entrega', 'is', null)
+            .neq('direccion_entrega', '')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          if (!active) return;
+          if (typeof ultimoPedido?.direccion_entrega === 'string') {
+            savedDireccion = ultimoPedido.direccion_entrega.trim();
+          }
+        }
+
+        setProfileAddress(savedDireccion || null);
         deliveryStore.hydrateFromProfile({
           userId: user.id,
-          direccion: perfil?.direccion || null,
+          direccion: savedDireccion || null,
           latitud: typeof perfil?.latitud === 'number' ? perfil.latitud : null,
           longitud: typeof perfil?.longitud === 'number' ? perfil.longitud : null,
         });
@@ -87,7 +108,7 @@ export default function CheckoutPage() {
           nombre: perfil?.nombre || prev.nombre,
           cedula: perfil?.cedula || prev.cedula,
           telefono: perfil?.telefono || prev.telefono,
-          direccion: prev.direccion.trim() || updatedStore.direccion || perfil?.direccion || '',
+          direccion: prev.direccion.trim() || updatedStore.direccion || savedDireccion || '',
           zonaBarinas: updatedStore.zonaBarinas || prev.zonaBarinas,
           email: user.email || prev.email,
           latitud:
@@ -375,11 +396,11 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      {/* PASO 1: DATOS DEL CLIENTE Y ENTREGA */}
+      {/* PASO 1: DATOS DEL CLIENTE Y UBICACIÓN */}
       {currentStep === 1 && (
         <section className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
-            <h2 className="text-sm font-black text-slate-900">Datos y Entrega</h2>
+            <h2 className="text-sm font-black text-slate-900">1. Datos y Ubicación</h2>
             <span className="text-xs font-bold text-slate-500 tabular-nums">
               Subtotal: <strong className="text-slate-900">{formatUsd(baseTotals.subtotalUsd)}</strong>
             </span>
@@ -387,9 +408,25 @@ export default function CheckoutPage() {
 
           <CheckoutDeliveryForm
             deliveryData={deliveryData}
-            onChange={(updated) => setDeliveryData((prev) => ({ ...prev, ...updated }))}
+            onChange={(updated) => {
+              const store = useDeliveryStore.getState();
+              if (updated.tipoEntrega) store.setDeliveryType(updated.tipoEntrega);
+              if (updated.direccion !== undefined && updated.latitud === undefined) {
+                store.setManualAddress(updated.direccion);
+              }
+              if (updated.zonaBarinas !== undefined) {
+                store.clearGpsLocation();
+                store.setZoneWithFallbackCoords(updated.zonaBarinas, null, null);
+              }
+              if (typeof updated.latitud === 'number' && typeof updated.longitud === 'number') {
+                store.setGpsLocation(updated.latitud, updated.longitud, updated.direccion);
+              }
+              setDeliveryData((prev) => ({ ...prev, ...updated }));
+            }}
             deliveryQuote={deliveryQuote}
             bcvRate={bcvRate}
+            profileAddress={profileAddress}
+            storeAddress={storeConfig?.direccion_fisica}
           />
 
           <div className="pt-2 flex justify-end">
@@ -399,7 +436,7 @@ export default function CheckoutPage() {
               className="w-full sm:w-auto min-h-[46px] inline-flex items-center justify-center gap-2 rounded-full bg-catador-blue hover:bg-catador-blue-dark px-6 py-3 text-sm font-extrabold text-white shadow-sm transition-all cursor-pointer"
             >
               <span>Continuar al Pago</span>
-              <ArrowRight className="h-4 w-4" />
+              <ArrowRight className="h-4 w-4" strokeWidth={2} />
             </button>
           </div>
         </section>

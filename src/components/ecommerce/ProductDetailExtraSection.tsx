@@ -49,11 +49,11 @@ export function ProductDetailExtraSection({
 
           <div className="hidden sm:flex flex-wrap items-center gap-2 pt-3 border-t border-slate-100 text-xs font-bold text-slate-700">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7F8FA] border border-slate-200 px-3 py-1.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" />
+              <ShieldCheck className="h-4 w-4 text-emerald-600 shrink-0" strokeWidth={1.5}/>
               100% Original y Precintado
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F7F8FA] border border-slate-200 px-3 py-1.5">
-              <Truck className="h-4 w-4 text-catador-amber shrink-0" />
+              <Truck className="h-4 w-4 text-catador-amber shrink-0" strokeWidth={1.5}/>
               Motorizado hasta {maxBoxesMoto} {maxBoxesMoto === 1 ? 'caja' : 'cajas'} · Carga mayorista
             </span>
           </div>
@@ -69,7 +69,7 @@ export function ProductDetailExtraSection({
                 </p>
               </div>
               <span className="h-8 w-8 shrink-0 rounded-full bg-catador-amber-soft border border-catador-amber-oak/60 flex items-center justify-center text-catador-blue">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4" strokeWidth={1.5}/>
               </span>
             </div>
 
@@ -90,7 +90,7 @@ export function ProductDetailExtraSection({
           </div>
 
           <Link
-            href="/carrito#cotizar-delivery"
+            href="/checkout#cotizar-delivery"
             className="w-full min-h-[40px] flex items-center justify-center rounded-full border border-catador-blue text-catador-blue hover:bg-catador-blue hover:text-white text-xs font-extrabold transition-colors"
           >
             Cotizar delivery

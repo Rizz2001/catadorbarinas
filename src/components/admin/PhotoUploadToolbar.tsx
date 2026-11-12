@@ -39,7 +39,7 @@ export function PhotoUploadToolbar({
       {/* Zona Drag & Drop para Subida Masiva + Botón para formulario manual */}
       <section className="rounded-2xl border-2 border-dashed border-catador-blue/30 bg-blue-50/40 p-5 text-center space-y-3 hover:border-catador-blue transition-colors">
         <div className="h-11 w-11 rounded-full bg-catador-blue/10 text-catador-blue flex items-center justify-center mx-auto">
-          <Upload className="h-5 w-5" />
+          <Upload className="h-5 w-5" strokeWidth={1.5}/>
         </div>
         <div>
           <h2 className="text-sm font-black text-slate-900">
@@ -56,7 +56,7 @@ export function PhotoUploadToolbar({
 
         <div className="flex flex-wrap items-center justify-center gap-2.5">
           <label className="inline-flex items-center gap-2 rounded-xl bg-catador-blue hover:bg-catador-blue-light px-4 py-2.5 font-bold text-white text-xs shadow-xs transition-all cursor-pointer">
-            <Upload className="h-4 w-4" />
+            <Upload className="h-4 w-4" strokeWidth={1.5}/>
             <span>Subir Varias Fotos por Código</span>
             <input
               type="file"
@@ -73,19 +73,19 @@ export function PhotoUploadToolbar({
             onClick={() => setShowManualForm((prev) => !prev)}
             className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 px-3.5 py-2.5 font-bold text-slate-700 text-xs transition-all cursor-pointer"
           >
-            <PlusCircle className="h-4 w-4 text-catador-amber" />
+            <PlusCircle className="h-4 w-4 text-catador-amber" strokeWidth={1.5}/>
             <span>Asignar por Código Manual</span>
             {showManualForm ? (
-              <ChevronUp className="h-3.5 w-3.5 text-slate-400" />
+              <ChevronUp className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             ) : (
-              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+              <ChevronDown className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
             )}
           </button>
         </div>
 
         {uploadProgress && (
           <div className="flex items-center justify-center gap-2 text-xs font-bold text-catador-blue pt-1">
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             <span>{uploadProgress}</span>
           </div>
         )}
@@ -146,9 +146,9 @@ export function PhotoUploadToolbar({
             className="flex items-center gap-2 rounded-xl bg-catador-amber hover:bg-catador-amber-dark font-extrabold text-white px-5 py-2.5 text-xs transition-colors cursor-pointer"
           >
             {uploading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
             ) : (
-              <Upload className="h-4 w-4" />
+              <Upload className="h-4 w-4" strokeWidth={1.5}/>
             )}
             <span>Subir y Vincular Foto</span>
           </button>

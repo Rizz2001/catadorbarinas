@@ -1,14 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
 import { X, Trash2, ShoppingBag, AlertTriangle } from 'lucide-react';
 import { useCartStore } from '@/store/useCartStore';
 import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { useCartTotals } from '@/hooks/useCartTotals';
-import { useCartUserLocation } from '@/hooks/useCartUserLocation';
-import { convertUsdToVes } from '@/lib/currency';
-import { calculateSmartDeliveryQuote } from '@/lib/delivery';
 import { IMAGE_FALLBACKS } from '@/constants/config';
 import { CartDrawerItemRow } from '@/components/cart/CartDrawerItemRow';
 import { CartDrawerFooter } from '@/components/cart/CartDrawerFooter';
@@ -30,36 +26,6 @@ export function CartDrawer() {
   const storeConfig = useStoreConfigStore((state) => state.config);
   const cmsLogo = storeConfig?.logo_url || IMAGE_FALLBACKS.product;
 
-  const { isAuthenticated, profileAddress, userLocation } = useCartUserLocation(isOpen);
-  const [showAuthSheet, setShowAuthSheet] = useState(false);
-
-  const deliveryQuote = useMemo(
-    () =>
-      calculateSmartDeliveryQuote({
-        items,
-        subtotalUsd: totals.subtotalUsd,
-        deliveryType: userLocation.deliveryType,
-        userLat: userLocation.latitud ?? null,
-        userLng: userLocation.longitud ?? null,
-        zonaBarinas: userLocation.zonaBarinas,
-        storeConfig,
-      }),
-    [
-      items,
-      totals.subtotalUsd,
-      userLocation.deliveryType,
-      userLocation.latitud,
-      userLocation.longitud,
-      userLocation.zonaBarinas,
-      storeConfig,
-    ]
-  );
-
-  const totalConDeliveryUsd = Number((totals.subtotalUsd + deliveryQuote.shippingUsd).toFixed(2));
-  const totalConDeliveryVes = Number(
-    (totals.subtotalVes + convertUsdToVes(deliveryQuote.shippingUsd, bcvRate)).toFixed(2)
-  );
-
   if (!isOpen) return null;
 
   return (
@@ -77,7 +43,7 @@ export function CartDrawer() {
 
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
             <div className="flex items-center gap-2.5">
-              <ShoppingBag className="h-5 w-5 text-catador-blue" />
+              <ShoppingBag className="h-5 w-5 text-catador-blue" strokeWidth={1.5}/>
               <div className="flex items-baseline gap-2">
                 <h2 className="text-sm sm:text-base font-black text-slate-900 leading-tight">
                   Carrito ({totals.itemCount})
@@ -95,7 +61,7 @@ export function CartDrawer() {
                   onClick={clearCart}
                   className="px-2.5 py-1.5 rounded-full text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-1 transition-colors cursor-pointer"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5}/>
                   <span>Vaciar</span>
                 </button>
               )}
@@ -105,14 +71,14 @@ export function CartDrawer() {
                 aria-label="Cerrar carrito"
                 className="p-2 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                <X className="h-5 w-5" />
+                <X className="h-5 w-5" strokeWidth={1.5}/>
               </button>
             </div>
           </div>
 
           {lastStockWarning && (
             <div className="mx-4 mt-3 p-2.5 rounded-xl bg-catador-amber-soft/70 flex items-center gap-2 text-xs font-semibold text-[#8B3E03]">
-              <AlertTriangle className="h-4 w-4 text-catador-amber shrink-0" />
+              <AlertTriangle className="h-4 w-4 text-catador-amber shrink-0" strokeWidth={1.5}/>
               <span>{lastStockWarning}</span>
             </div>
           )}
@@ -120,7 +86,7 @@ export function CartDrawer() {
           <div className="flex-1 overflow-y-auto px-4 divide-y divide-gray-100 bg-white">
             {items.length === 0 ? (
               <div className="h-full py-12 flex flex-col items-center justify-center text-center text-slate-500">
-                <ShoppingBag className="h-14 w-14 stroke-1 mb-3 text-slate-300" />
+                <ShoppingBag className="h-14 w-14 stroke-1 mb-3 text-slate-300" strokeWidth={1.5}/>
                 <p className="text-sm font-extrabold text-slate-800">Tu carrito está vacío</p>
                 <p className="text-xs text-slate-500 mt-1 max-w-xs">
                   Agrega productos por unidad o por caja para ver tu cotización bimonetaria.
@@ -152,21 +118,6 @@ export function CartDrawer() {
             <CartDrawerFooter
               totals={totals}
               bcvRate={bcvRate}
-              deliveryType={userLocation.deliveryType}
-              shippingUsd={deliveryQuote.shippingUsd}
-              tierBadge={
-                userLocation.deliveryType === 'pickup'
-                  ? 'Pick-Up'
-                  : userLocation.latitud
-                  ? `${deliveryQuote.tierBadge || 'Barinas'} · ${deliveryQuote.distanceKm} km`
-                  : deliveryQuote.tierBadge || 'Barinas'
-              }
-              totalConDeliveryUsd={totalConDeliveryUsd}
-              totalConDeliveryVes={totalConDeliveryVes}
-              isAuthenticated={isAuthenticated}
-              profileAddress={profileAddress}
-              showAuthSheet={showAuthSheet && !isAuthenticated}
-              onShowAuthSheet={setShowAuthSheet}
               onCloseCart={closeCart}
             />
           )}

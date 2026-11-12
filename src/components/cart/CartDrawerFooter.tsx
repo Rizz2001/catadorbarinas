@@ -2,92 +2,47 @@
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
-import { CartTotals } from '@/types';
-import { CartAuthBottomSheet } from './CartAuthBottomSheet';
-import { CartDeliveryAddressBox } from './CartDeliveryAddressBox';
 import { CartPriceSummaryRows } from './CartPriceSummaryRows';
 
 interface CartDrawerFooterProps {
-  totals: CartTotals;
+  totals: {
+    subtotalUsd: number;
+    subtotalVes: number;
+    discountUsd: number;
+    discountVes: number;
+  };
   bcvRate: number;
-  deliveryType: 'delivery' | 'pickup';
-  shippingUsd: number;
-  tierBadge: string;
-  totalConDeliveryUsd: number;
-  totalConDeliveryVes: number;
-  isAuthenticated: boolean;
-  profileAddress?: string | null;
-  showAuthSheet: boolean;
-  onShowAuthSheet: (val: boolean) => void;
   onCloseCart: () => void;
 }
 
+/**
+ * Pie fijo (sticky) del cajón del carrito: muestra solo costos de productos y redirige directo a /checkout.
+ */
 export function CartDrawerFooter({
   totals,
   bcvRate,
-  deliveryType,
-  shippingUsd,
-  tierBadge,
-  totalConDeliveryUsd,
-  totalConDeliveryVes,
-  isAuthenticated,
-  profileAddress,
-  showAuthSheet,
-  onShowAuthSheet,
   onCloseCart,
 }: CartDrawerFooterProps) {
-  if (showAuthSheet && !isAuthenticated) {
-    return (
-      <CartAuthBottomSheet
-        onCloseCart={onCloseCart}
-        onDismissSheet={() => onShowAuthSheet(false)}
-      />
-    );
-  }
-
-  const deliveryLabel =
-    deliveryType === 'pickup' ? 'Retiro Pick-Up' : `Delivery (${tierBadge})`;
-
   return (
-    <div className="px-4 pt-3.5 pb-[calc(1rem+env(safe-area-inset-bottom))] border-t border-gray-100 bg-white space-y-3.5">
-      <CartDeliveryAddressBox
-        isAuthenticated={isAuthenticated}
-        profileAddress={profileAddress}
-        variant="drawer"
-        onNavigate={onCloseCart}
-      />
-
+    <div className="sticky bottom-0 shrink-0 border-t border-gray-100 bg-white px-4 py-3.5 sm:px-5 sm:py-4 space-y-3.5 shadow-[0_-6px_24px_-10px_rgba(15,23,42,0.1)]">
       <CartPriceSummaryRows
         subtotalUsd={totals.subtotalUsd}
         subtotalVes={totals.subtotalVes}
         discountUsd={totals.discountUsd}
         discountVes={totals.discountVes}
-        deliveryLabel={deliveryLabel}
-        shippingUsd={shippingUsd}
         bcvRate={bcvRate}
-        totalUsd={totalConDeliveryUsd}
-        totalVes={totalConDeliveryVes}
+        totalUsd={totals.subtotalUsd}
+        totalVes={totals.subtotalVes}
       />
 
-      {isAuthenticated ? (
-        <Link
-          href="/checkout"
-          onClick={onCloseCart}
-          className="group w-full min-h-[46px] flex items-center justify-center gap-2 rounded-full bg-[#0F172A] hover:bg-[#001754] active:scale-[0.98] py-3 text-sm font-extrabold text-white transition-all"
-        >
-          <span>Ir a pagar</span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Link>
-      ) : (
-        <button
-          type="button"
-          onClick={() => onShowAuthSheet(true)}
-          className="group w-full min-h-[46px] flex items-center justify-center gap-2 rounded-full bg-[#0F172A] hover:bg-[#001754] active:scale-[0.98] py-3 text-sm font-extrabold text-white transition-all cursor-pointer"
-        >
-          <span>Ir a pagar</span>
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </button>
-      )}
+      <Link
+        href="/checkout"
+        onClick={onCloseCart}
+        className="w-full min-h-[48px] px-5 rounded-full bg-catador-navy hover:bg-catador-blue text-white font-extrabold text-sm flex items-center justify-center gap-2 transition-colors active:scale-[0.99]"
+      >
+        <span>Ir a pagar</span>
+        <ArrowRight className="h-4 w-4" strokeWidth={2} />
+      </Link>
     </div>
   );
 }

@@ -46,7 +46,7 @@ export function BottomNav() {
             >
               <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-catador-amber text-white font-black text-xs">
                 {itemCount}
-                <ChevronUp className="h-3 w-3 absolute -top-1 -right-1 rounded-full bg-catador-blue-dark text-catador-amber-oak" />
+                <ChevronUp className="h-3 w-3 absolute -top-1 -right-1 rounded-full bg-catador-blue-dark text-catador-amber-oak" strokeWidth={1.5}/>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline gap-1.5 tabular-nums">
@@ -68,7 +68,7 @@ export function BottomNav() {
               className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-catador-blue hover:bg-catador-blue-light border border-white/15 px-4 py-2.5 text-xs font-extrabold text-white active:scale-95 transition-all"
             >
               <span>Pagar</span>
-              <ArrowRight className="h-3.5 w-3.5" />
+              <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.5}/>
             </Link>
           </div>
         </div>
@@ -94,11 +94,11 @@ export function BottomNav() {
                   className={cn(
                     'relative flex items-center justify-center transition-all duration-150',
                     isActive
-                      ? 'h-9 w-9 rounded-[14px_14px_14px_4px] bg-catador-blue text-white shadow-xs'
-                      : 'h-8 w-8 text-slate-500'
+                      ? 'h-9 w-10 rounded-[14px_14px_14px_4px] bg-catador-blue text-white shadow-xs'
+                      : 'h-9 w-9 text-slate-500'
                   )}
                 >
-                  <Icon className="h-[18px] w-[18px]" />
+                  <Icon className="w-6 h-6" strokeWidth={isActive ? 2 : 1.5} />
                   {item.isCart && itemCount > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-catador-discount text-[10px] font-black text-white tabular-nums">
                       {itemCount > 99 ? '99+' : itemCount}

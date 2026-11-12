@@ -1,32 +1,13 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
-import {
-  Wine,
-  ShoppingBasket,
-  Sandwich,
-  Cookie,
-  CupSoda,
-  Snowflake,
-  ChevronRight,
-  Plus,
-} from 'lucide-react';
-import { QuickCategory } from '@/types';
+import { ChevronRight, Plus } from 'lucide-react';
+import { CategoryPillNode } from '@/types';
+import { DynamicLucideIcon } from '@/components/ui';
 
 interface QuickCategoriesStripProps {
-  categories: QuickCategory[];
+  categories: CategoryPillNode[];
 }
-
-const ICON_MAP: Record<string, React.ElementType> = {
-  Wine,
-  CupSoda,
-  ShoppingBasket,
-  Cookie,
-  Sandwich,
-  Snowflake,
-  Sparkles: Snowflake,
-};
 
 const RIBBON_ACCENTS = [
   'bg-[#0F172A] text-[#0F172A] border-[#0F172A]',
@@ -35,75 +16,19 @@ const RIBBON_ACCENTS = [
   'bg-[#B6683E] text-[#8B3E03] border-[#B6683E]',
 ];
 
-const DEFAULT_QUICK_CATEGORIES: QuickCategory[] = [
-  {
-    id: 'cat-whisky',
-    nombre: 'Whisky & Ron',
-    descripcion: 'Escoceses y reservas',
-    icono: 'Wine',
-    url: '/catalogo/01',
-    orden: 1,
-    activo: true,
-  },
-  {
-    id: 'cat-cervezas',
-    nombre: 'Cervezas',
-    descripcion: 'Polar, Solera y Corona',
-    icono: 'CupSoda',
-    url: '/catalogo/09',
-    orden: 2,
-    activo: true,
-  },
-  {
-    id: 'cat-vinos',
-    nombre: 'Vinos & Cavas',
-    descripcion: 'Tintos, blancos y espumosos',
-    icono: 'Wine',
-    url: '/catalogo/01/04',
-    orden: 3,
-    activo: true,
-  },
-  {
-    id: 'cat-refrescos',
-    nombre: 'Refrescos & Agua',
-    descripcion: 'Bebidas y mezcladores',
-    icono: 'CupSoda',
-    url: '/catalogo/02',
-    orden: 4,
-    activo: true,
-  },
-  {
-    id: 'cat-despensa',
-    nombre: 'Despensa & Snacks',
-    descripcion: 'Víveres y confitería',
-    icono: 'ShoppingBasket',
-    url: '/catalogo/11',
-    orden: 5,
-    activo: true,
-  },
-  {
-    id: 'cat-hielo',
-    nombre: 'Hielo & Carbón',
-    descripcion: 'Listos para tu evento',
-    icono: 'Snowflake',
-    url: '/catalogo/03',
-    orden: 6,
-    activo: true,
-  },
-];
-
 export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) {
-  const activeCategories =
-    categories && categories.length > 0 ? categories : DEFAULT_QUICK_CATEGORIES;
+  const activeCategories = categories.filter(
+    (cat) => (cat.show_on_homepage ?? cat.activo) !== false
+  );
+  if (activeCategories.length === 0) return null;
 
   return (
     <nav aria-label="Departamentos Principales">
-      {/* Móvil: Carrusel horizontal compacto con cintillo inferior '+' */}
       <div className="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pb-1 scrollbar-none sm:hidden">
         {activeCategories.map((cat, idx) => {
-          const Icon = ICON_MAP[cat.icono] || Wine;
           const accent = RIBBON_ACCENTS[idx % RIBBON_ACCENTS.length];
           const [bgClass, textClass, borderClass] = accent.split(' ');
+          const iconName = cat.icon_name || cat.icono;
           return (
             <Link
               key={cat.id || cat.nombre}
@@ -112,7 +37,12 @@ export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) 
             >
               <div className="flex-1 flex flex-col items-center justify-center p-2.5 text-center">
                 <div className="h-10 w-10 rounded-full bg-[#FEF3C7]/80 border border-[#EB9C53]/50 flex items-center justify-center text-[#8B3E03]">
-                  <Icon className="h-4.5 w-4.5" />
+                  <DynamicLucideIcon
+                    name={iconName}
+                    fallback="Wine"
+                    className="w-5 h-5"
+                    strokeWidth={1.5}
+                  />
                 </div>
               </div>
 
@@ -124,7 +54,7 @@ export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) 
                   className={`inline-flex items-center justify-center px-2.5 py-1.5 text-white ${bgClass}`}
                   style={{ clipPath: 'polygon(22% 0, 100% 0, 100% 100%, 0 100%)' }}
                 >
-                  <Plus className="h-3 w-3 stroke-[3]" />
+                  <Plus className="w-3 h-3" strokeWidth={2} />
                 </span>
               </div>
             </Link>
@@ -132,26 +62,30 @@ export function QuickCategoriesStrip({ categories }: QuickCategoriesStripProps) 
         })}
       </div>
 
-      {/* Desktop / Tablet: Píldoras horizontales en una sola línea estilo Opción C */}
       <div className="hidden sm:flex items-center justify-center gap-2.5 lg:gap-3.5 overflow-x-auto no-scrollbar pt-1">
-        {activeCategories.map((cat) => {
-          const Icon = ICON_MAP[cat.icono] || Wine;
-          return (
-            <Link
-              key={cat.id || cat.nombre}
-              href={cat.url}
-              className="group inline-flex items-center gap-2 rounded-full bg-white pl-1.5 pr-3.5 py-1.5 border border-slate-200 shadow-2xs hover:border-[#0F172A] transition-all duration-150 shrink-0"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] border border-[#EB9C53]/60 text-[#8B3E03] group-hover:bg-[#0F172A] group-hover:text-white group-hover:border-[#0F172A] transition-colors duration-150">
-                <Icon className="h-4 w-4" />
-              </div>
-              <span className="text-[13px] font-extrabold text-slate-900 group-hover:text-[#0F172A] whitespace-nowrap">
-                {cat.nombre}
-              </span>
-              <ChevronRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-[#0F172A] shrink-0 transition-colors" />
-            </Link>
-          );
-        })}
+        {activeCategories.map((cat) => (
+          <Link
+            key={cat.id || cat.nombre}
+            href={cat.url}
+            className="group inline-flex items-center gap-2 rounded-full bg-white pl-1.5 pr-3.5 py-1.5 border border-slate-200 shadow-2xs hover:border-[#0F172A] transition-all duration-150 shrink-0"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FEF3C7] border border-[#EB9C53]/60 text-[#8B3E03] group-hover:bg-[#0F172A] group-hover:text-white group-hover:border-[#0F172A] transition-colors duration-150">
+              <DynamicLucideIcon
+                name={cat.icon_name || cat.icono}
+                fallback="Wine"
+                className="w-4 h-4"
+                strokeWidth={1.5}
+              />
+            </div>
+            <span className="text-[13px] font-extrabold text-slate-900 group-hover:text-[#0F172A] whitespace-nowrap">
+              {cat.nombre}
+            </span>
+            <ChevronRight
+              className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F172A] shrink-0 transition-colors"
+              strokeWidth={1.5}
+            />
+          </Link>
+        ))}
       </div>
     </nav>
   );

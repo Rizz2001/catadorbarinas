@@ -119,7 +119,7 @@ export function AdminOrderQueue({
           <div className="p-6">
             <EmptyState
               isCompact
-              icon={<Inbox className="h-8 w-8 text-slate-400" />}
+              icon={<Inbox className="h-8 w-8 text-slate-400" strokeWidth={1.5}/>}
               title="Sin órdenes en este estado"
               description="Cambia el filtro superior o limpia la búsqueda para ver otras órdenes."
             />
@@ -147,7 +147,7 @@ export function AdminOrderQueue({
                   <div className="flex items-center gap-1.5">
                     {hasUnread && (
                       <span className="flex items-center gap-1 rounded-md bg-catador-discount px-2 py-0.5 text-xs font-black text-white animate-pulse">
-                        <MessageSquare className="h-3 w-3" />
+                        <MessageSquare className="h-3 w-3" strokeWidth={1.5}/>
                         <span>{order.mensajes_no_leidos}</span>
                       </span>
                     )}
@@ -166,11 +166,11 @@ export function AdminOrderQueue({
 
                 <div className="flex items-center justify-between text-xs text-slate-500 pt-0.5 tabular-nums">
                   <span className="flex items-center gap-1 font-medium">
-                    <Clock className="h-3.5 w-3.5 text-slate-400" />
+                    <Clock className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5}/>
                     {getMinutesAgo(order.created_at)}
                   </span>
                   <span className="flex items-center gap-1 font-bold text-slate-700">
-                    <MapPin className="h-3.5 w-3.5 text-catador-amber" />
+                    <MapPin className="h-3.5 w-3.5 text-catador-amber" strokeWidth={1.5}/>
                     {order.tipo_entrega === 'delivery' ? 'Delivery' : 'Pick-Up'}
                   </span>
                 </div>

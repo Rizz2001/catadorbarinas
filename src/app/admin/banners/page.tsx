@@ -175,7 +175,7 @@ export default function AdminBannersPage() {
   if (loading) {
     return (
       <div className="p-8 flex items-center justify-center min-h-[50vh] gap-3">
-        <Loader2 className="h-6 w-6 animate-spin text-catador-blue" />
+        <Loader2 className="h-6 w-6 animate-spin text-catador-blue" strokeWidth={1.5}/>
         <span className="text-xs font-bold text-slate-500">
           Cargando Banners y Promociones...
         </span>
@@ -207,12 +207,12 @@ export default function AdminBannersPage() {
           <SegmentedControlItem
             value="banners"
             label="Banners & Promociones"
-            icon={<LayoutTemplate className="h-3.5 w-3.5" />}
+            icon={<LayoutTemplate className="h-3.5 w-3.5" strokeWidth={1.5}/>}
           />
           <SegmentedControlItem
             value="quick_categories"
             label="Categorías Rápidas (6)"
-            icon={<Grid className="h-3.5 w-3.5" />}
+            icon={<Grid className="h-3.5 w-3.5" strokeWidth={1.5}/>}
           />
         </SegmentedControl>
       </div>
@@ -230,22 +230,22 @@ export default function AdminBannersPage() {
             <Tab
               value="hero"
               label="Hero Principal Superior"
-              icon={<LayoutTemplate className="h-3.5 w-3.5" />}
+              icon={<LayoutTemplate className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             />
             <Tab
               value="promo_1"
               label="Promo 1: Whiskies Escoceses"
-              icon={<Wine className="h-3.5 w-3.5" />}
+              icon={<Wine className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             />
             <Tab
               value="promo_2"
               label="Promo 2: Cervezas & Refrescos"
-              icon={<Tag className="h-3.5 w-3.5" />}
+              icon={<Tag className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             />
             <Tab
               value="promo_3"
               label="Promo 3: Víveres & Despensa"
-              icon={<ShoppingBag className="h-3.5 w-3.5" />}
+              icon={<ShoppingBag className="h-3.5 w-3.5" strokeWidth={1.5}/>}
             />
           </TabList>
 
@@ -261,7 +261,7 @@ export default function AdminBannersPage() {
 
           <section className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-              <Eye className="h-4 w-4 text-catador-blue" />
+              <Eye className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
               <span>Vista Previa en Vivo ({activeSlot.toUpperCase()})</span>
             </div>
             {activeSlot === 'hero' ? (
@@ -502,7 +502,7 @@ export default function AdminBannersPage() {
                 label={`Guardar Banner (${activeSlot})`}
                 variant="primary"
                 size="lg"
-                icon={<Save className="h-4 w-4" />}
+                icon={<Save className="h-4 w-4" strokeWidth={1.5}/>}
                 isLoading={saving}
               />
             </div>

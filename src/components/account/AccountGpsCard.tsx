@@ -44,7 +44,7 @@ export function AccountGpsCard({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div>
           <span className="text-xs font-black text-slate-900 flex items-center gap-1.5">
-            <Navigation className="h-4 w-4 text-catador-blue" />
+            <Navigation className="h-4 w-4 text-catador-blue" strokeWidth={1.5}/>
             <span>Ubicación Satelital GPS y Tarifa</span>
           </span>
           <p className="text-xs text-slate-600 mt-0.5">
@@ -60,12 +60,12 @@ export function AccountGpsCard({
         >
           {locatingGps ? (
             <>
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" strokeWidth={1.5}/>
               <span>Obteniendo GPS...</span>
             </>
           ) : (
             <>
-              <Crosshair className="h-4 w-4" />
+              <Crosshair className="h-4 w-4" strokeWidth={1.5}/>
               <span>{hasExactGps ? 'Recotizar delivery (GPS)' : 'Cotizar delivery'}</span>
             </>
           )}
@@ -75,7 +75,7 @@ export function AccountGpsCard({
       {quoteInfo && distanceKm !== null && (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white border border-slate-200 px-3.5 py-2.5 text-xs tabular-nums">
           <div className="flex items-center gap-2">
-            <Truck className="h-4 w-4 text-catador-blue shrink-0" />
+            <Truck className="h-4 w-4 text-catador-blue shrink-0" strokeWidth={1.5}/>
             <div>
               <span className="font-extrabold text-slate-900">
                 {quoteInfo.tierBadge} · {distanceKm} km
@@ -111,7 +111,7 @@ export function AccountGpsCard({
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 text-xs font-extrabold text-catador-blue hover:underline"
             >
-              <ExternalLink className="h-3.5 w-3.5" />
+              <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5}/>
               <span>Ver en Google Maps</span>
             </a>
             <button

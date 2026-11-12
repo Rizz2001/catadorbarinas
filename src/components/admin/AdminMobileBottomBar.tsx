@@ -37,7 +37,7 @@ export function AdminMobileBottomBar({
                 item.active ? 'text-catador-amber-oak font-black' : 'text-slate-400 hover:text-slate-200'
               )}
             >
-              <Icon className="h-5 w-5 shrink-0" />
+              <Icon className="h-5 w-5 shrink-0" strokeWidth={1.5}/>
               <span className="text-[10px] font-bold mt-1 leading-none">{item.label}</span>
             </Link>
           );
@@ -48,7 +48,7 @@ export function AdminMobileBottomBar({
           onClick={onOpenDrawer}
           className="flex flex-col items-center justify-center h-full min-h-[48px] rounded-lg text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
         >
-          <Menu className="h-5 w-5 shrink-0" />
+          <Menu className="h-5 w-5 shrink-0" strokeWidth={1.5}/>
           <span className="text-[10px] font-bold mt-1 leading-none">Más</span>
         </button>
       </div>

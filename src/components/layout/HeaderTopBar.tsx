@@ -27,14 +27,14 @@ export function HeaderTopBar() {
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 text-[13px] sm:text-sm text-slate-700 min-w-0 flex-1 truncate">
           <span className="inline-flex items-center gap-1.5 truncate font-semibold text-slate-800">
-            <MapPin className="h-3.5 w-3.5 text-catador-amber shrink-0" />
+            <MapPin className="h-3.5 w-3.5 text-catador-amber shrink-0" strokeWidth={1.5}/>
             <span className="truncate">
               {storeConfig?.direccion_fisica || `${APP_CONFIG.city}, ${APP_CONFIG.country}`}
             </span>
           </span>
           <span className="hidden md:inline text-slate-300">·</span>
           <span className="hidden md:inline-flex items-center gap-1.5 shrink-0 text-slate-700 font-semibold tabular-nums">
-            <Phone className="h-3.5 w-3.5 text-catador-blue shrink-0" />
+            <Phone className="h-3.5 w-3.5 text-catador-blue shrink-0" strokeWidth={1.5}/>
             <span>{storeConfig?.telefono_atencion || APP_CONFIG.phone}</span>
           </span>
         </div>
@@ -52,7 +52,7 @@ export function HeaderTopBar() {
               'h-3 w-3 text-white transition-transform shrink-0',
               isLoading && 'animate-spin'
             )}
-          />
+          strokeWidth={1.5}/>
         </button>
 
         <span className="hidden lg:inline-flex items-center gap-2 text-xs font-bold text-slate-600">

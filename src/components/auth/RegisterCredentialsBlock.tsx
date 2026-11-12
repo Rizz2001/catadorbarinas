@@ -24,7 +24,7 @@ export function RegisterCredentialsBlock({
       <div>
         <label className="block font-extrabold text-slate-700 mb-1.5">Correo Electrónico *</label>
         <div className="relative">
-          <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+          <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
           <input
             type="email"
             required
@@ -41,7 +41,7 @@ export function RegisterCredentialsBlock({
         <div>
           <label className="block font-extrabold text-slate-700 mb-1.5">Contraseña *</label>
           <div className="relative">
-            <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+            <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
             <input
               type={showPassword ? 'text' : 'password'}
               required
@@ -58,7 +58,7 @@ export function RegisterCredentialsBlock({
               className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
               aria-label="Mostrar u ocultar contraseña"
             >
-              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showPassword ? <EyeOff className="h-4 w-4" strokeWidth={1.5}/> : <Eye className="h-4 w-4" strokeWidth={1.5}/>}
             </button>
           </div>
         </div>
@@ -66,7 +66,7 @@ export function RegisterCredentialsBlock({
         <div>
           <label className="block font-extrabold text-slate-700 mb-1.5">Confirmar Contraseña *</label>
           <div className="relative">
-            <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+            <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" strokeWidth={1.5}/>
             <input
               type={showConfirmPassword ? 'text' : 'password'}
               required
@@ -83,7 +83,7 @@ export function RegisterCredentialsBlock({
               className="absolute right-3.5 top-3 text-slate-400 hover:text-slate-700 p-1 cursor-pointer"
               aria-label="Mostrar u ocultar confirmación"
             >
-              {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              {showConfirmPassword ? <EyeOff className="h-4 w-4" strokeWidth={1.5}/> : <Eye className="h-4 w-4" strokeWidth={1.5}/>}
             </button>
           </div>
         </div>

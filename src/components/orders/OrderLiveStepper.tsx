@@ -73,7 +73,7 @@ export function OrderLiveStepper({ estado }: OrderLiveStepperProps) {
                     : 'bg-slate-200 text-slate-400'
                 )}
               >
-                {isDone ? <CheckCircle2 className="h-5 w-5" /> : <Icon className="h-5 w-5" />}
+                {isDone ? <CheckCircle2 className="h-5 w-5" strokeWidth={1.5}/> : <Icon className="h-5 w-5" strokeWidth={1.5}/>}
               </div>
               <span className={cn('text-xs font-bold', isCurrent ? 'text-slate-900' : isDone ? 'text-emerald-900' : 'text-slate-400')}>
                 {step.label}
