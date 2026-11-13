@@ -3,7 +3,6 @@
 import React from 'react';
 import { Clock, MessageSquare, MapPin, Inbox } from 'lucide-react';
 import { Badge } from '@astryxdesign/core/Badge';
-import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { PedidoConDetalles, EstadoPedido } from '@/types';
 import { formatUsd } from '@/lib/currency';
@@ -73,8 +72,8 @@ export function AdminOrderQueue({
   });
 
   return (
-    <div className="flex flex-col h-[calc(100vh-16rem)] min-h-[460px] lg:h-[calc(100vh-14rem)] lg:min-h-[520px] lg:max-h-[720px] rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-sm">
-      <div className="p-3.5 border-b border-slate-200 bg-slate-50 space-y-2.5">
+    <div className="flex flex-col h-[calc(100vh-240px)] min-h-[480px] xl:h-[calc(100vh-220px)] rounded-2xl border border-slate-200/90 bg-white overflow-hidden shadow-sm">
+      <div className="p-3.5 border-b border-slate-200 bg-slate-50 space-y-2.5 shrink-0">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-black text-slate-900 tabular-nums">
             Cola de Órdenes ({orders.length})
@@ -87,30 +86,33 @@ export function AdminOrderQueue({
           placeholder="Buscar por cliente, #orden o cédula..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full min-h-[44px] rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-catador-blue focus:ring-2 focus:ring-catador-blue/15"
+          className="w-full min-h-[44px] rounded-full border border-slate-200 bg-white px-4 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0F172A] focus:ring-2 focus:ring-[#0F172A]/15"
         />
 
-        <div className="overflow-x-auto pb-0.5 no-scrollbar tabular-nums">
-          <SegmentedControl
-            size="sm"
-            label="Filtrar órdenes por estado"
-            value={statusFilter}
-            onChange={(val) => setStatusFilter(val as FilterTab)}
-          >
-            {tabs.map((tab) => {
-              const count =
-                tab.key === 'todos'
-                  ? orders.length
-                  : orders.filter((o) => o.estado_pedido === tab.key).length;
-              return (
-                <SegmentedControlItem
-                  key={tab.key}
-                  value={tab.key}
-                  label={`${tab.label} (${count})`}
-                />
-              );
-            })}
-          </SegmentedControl>
+        <div className="flex overflow-x-auto scrollbar-none no-scrollbar gap-1.5 pb-1 tabular-nums">
+          {tabs.map((tab) => {
+            const count =
+              tab.key === 'todos'
+                ? orders.length
+                : orders.filter((o) => o.estado_pedido === tab.key).length;
+            const isActive = statusFilter === tab.key;
+
+            return (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setStatusFilter(tab.key)}
+                className={cn(
+                  'shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer',
+                  isActive
+                    ? 'bg-[#0F172A] text-white shadow-xs'
+                    : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                )}
+              >
+                {tab.label} ({count})
+              </button>
+            );
+          })}
         </div>
       </div>
 

@@ -28,3 +28,11 @@
   --radius-container: 16px;
 }
 
+/* Evitar que el reset de Astryx fuerce color oscuro sobre encabezados/párrafos
+   dentro de contenedores oscuros con .text-white (ej. Chat en Vivo #0F172A). */
+@layer reset {
+  [data-astryx-theme="neutral"] .text-white :where(h1, h2, h3, h4, h5, h6, p, small) {
+    color: inherit;
+  }
+}
+
