@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { StoreConfig } from '@/types';
-import { APP_CONFIG } from '@/constants/config';
+import { APP_CONFIG, OFFICIAL_LOGO_PATH } from '@/constants/config';
 import { MOCK_HOME_CMS_RESPONSE } from '@/constants/home-cms.mock';
 import { getStoreConfig, updateStoreConfig as updateStoreConfigService } from '@/services/cms.service';
 
@@ -38,7 +38,7 @@ export const DEFAULT_STORE_CONFIG: StoreConfig = {
   transferencia_tipo_cuenta: 'Cuenta Corriente',
   bcv_tasa_manual: null,
   bcv_usar_manual: false,
-  logo_url: '/logo-catador.svg',
+  logo_url: OFFICIAL_LOGO_PATH,
   logo_alto_px: 44,
   logo_ancho_px: 200,
   catalogo_titulo: 'Catálogo General Bodegón',

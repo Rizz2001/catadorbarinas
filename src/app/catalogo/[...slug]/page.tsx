@@ -8,6 +8,7 @@ import {
 } from '@/services/foxdata.service';
 import { CatalogBrowser } from '@/components/catalog';
 import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
+import { OFFICIAL_LOGO_VERSIONED, OFFICIAL_OG_IMAGE } from '@/constants/config';
 
 export const revalidate = 60;
 
@@ -43,11 +44,13 @@ export async function generateMetadata({ params }: CatalogGroupPageProps): Promi
     openGraph: {
       title,
       description,
+      images: [{ ...OFFICIAL_OG_IMAGE }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
+      images: [OFFICIAL_LOGO_VERSIONED],
     },
   };
 }

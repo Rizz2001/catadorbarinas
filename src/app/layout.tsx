@@ -8,6 +8,11 @@ import {
   CookieConsentBanner,
 } from '@/components/layout';
 import { getStoreConfigServer } from '@/services/cms.server';
+import {
+  APP_CONFIG,
+  OFFICIAL_LOGO_VERSIONED,
+  OFFICIAL_OG_IMAGE,
+} from '@/constants/config';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -19,10 +24,12 @@ export const viewport: Viewport = {
 
 export async function generateMetadata(): Promise<Metadata> {
   const storeConfig = await getStoreConfigServer();
-  const storeName = storeConfig?.nombre_tienda || 'EL CATADOR.';
-  const iconUrl = storeConfig?.logo_url || '/icon-catador.png';
+  const storeName = storeConfig?.nombre_tienda || APP_CONFIG.name;
+  const ogDescription =
+    'Compra por unidad o caja cerrada con inventario en tiempo real y precios duales ($ USD y Bs. BCV). Delivery express en Barinas.';
 
   return {
+    metadataBase: new URL(APP_CONFIG.siteUrl),
     title: {
       default: storeName,
       template: `%s | ${storeName}`,
@@ -30,12 +37,9 @@ export async function generateMetadata(): Promise<Metadata> {
     description:
       'Tienda online oficial de EL CATADOR. en Barinas. Compra licores, cervezas, refrescos, hielo y víveres por unidad o por caja con precios en $ USD y Bs. BCV. Cálculo automático de delivery por GPS en tiempo real.',
     icons: {
-      icon: [
-        { url: '/icon-catador.png', type: 'image/png' },
-        { url: iconUrl },
-      ],
-      shortcut: '/icon-catador.png',
-      apple: '/icon-catador.png',
+      icon: [{ url: OFFICIAL_LOGO_VERSIONED, type: 'image/png' }],
+      shortcut: [OFFICIAL_LOGO_VERSIONED],
+      apple: [{ url: OFFICIAL_LOGO_VERSIONED, type: 'image/png' }],
     },
     keywords: [
       'EL CATADOR.',
@@ -49,11 +53,23 @@ export async function generateMetadata(): Promise<Metadata> {
     ],
     openGraph: {
       title: storeName,
-      description:
-        'Compra por unidad o caja cerrada con inventario en tiempo real y precios duales ($ USD y Bs. BCV). Delivery express en Barinas.',
+      description: ogDescription,
+      url: APP_CONFIG.siteUrl,
       locale: 'es_VE',
       type: 'website',
       siteName: storeName,
+      images: [{ ...OFFICIAL_OG_IMAGE }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: storeName,
+      description: ogDescription,
+      images: [
+        {
+          url: OFFICIAL_LOGO_VERSIONED,
+          alt: APP_CONFIG.logoAlt,
+        },
+      ],
     },
     robots: {
       index: true,

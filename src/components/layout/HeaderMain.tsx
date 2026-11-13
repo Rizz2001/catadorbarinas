@@ -12,6 +12,7 @@ import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { HeaderSearch } from './HeaderSearch';
 import { HeaderSearchTrends } from './HeaderSearchTrends';
 import { UserNavMenu } from '@/components/auth';
+import { OFFICIAL_LOGO_ALT, resolveOfficialLogo } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 export function HeaderMain() {
@@ -31,8 +32,7 @@ export function HeaderMain() {
     maximumFractionDigits: 2,
   }).format(rateInfo.rate);
 
-  const logoUrl = storeConfig?.logo_url || '/logo-catador.svg';
-  const isDefaultSvg = logoUrl === '/logo-catador.svg';
+  const logoUrl = resolveOfficialLogo(storeConfig?.logo_url);
   const calibratedHeight = Math.min(56, Math.max(36, storeConfig?.logo_alto_px || 48));
   const calibratedWidth = Math.round(calibratedHeight * 1.15);
 
@@ -41,48 +41,27 @@ export function HeaderMain() {
       <div className="container mx-auto max-w-7xl px-3 sm:px-4 space-y-2 md:space-y-0">
         <div className="flex items-center justify-between gap-2 sm:gap-4 lg:gap-6 min-w-0">
           <Link href="/" className="shrink-0 flex items-center gap-2 sm:gap-3 min-w-0 group">
-            {isDefaultSvg ? (
-              <div
-                className="relative flex items-center max-w-[140px] sm:max-w-none"
-                style={{
-                  height: `${calibratedHeight}px`,
-                  width: `${Math.min(230, Math.max(135, storeConfig?.logo_ancho_px || 190))}px`,
-                }}
-              >
-                <Image
-                  src={logoUrl}
-                  alt={storeConfig?.nombre_tienda || 'EL CATADOR. Gran Catador Bodegón'}
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 145px, 210px"
-                  className="object-contain object-left"
-                />
-              </div>
-            ) : (
-              <>
-                <div
-                  className="relative shrink-0 rounded-xl bg-white border border-slate-100 p-1 shadow-xs overflow-hidden"
-                  style={{ height: `${calibratedHeight}px`, width: `${calibratedWidth}px` }}
-                >
-                  <Image
-                    src={logoUrl}
-                    alt={storeConfig?.nombre_tienda || 'EL CATADOR. Gran Catador Bodegón'}
-                    fill
-                    priority
-                    sizes="64px"
-                    className="object-contain"
-                  />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm sm:text-xl font-black tracking-tight text-[#0F172A] leading-none group-hover:text-[#001754] transition-colors truncate">
-                    {storeConfig?.nombre_tienda || 'EL CATADOR.'}
-                  </span>
-                  <span className="hidden sm:block text-[11px] font-extrabold uppercase tracking-wider text-[#B6683E] mt-1 truncate">
-                    Bodegón & Supermercado
-                  </span>
-                </div>
-              </>
-            )}
+            <div
+              className="relative shrink-0 rounded-xl bg-white border border-slate-100 p-1 shadow-xs overflow-hidden"
+              style={{ height: `${calibratedHeight}px`, width: `${calibratedWidth}px` }}
+            >
+              <Image
+                src={logoUrl}
+                alt={OFFICIAL_LOGO_ALT}
+                fill
+                priority
+                sizes="64px"
+                className="object-contain"
+              />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm sm:text-xl font-black tracking-tight text-[#0F172A] leading-none group-hover:text-[#001754] transition-colors truncate">
+                {storeConfig?.nombre_tienda || 'EL CATADOR.'}
+              </span>
+              <span className="hidden sm:block text-[11px] font-extrabold uppercase tracking-wider text-[#B6683E] mt-1 truncate">
+                Bodegón & Supermercado
+              </span>
+            </div>
           </Link>
 
           <div className="hidden md:flex flex-col flex-1 max-w-xl lg:max-w-2xl min-w-0">

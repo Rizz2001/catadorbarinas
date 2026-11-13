@@ -1,8 +1,9 @@
 import type { MetadataRoute } from 'next';
 import { DEFAULT_GROUPS } from '@/constants/fallback-products';
+import { APP_CONFIG } from '@/constants/config';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://grancatador.com';
+  const baseUrl = APP_CONFIG.siteUrl;
   const now = new Date();
 
   const staticRoutes: MetadataRoute.Sitemap = [

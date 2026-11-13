@@ -1,7 +1,8 @@
 import type { MetadataRoute } from 'next';
+import { APP_CONFIG } from '@/constants/config';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://grancatador.com';
+  const baseUrl = APP_CONFIG.siteUrl;
 
   return {
     rules: [

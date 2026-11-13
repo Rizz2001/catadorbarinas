@@ -5,6 +5,11 @@ import { ChevronRight } from 'lucide-react';
 import { fetchArticulosSmartVentas, fetchProductById } from '@/services/foxdata.service';
 import { ProductDetailView } from '@/components/ecommerce';
 import { formatUsd } from '@/lib/currency';
+import {
+  OFFICIAL_LOGO_PATH,
+  OFFICIAL_LOGO_VERSIONED,
+  OFFICIAL_OG_IMAGE,
+} from '@/constants/config';
 
 export const revalidate = 60;
 
@@ -27,6 +32,11 @@ export async function generateMetadata({ params, searchParams }: ProductPageProp
   const priceFormatted = formatUsd(product.priceUsd);
   const title = `${product.name} (${priceFormatted}) | Gran Catador Barinas`;
   const description = `${product.description} Compra por unidad o caja en Gran Catador Barinas por ${priceFormatted} ($ USD y Bs. BCV). Delivery express y Pick-Up.`;
+  const hasRealImages =
+    product.images.length > 0 &&
+    !product.images.every((img) => img === OFFICIAL_LOGO_PATH || img.includes('logo'));
+  const ogImages = hasRealImages ? product.images : [{ ...OFFICIAL_OG_IMAGE }];
+  const twitterImages = hasRealImages ? product.images : [OFFICIAL_LOGO_VERSIONED];
 
   return {
     title,
@@ -34,14 +44,14 @@ export async function generateMetadata({ params, searchParams }: ProductPageProp
     openGraph: {
       title,
       description,
-      images: product.images,
+      images: ogImages,
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: product.images,
+      images: twitterImages,
     },
   };
 }

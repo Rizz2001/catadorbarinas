@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Search, ChevronRight, ArrowLeft } from 'lucide-react';
 import { searchProducts, fetchGruposInv, fetchSubgruposInv } from '@/services/foxdata.service';
 import { CatalogBrowser } from '@/components/catalog';
+import { OFFICIAL_LOGO_VERSIONED, OFFICIAL_OG_IMAGE } from '@/constants/config';
 
 interface SearchPageProps {
   searchParams: Promise<{ q?: string; grupo?: string }>;
@@ -29,7 +30,17 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   return {
     title,
     description,
-    openGraph: { title, description },
+    openGraph: {
+      title,
+      description,
+      images: [{ ...OFFICIAL_OG_IMAGE }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [OFFICIAL_LOGO_VERSIONED],
+    },
   };
 }
 

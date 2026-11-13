@@ -4,6 +4,7 @@ import React, { useState, useRef } from 'react';
 import { Upload, Image as ImageIcon, Loader2, RotateCcw, CheckCircle2 } from 'lucide-react';
 import { uploadStoreLogo } from '@/services/cms.service';
 import { trimTransparentBorders } from '@/lib/image-trim';
+import { OFFICIAL_LOGO_PATH, resolveOfficialLogo } from '@/constants/config';
 import { ConfigLogoPreview } from './ConfigLogoPreview';
 import { ConfigLogoSliders } from './ConfigLogoSliders';
 
@@ -29,7 +30,7 @@ export function ConfigLogoUploader({
   const [message, setMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const currentLogo = logoUrl || '/logo-catador.svg';
+  const currentLogo = resolveOfficialLogo(logoUrl);
   const currentHeight = logoAltoPx || 56;
   const currentWidth = logoAnchoPx || 240;
 
@@ -117,11 +118,11 @@ export function ConfigLogoUploader({
             />
           </label>
 
-          {currentLogo !== '/logo-catador.svg' && (
+          {currentLogo !== OFFICIAL_LOGO_PATH && (
             <button
               type="button"
               onClick={() => {
-                onLogoChange('/logo-catador.svg');
+                onLogoChange(OFFICIAL_LOGO_PATH);
                 onDimensionsChange({ logo_alto_px: 56, logo_ancho_px: 240 });
               }}
               className="inline-flex items-center gap-1 rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors cursor-pointer"

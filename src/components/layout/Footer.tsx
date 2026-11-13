@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { MapPin, Phone, Clock } from 'lucide-react';
-import { APP_CONFIG } from '@/constants/config';
+import { APP_CONFIG, OFFICIAL_LOGO_ALT, resolveOfficialLogo } from '@/constants/config';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 
 const PAYMENT_PILLS = ['Pago Móvil', 'Transferencia', 'Zelle', 'Efectivo USD'];
@@ -29,25 +29,28 @@ export function Footer() {
   const activePaymentPills = PAYMENT_PILLS.filter(
     (method) => method !== 'Transferencia' || storeConfig?.transferencia_activa !== false
   );
+  const logoUrl = resolveOfficialLogo(storeConfig?.logo_url);
+  const footerLogoHeight = Math.min(Math.max(storeConfig?.logo_alto_px || 46, 40), 52);
+  const footerLogoWidth = Math.round(footerLogoHeight * 1.35);
 
   return (
     <footer className="bg-catador-blue-dark text-slate-200 mt-10 sm:mt-14 pb-28 md:pb-0 border-t border-white/10">
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-14 grid grid-cols-2 lg:grid-cols-12 gap-x-5 gap-y-7 sm:gap-10 lg:gap-12">
         <div className="col-span-2 sm:col-span-1 lg:col-span-4 space-y-3.5 sm:space-y-4">
-          <div className="inline-flex items-center rounded-2xl bg-white px-3.5 py-2 shadow-xs">
+          <div className="inline-flex items-center rounded-2xl bg-white px-3 py-2 shadow-xs">
             <div
               className="relative shrink-0"
               style={{
-                height: `${Math.min(storeConfig?.logo_alto_px || 42, 46)}px`,
-                width: `${Math.min(storeConfig?.logo_ancho_px || 170, 185)}px`,
+                height: `${footerLogoHeight}px`,
+                width: `${footerLogoWidth}px`,
               }}
             >
               <Image
-                src={storeConfig?.logo_url || '/logo-catador.svg'}
-                alt={storeConfig?.nombre_tienda || APP_CONFIG.name}
+                src={logoUrl}
+                alt={OFFICIAL_LOGO_ALT}
                 fill
-                sizes="185px"
-                className="object-contain object-left"
+                sizes="80px"
+                className="object-contain"
               />
             </div>
           </div>

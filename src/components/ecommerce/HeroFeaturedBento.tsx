@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Product } from '@/types';
 import { formatUsd, formatVes, convertUsdToVes } from '@/lib/currency';
 import { getDefaultPurchaseMode, getEffectivePriceUsd } from '@/lib/inventory';
+import { OFFICIAL_LOGO_PATH } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 interface HeroFeaturedBentoProps {
@@ -33,7 +34,7 @@ export function HeroFeaturedBento({
   if (!currentSlide) return null;
 
   const rawImg = currentSlide.images?.[0];
-  const isNoImg = !rawImg || rawImg === '/logo-catador.svg' || rawImg.includes('logo');
+  const isNoImg = !rawImg || rawImg === OFFICIAL_LOGO_PATH || rawImg.includes('logo');
   const slideImg = isNoImg ? cmsLogo : rawImg;
   const slidePriceUsd = getEffectivePriceUsd(currentSlide, getDefaultPurchaseMode(currentSlide));
 

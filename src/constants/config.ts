@@ -3,9 +3,28 @@
  * Estricta fidelidad con la API de FoxData / SmartVentas.
  */
 
+export const OFFICIAL_LOGO_PATH = '/icon-catador.png';
+export const OFFICIAL_LOGO_VERSIONED = '/icon-catador.png?v=2';
+export const OFFICIAL_LOGO_ALT = 'Distribuidora Gran Catador - Bodegón & Licorería';
+
+export function resolveOfficialLogo(rawLogo?: string | null): string {
+  if (!rawLogo || rawLogo === '/logo-catador.svg') return OFFICIAL_LOGO_PATH;
+  return rawLogo;
+}
+
+export const OFFICIAL_OG_IMAGE = {
+  url: OFFICIAL_LOGO_VERSIONED,
+  width: 1200,
+  height: 630,
+  alt: OFFICIAL_LOGO_ALT,
+  type: 'image/png',
+} as const;
+
 export const APP_CONFIG = {
   name: 'EL CATADOR.',
   legalName: 'Gran Catador Supermercado y Bodegon',
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://elcatadorbarinas.vercel.app',
+  logoAlt: OFFICIAL_LOGO_ALT,
   city: 'Barinas',
   country: 'Venezuela',
   address: 'Av. San Silvestre Detras de la Ciudad Deportiva, C.C Ciudad Catador Local N1',
@@ -18,8 +37,8 @@ export const APP_CONFIG = {
 } as const;
 
 export const IMAGE_FALLBACKS = {
-  product: '/logo-catador.svg',
-  category: '/logo-catador.svg',
+  product: OFFICIAL_LOGO_PATH,
+  category: OFFICIAL_LOGO_PATH,
   banner: 'https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?auto=format&fit=crop&w=1200&q=80',
   logoText: 'EL CATADOR.',
 } as const;

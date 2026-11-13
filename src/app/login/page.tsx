@@ -7,6 +7,7 @@ import { ShieldCheck, ArrowLeft } from 'lucide-react';
 import { LoginForm } from '@/components/auth';
 import { createClientForServer } from '@/lib/supabase/server';
 import { getStoreConfigServer } from '@/services/cms.server';
+import { OFFICIAL_LOGO_ALT, resolveOfficialLogo } from '@/constants/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,7 +60,7 @@ export default async function LoginPage({
   }
 
   const storeConfig = await getStoreConfigServer();
-  const logoUrl = storeConfig?.logo_url || '/logo-catador.svg';
+  const logoUrl = resolveOfficialLogo(storeConfig?.logo_url);
 
   return (
     <main className="container mx-auto px-4 py-10 flex flex-col items-center justify-center min-h-[75vh]">
@@ -77,7 +78,7 @@ export default async function LoginPage({
             <div className="relative mx-auto h-14 w-28 rounded-2xl bg-[#F8FAFC] border border-slate-200/80 p-2 flex items-center justify-center overflow-hidden">
               <Image
                 src={logoUrl}
-                alt={storeConfig?.nombre_tienda || 'EL CATADOR.'}
+                alt={OFFICIAL_LOGO_ALT}
                 fill
                 sizes="112px"
                 className="object-contain p-1.5"

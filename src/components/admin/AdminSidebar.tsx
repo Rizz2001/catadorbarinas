@@ -17,13 +17,14 @@ import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { QuickDeliveryCalculatorModal } from './QuickDeliveryCalculatorModal';
 import { AdminMobileBottomBar } from './AdminMobileBottomBar';
 import { ADMIN_NAV_GROUPS } from './admin-nav-config';
+import { OFFICIAL_LOGO_ALT, resolveOfficialLogo } from '@/constants/config';
 import { cn } from '@/lib/utils';
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const storeConfig = useStoreConfigStore((state) => state.config);
-  const logoUrl = storeConfig?.logo_url;
+  const logoUrl = resolveOfficialLogo(storeConfig?.logo_url);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [deliveryCalcOpen, setDeliveryCalcOpen] = useState(false);
 
@@ -38,21 +39,15 @@ export function AdminSidebar() {
       <div className="p-4 space-y-5 overflow-y-auto flex-1">
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-3">
-            {logoUrl && logoUrl !== '/logo-catador.svg' ? (
-              <div className="relative h-10 w-11 rounded-xl bg-white p-1 shrink-0 overflow-hidden shadow-sm">
-                <Image
-                  src={logoUrl}
-                  alt={storeConfig?.nombre_tienda || 'EL CATADOR.'}
-                  fill
-                  sizes="44px"
-                  className="object-contain"
-                />
-              </div>
-            ) : (
-              <div className="h-10 w-10 rounded-xl bg-catador-amber-oak flex items-center justify-center font-black text-slate-950 text-sm shadow-sm">
-                EC
-              </div>
-            )}
+            <div className="relative h-10 w-11 rounded-xl bg-white p-1 shrink-0 overflow-hidden shadow-sm">
+              <Image
+                src={logoUrl}
+                alt={OFFICIAL_LOGO_ALT}
+                fill
+                sizes="44px"
+                className="object-contain"
+              />
+            </div>
             <div>
               <h2 className="text-sm font-black text-white tracking-tight leading-none">
                 {storeConfig?.nombre_tienda || 'EL CATADOR.'} CMS

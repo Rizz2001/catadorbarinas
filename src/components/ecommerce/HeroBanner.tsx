@@ -8,6 +8,7 @@ import { useBcvStore } from '@/store/useBcvStore';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
 import { convertUsdToVes, DEFAULT_BCV_RATE, formatVes } from '@/lib/currency';
 import { buildHeroScrimGradient, resolveHeroDisplay } from '@/lib/hero-config';
+import { resolveOfficialLogo } from '@/constants/config';
 import { QuickCategoriesStrip } from './QuickCategoriesStrip';
 import { HeroBentoCards } from './HeroBentoCards';
 
@@ -33,7 +34,7 @@ export function HeroBanner({
 
   const bcvRate = useBcvStore((state) => state.rateInfo?.rate ?? DEFAULT_BCV_RATE);
   const storeConfig = useStoreConfigStore((state) => state.config);
-  const cmsLogo = storeConfig?.logo_url || '/logo-catador.svg';
+  const cmsLogo = resolveOfficialLogo(storeConfig?.logo_url);
 
   const slides = React.useMemo(() => {
     if (heroProducts.length > 0) return heroProducts.slice(0, 5);
