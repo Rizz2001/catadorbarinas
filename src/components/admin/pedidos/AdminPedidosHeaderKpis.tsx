@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowLeft, Bike, RefreshCw, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, BellRing, Bike, RefreshCw, Volume2, VolumeX } from 'lucide-react';
 import { formatUsd, formatVes } from '@/lib/currency';
 
 export const ADMIN_QUICK_REPLIES = [
@@ -25,6 +25,7 @@ interface AdminPedidosHeaderKpisProps {
   totalOrdersCount: number;
   kpis: AdminPedidosKpis;
   soundEnabled: boolean;
+  notificationPermission?: NotificationPermission | null;
   onToggleSound: () => void;
   onOpenDeliveryCalc: () => void;
   onSync: () => void;
@@ -37,10 +38,13 @@ export function AdminPedidosHeaderKpis({
   totalOrdersCount,
   kpis,
   soundEnabled,
+  notificationPermission = null,
   onToggleSound,
   onOpenDeliveryCalc,
   onSync,
 }: AdminPedidosHeaderKpisProps) {
+  const needsPermission = notificationPermission === 'default';
+
   return (
     <>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 pb-3.5">
@@ -66,14 +70,37 @@ export function AdminPedidosHeaderKpis({
           <button
             type="button"
             onClick={onToggleSound}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+            title={
+              needsPermission
+                ? 'Haz clic para permitir notificaciones del navegador y desbloquear el sonido del turno'
+                : 'Alternar alertas sonoras y notificaciones'
+            }
+            className={
+              needsPermission
+                ? 'flex items-center gap-1.5 rounded-lg border border-amber-500 bg-amber-100 min-h-[36px] px-3 py-1.5 text-xs font-black text-amber-950 hover:bg-amber-200 transition-colors cursor-pointer shadow-xs ring-2 ring-amber-400/40'
+                : 'flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer'
+            }
           >
-            {soundEnabled ? (
-              <Volume2 className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5} />
+            {needsPermission ? (
+              <>
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600" />
+                </span>
+                <BellRing className="h-3.5 w-3.5 text-amber-800" strokeWidth={1.75} />
+                <span>Activar Alertas</span>
+              </>
+            ) : soundEnabled ? (
+              <>
+                <Volume2 className="h-3.5 w-3.5 text-emerald-600" strokeWidth={1.5} />
+                <span>Alertas Sonoras</span>
+              </>
             ) : (
-              <VolumeX className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5} />
+              <>
+                <VolumeX className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.5} />
+                <span>Silenciado</span>
+              </>
             )}
-            <span>{soundEnabled ? 'Alertas Sonoras' : 'Silenciado'}</span>
           </button>
 
           <button
@@ -94,6 +121,21 @@ export function AdminPedidosHeaderKpis({
           </Link>
         </div>
       </div>
+
+      {needsPermission && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-amber-300 bg-amber-50/90 px-3.5 py-2.5 text-xs text-amber-950">
+          <span className="font-semibold">
+            Activa las alertas con un clic al abrir tu turno para recibir avisos del navegador y timbre sonoro en tiempo real.
+          </span>
+          <button
+            type="button"
+            onClick={onToggleSound}
+            className="shrink-0 self-start sm:self-auto rounded-lg bg-[#0F172A] px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            Activar ahora
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 rounded-xl bg-white border border-slate-200/90 divide-y sm:divide-y-0 sm:divide-x divide-slate-200/90">
         <div className="p-3.5 sm:px-4">

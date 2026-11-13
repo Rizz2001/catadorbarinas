@@ -1,7 +1,7 @@
 import React from 'react';
 import { redirect } from 'next/navigation';
 import { createClientForServer } from '@/lib/supabase/server';
-import { AdminSidebar, AdminThemeProvider } from '@/components/admin';
+import { AdminRealtimeNotifications, AdminSidebar, AdminThemeProvider } from '@/components/admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,6 +39,7 @@ export default async function AdminLayout({
 
   return (
     <AdminThemeProvider>
+      <AdminRealtimeNotifications />
       <div className="min-h-screen flex flex-col md:flex-row bg-[#F7F8FA] text-slate-900 pb-20 md:pb-0">
         <AdminSidebar />
         <div className="flex-1 min-w-0">{children}</div>

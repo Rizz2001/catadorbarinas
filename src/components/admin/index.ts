@@ -1,5 +1,6 @@
 export * from './AdminOrderQueue';
 export * from './AdminOrderDetail';
+export * from './AdminRealtimeNotifications';
 export * from './AdminSidebar';
 export * from './AdminThemeProvider';
 export * from './BannerPreview';

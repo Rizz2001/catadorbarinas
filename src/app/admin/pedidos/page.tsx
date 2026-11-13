@@ -8,7 +8,7 @@ import { AdminOrderQueue, AdminOrderDetail, QuickDeliveryCalculatorModal } from 
 import { ADMIN_QUICK_REPLIES, AdminPedidosHeaderKpis } from '@/components/admin/pedidos/AdminPedidosHeaderKpis';
 import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { OrderLiveChat } from '@/components/orders';
-import { soundFx } from '@/lib/sound';
+import { getAdminAlertsPreference, setAdminAlertsPreference, soundFx } from '@/lib/sound';
 import { cn } from '@/lib/utils';
 
 export default function AdminPedidosCommandCenterPage() {
@@ -17,6 +17,7 @@ export default function AdminPedidosCommandCenterPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | null>(null);
   const [mobileViewOpen, setMobileViewOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<'detalle' | 'chat'>('detalle');
   const [deliveryCalcOpen, setDeliveryCalcOpen] = useState(false);
@@ -37,18 +38,20 @@ export default function AdminPedidosCommandCenterPage() {
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => { loadOrders(); }, 0);
+    const timer = setTimeout(() => {
+      setSoundEnabled(getAdminAlertsPreference());
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        setNotificationPermission(window.Notification.permission);
+      }
+      loadOrders();
+    }, 0);
     const channel = supabase
       .channel('admin-orders-stream')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => {
-        if (soundEnabled) soundFx.playOrderAlert();
-        loadOrders();
-      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => { loadOrders(); })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pedidos' }, () => { loadOrders(); })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedido_mensajes' }, (payload: { new: Record<string, unknown> }) => {
         const msg = payload.new as unknown as { pedido_id: string; remitente_rol: string };
         if (msg.remitente_rol !== 'cliente') return;
-        if (soundEnabled) soundFx.playMessageBubble();
         setOrders((prev) => prev.map((o) => (o.id === msg.pedido_id ? { ...o, mensajes_no_leidos: (o.mensajes_no_leidos || 0) + 1 } : o)));
         setSelectedOrder((prev) => (prev && prev.id === msg.pedido_id ? { ...prev, mensajes_no_leidos: (prev.mensajes_no_leidos || 0) + 1 } : prev));
       })
@@ -57,7 +60,22 @@ export default function AdminPedidosCommandCenterPage() {
       clearTimeout(timer);
       supabase.removeChannel(channel);
     };
-  }, [loadOrders, soundEnabled]);
+  }, [loadOrders]);
+
+  const handleToggleAlerts = async () => {
+    if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'default') {
+      const perm = await window.Notification.requestPermission();
+      setNotificationPermission(perm);
+      setSoundEnabled(true);
+      setAdminAlertsPreference(true);
+      soundFx.playOrderAlert();
+      return;
+    }
+    const next = !soundEnabled;
+    setSoundEnabled(next);
+    setAdminAlertsPreference(next);
+    if (next) soundFx.playOrderAlert();
+  };
 
   const kpis = useMemo(() => {
     const valid = orders.filter((o) => o.estado_pedido !== 'cancelado');
@@ -122,7 +140,7 @@ export default function AdminPedidosCommandCenterPage() {
 
   return (
     <main className="px-4 sm:px-6 pt-4 sm:pt-6 pb-8 space-y-4 max-w-[1600px] mx-auto">
-      <AdminPedidosHeaderKpis totalOrdersCount={orders.length} kpis={kpis} soundEnabled={soundEnabled} onToggleSound={() => setSoundEnabled((prev) => !prev)} onOpenDeliveryCalc={() => setDeliveryCalcOpen(true)} onSync={loadOrders} />
+      <AdminPedidosHeaderKpis totalOrdersCount={orders.length} kpis={kpis} soundEnabled={soundEnabled} notificationPermission={notificationPermission} onToggleSound={handleToggleAlerts} onOpenDeliveryCalc={() => setDeliveryCalcOpen(true)} onSync={loadOrders} />
 
       {mobileViewOpen && selectedOrder && (
         <div className="xl:hidden space-y-2.5">
