@@ -40,9 +40,7 @@ export default function AdminPedidosCommandCenterPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSoundEnabled(getAdminAlertsPreference());
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        setNotificationPermission(window.Notification.permission);
-      }
+      if (typeof window !== 'undefined' && 'Notification' in window) setNotificationPermission(window.Notification.permission);
       loadOrders();
     }, 0);
     const channel = supabase
@@ -56,10 +54,7 @@ export default function AdminPedidosCommandCenterPage() {
         setSelectedOrder((prev) => (prev && prev.id === msg.pedido_id ? { ...prev, mensajes_no_leidos: (prev.mensajes_no_leidos || 0) + 1 } : prev));
       })
       .subscribe();
-    return () => {
-      clearTimeout(timer);
-      supabase.removeChannel(channel);
-    };
+    return () => { clearTimeout(timer); supabase.removeChannel(channel); };
   }, [loadOrders]);
 
   const handleToggleAlerts = async () => {
@@ -157,11 +152,7 @@ export default function AdminPedidosCommandCenterPage() {
               icon={
                 <span className="inline-flex items-center gap-1">
                   <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.5} />
-                  {unreadCount > 0 && (
-                    <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">
-                      {unreadCount}
-                    </span>
-                  )}
+                  {unreadCount > 0 && <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">{unreadCount}</span>}
                 </span>
               }
             />
@@ -175,9 +166,7 @@ export default function AdminPedidosCommandCenterPage() {
             orders={orders}
             selectedOrderId={selectedOrder?.id || null}
             onSelectOrder={(ord) => {
-              setSelectedOrder(ord);
-              setMobileViewOpen(true);
-              setMobileTab('detalle');
+              setSelectedOrder(ord); setMobileViewOpen(true); setMobileTab('detalle');
               setOrders((prev) => prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o)));
             }}
             searchTerm={searchTerm}
