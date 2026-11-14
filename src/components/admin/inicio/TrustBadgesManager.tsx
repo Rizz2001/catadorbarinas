@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Save } from 'lucide-react';
 import { Switch } from '@/components/admin/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { useToast } from '@astryxdesign/core/Toast';
 import { StoreConfig, TrustBadgeNode } from '@/types';
 import { useStoreConfigStore } from '@/store/useStoreConfigStore';
-import { LucideIconField } from '../LucideIconField';
+import { TrustBadgeEditorRow } from './TrustBadgeEditorRow';
 
 interface TrustBadgesManagerProps {
   badges: TrustBadgeNode[];
@@ -26,6 +26,7 @@ export function TrustBadgesManager({
 }: TrustBadgesManagerProps) {
   const showToast = useToast();
   const [saving, setSaving] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
   const updateBadge = (idx: number, patch: Partial<TrustBadgeNode>) => {
     onBadgesChange(badges.map((item, i) => (i === idx ? { ...item, ...patch } : item)));
@@ -43,10 +44,12 @@ export function TrustBadgesManager({
         href: '',
       },
     ]);
+    setExpandedIndex(badges.length);
   };
 
   const handleDelete = (idx: number) => {
     onBadgesChange(badges.filter((_, i) => i !== idx));
+    setExpandedIndex((prev) => (prev === idx ? null : prev && prev > idx ? prev - 1 : prev));
   };
 
   const handleSave = async () => {
@@ -117,82 +120,15 @@ export function TrustBadgesManager({
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
         {badges.map((badge, idx) => (
-          <div
+          <TrustBadgeEditorRow
             key={badge.id || idx}
-            className="rounded-xl border border-slate-200/90 bg-slate-50/50 p-3.5 space-y-3"
-          >
-            <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-200/70">
-              <span className="text-xs font-black text-[#0F172A]">
-                Bloque de Confianza #{idx + 1}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleDelete(idx)}
-                title="Eliminar bloque"
-                className="p-1.5 rounded-lg border border-red-200 bg-white text-red-600 hover:bg-red-50 cursor-pointer"
-              >
-                <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                  Etiqueta / Cifra *
-                </label>
-                <input
-                  type="text"
-                  value={badge.figura}
-                  onChange={(e) => updateBadge(idx, { figura: e.target.value })}
-                  placeholder="Ej. < 45 min"
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-bold text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">Título *</label>
-                <input
-                  type="text"
-                  value={badge.titulo}
-                  onChange={(e) => updateBadge(idx, { titulo: e.target.value })}
-                  placeholder="Despacho Express en Barinas"
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-900"
-                />
-              </div>
-
-              <div className="sm:col-span-2">
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                  Subtítulo / Descripción *
-                </label>
-                <input
-                  type="text"
-                  value={badge.subtitulo}
-                  onChange={(e) => updateBadge(idx, { subtitulo: e.target.value })}
-                  placeholder="Detalle breve para desktop"
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-900"
-                />
-              </div>
-
-              <LucideIconField
-                value={badge.icon || ''}
-                onChange={(icon) => updateBadge(idx, { icon })}
-                placeholder="Ej. Truck, ShieldCheck"
-              />
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                  URL / Enlace (Opcional)
-                </label>
-                <input
-                  type="text"
-                  value={badge.href || ''}
-                  onChange={(e) => updateBadge(idx, { href: e.target.value })}
-                  placeholder="/catalogo o /checkout"
-                  className="w-full h-10 rounded-xl border border-slate-200 bg-white px-3 text-xs font-mono text-slate-900"
-                />
-              </div>
-            </div>
-          </div>
+            badge={badge}
+            index={idx}
+            isOpen={expandedIndex === idx}
+            onToggleOpen={() => setExpandedIndex((prev) => (prev === idx ? null : idx))}
+            onChange={(patch) => updateBadge(idx, patch)}
+            onDelete={() => handleDelete(idx)}
+          />
         ))}
       </div>
     </section>

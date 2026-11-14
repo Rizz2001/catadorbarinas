@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
-import { Send, ImagePlus, Loader2, Bot, Shield, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ArrowDown, Bot, ImagePlus, Loader2, Send, Shield, User } from 'lucide-react';
 import { useOrderChat } from '@/hooks/useOrderChat';
 import { RemitenteRol } from '@/types';
 import { cn } from '@/lib/utils';
+import { OrderChatMessageBubble } from './OrderChatMessageBubble';
 
 interface OrderLiveChatProps {
   pedidoId: string;
@@ -18,24 +18,62 @@ interface OrderLiveChatProps {
 }
 
 export function OrderLiveChat({
-  pedidoId,
-  usuarioRol,
-  usuarioNombre,
-  usuarioId = null,
-  numeroOrden,
-  quickReplies = [],
-  className,
+  pedidoId, usuarioRol, usuarioNombre, usuarioId = null, numeroOrden, quickReplies = [], className,
 }: OrderLiveChatProps) {
   const { mensajes, cargando, enviando, otherTyping, enviarMensaje, subirAdjuntoYEnviar, emitirTyping, marcarComoLeidos } =
     useOrderChat({ pedidoId, usuarioRol, usuarioNombre, usuarioId });
   const [inputTexto, setInputTexto] = useState('');
+  const [hasNewMessagesBelow, setHasNewMessagesBelow] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isUserNearBottomRef = useRef(true);
+  const prevMessagesLengthRef = useRef(0);
+  const prevPedidoIdRef = useRef(pedidoId);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({ top: messagesContainerRef.current.scrollHeight, behavior });
+      setHasNewMessagesBelow(false);
+      isUserNearBottomRef.current = true;
+    }
+  }, []);
+
+  const handleScroll = () => {
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    const isNear = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    isUserNearBottomRef.current = isNear;
+    if (isNear && hasNewMessagesBelow) setHasNewMessagesBelow(false);
+  };
 
   useEffect(() => {
-    if (messagesContainerRef.current) messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    if (prevPedidoIdRef.current !== pedidoId) {
+      prevPedidoIdRef.current = pedidoId;
+      prevMessagesLengthRef.current = mensajes.length;
+      isUserNearBottomRef.current = true;
+      setHasNewMessagesBelow(false);
+      scrollToBottom('auto');
+      marcarComoLeidos();
+      return;
+    }
+
+    const prevLen = prevMessagesLengthRef.current;
+    const currentLen = mensajes.length;
+
+    if (currentLen > prevLen) {
+      const isSentByMe = mensajes[currentLen - 1]?.remitente_rol === usuarioRol;
+      if (isSentByMe || isUserNearBottomRef.current) {
+        scrollToBottom('smooth');
+      } else {
+        setHasNewMessagesBelow(true);
+      }
+    } else if (prevLen === 0 && currentLen > 0) {
+      scrollToBottom('auto');
+    }
+
+    prevMessagesLengthRef.current = currentLen;
     marcarComoLeidos();
-  }, [mensajes, otherTyping, marcarComoLeidos]);
+  }, [mensajes, pedidoId, usuarioRol, scrollToBottom, marcarComoLeidos]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +81,7 @@ export function OrderLiveChat({
     const textToSend = inputTexto;
     setInputTexto('');
     await enviarMensaje(textToSend);
+    scrollToBottom('smooth');
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +94,7 @@ export function OrderLiveChat({
     if (!file) return;
     await subirAdjuntoYEnviar(file);
     if (fileInputRef.current) fileInputRef.current.value = '';
+    scrollToBottom('smooth');
   };
 
   const headerTitle = usuarioRol === 'cliente' ? 'Concierge en Vivo • Gran Catador' : `Cliente: ${usuarioNombre}`;
@@ -65,7 +105,7 @@ export function OrderLiveChat({
     : 'Canal directo de la orden';
 
   return (
-    <div className={cn('flex flex-col h-[540px] xl:h-[calc(100vh-220px)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden', className)}>
+    <div className={cn('relative flex flex-col h-[540px] xl:h-[calc(100vh-220px)] rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden', className)}>
       <div className="bg-[#0F172A] text-white p-3.5 flex items-center justify-between gap-2 shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="relative shrink-0">
@@ -90,7 +130,7 @@ export function OrderLiveChat({
         </button>
       </div>
 
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/80 text-xs">
+      <div ref={messagesContainerRef} onScroll={handleScroll} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/80 text-xs">
         {cargando ? (
           <div className="h-full flex items-center justify-center text-slate-500 gap-2">
             <Loader2 className="h-4 w-4 animate-spin text-[#0F172A]" strokeWidth={1.5} />
@@ -100,42 +140,12 @@ export function OrderLiveChat({
           <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-1.5">
             <Bot className="h-9 w-9 text-amber-500 mb-1" strokeWidth={1.5} />
             <p className="font-bold text-slate-800">¡Canal de atención en vivo activo!</p>
-            <p className="text-[11px] text-slate-500 max-w-xs">
-              Escríbenos cualquier indicación de entrega o adjunta el comprobante de tu pago aquí.
-            </p>
+            <p className="text-[11px] text-slate-500 max-w-xs">Escríbenos cualquier indicación de entrega o adjunta el comprobante de tu pago aquí.</p>
           </div>
         ) : (
-          mensajes.map((m) => {
-            const isMe = m.remitente_rol === usuarioRol;
-            const timeLabel = new Date(m.created_at).toLocaleTimeString('es-VE', { hour: '2-digit', minute: '2-digit' });
-            if (m.remitente_rol === 'sistema') {
-              return (
-                <div key={m.id} className="flex justify-center my-2">
-                  <div className="rounded-xl bg-amber-50 border border-amber-200 px-3.5 py-2 text-center text-[11px] text-slate-800 max-w-sm shadow-2xs">
-                    <span className="font-extrabold text-amber-700 mr-1">Gran Catador:</span>
-                    <span>{m.mensaje}</span>
-                  </div>
-                </div>
-              );
-            }
-            return (
-              <div key={m.id} className={cn('flex flex-col', isMe ? 'items-end' : 'items-start')}>
-                <div className="flex items-center gap-1.5 mb-0.5 px-1">
-                  <span className="text-[10px] font-bold text-slate-600">{m.remitente_nombre}</span>
-                  <span className="text-[10px] text-slate-500 tabular-nums">{timeLabel}</span>
-                </div>
-                <div className={cn('max-w-[82%] rounded-2xl px-3.5 py-2.5 shadow-2xs space-y-1.5', isMe ? 'bg-[#0F172A] text-white rounded-br-xs' : 'bg-white border border-slate-200 text-slate-800 rounded-bl-xs')}>
-                  {m.adjunto_url && (
-                    <div className="relative aspect-video w-52 max-w-full rounded-xl overflow-hidden bg-slate-100 border border-slate-200/40">
-                      <Image src={m.adjunto_url} alt="Comprobante adjunto" fill sizes="208px" className="object-cover" />
-                    </div>
-                  )}
-                  {m.mensaje && <p className={cn('leading-relaxed break-words text-[13px]', isMe ? 'text-white !text-white' : 'text-slate-800')}>{m.mensaje}</p>}
-                  <span className={cn('block text-[10px] text-right tabular-nums', isMe ? 'text-slate-300 !text-slate-300' : 'text-slate-500')}>{timeLabel}</span>
-                </div>
-              </div>
-            );
-          })
+          mensajes.map((m) => (
+            <OrderChatMessageBubble key={m.id} mensaje={m} usuarioRol={usuarioRol} />
+          ))
         )}
 
         {otherTyping.isTyping && (
@@ -149,6 +159,17 @@ export function OrderLiveChat({
           </div>
         )}
       </div>
+
+      {hasNewMessagesBelow && (
+        <button
+          type="button"
+          onClick={() => scrollToBottom('smooth')}
+          className="absolute bottom-16 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-bold shadow-lg transition-all cursor-pointer animate-bounce border border-slate-700/60"
+        >
+          <ArrowDown className="h-3.5 w-3.5 text-amber-400" strokeWidth={2} />
+          <span>Nuevos mensajes</span>
+        </button>
+      )}
 
       {quickReplies.length > 0 && (
         <div className="px-3 py-2 bg-slate-100/90 border-t border-slate-200 flex items-center gap-1.5 overflow-x-auto text-[11px] scrollbar-none no-scrollbar shrink-0">

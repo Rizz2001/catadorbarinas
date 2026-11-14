@@ -5,8 +5,8 @@ import { ArrowLeft, FileText, MessageSquare } from 'lucide-react';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { AdminOrderQueue, AdminOrderDetail, QuickDeliveryCalculatorModal } from '@/components/admin';
 import { ADMIN_QUICK_REPLIES, AdminPedidosHeaderKpis } from '@/components/admin/pedidos/AdminPedidosHeaderKpis';
+import { AdminOrderChatPanel } from '@/components/admin/pedidos/AdminOrderChatPanel';
 import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
-import { OrderLiveChat } from '@/components/orders';
 import {
   ADMIN_MESSAGE_INSERTED_EVENT,
   ADMIN_ORDER_INSERTED_EVENT,
@@ -176,13 +176,7 @@ export default function AdminPedidosCommandCenterPage() {
           <AdminOrderDetail order={selectedOrder} onUpdateStatus={handleUpdateStatus} onDeleteOrder={handleDeleteOrder} isUpdating={isUpdating} />
         </div>
         <div className={cn('xl:col-span-4 xl:h-[calc(100vh-220px)] xl:overflow-y-auto', mobileViewOpen && selectedOrder && mobileTab === 'chat' ? 'block' : 'hidden xl:block')}>
-          {selectedOrder ? (
-            <OrderLiveChat pedidoId={selectedOrder.id} usuarioRol="admin" usuarioNombre="Administrador Gran Catador" numeroOrden={selectedOrder.numero_orden} quickReplies={ADMIN_QUICK_REPLIES} />
-          ) : (
-            <div className="flex h-[540px] xl:h-[calc(100vh-220px)] items-center justify-center rounded-2xl border border-slate-200 bg-white p-6 text-center text-sm font-medium text-slate-400">
-              Selecciona una orden para abrir el canal de chat con el cliente.
-            </div>
-          )}
+          <AdminOrderChatPanel order={selectedOrder} quickReplies={ADMIN_QUICK_REPLIES} />
         </div>
       </div>
 

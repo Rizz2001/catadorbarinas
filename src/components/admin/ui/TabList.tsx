@@ -34,8 +34,8 @@ export function TabList({
       <div
         role="tablist"
         className={cn(
-          'flex border-b border-gray-200 gap-4',
-          overflow === 'scroll' ? 'overflow-x-auto hide-scrollbar' : 'flex-wrap',
+          'flex border-b border-gray-200 gap-3 sm:gap-4',
+          overflow === 'scroll' ? 'overflow-x-auto scrollbar-none no-scrollbar hide-scrollbar px-1 pb-0.5' : 'flex-wrap',
           className
         )}
       >

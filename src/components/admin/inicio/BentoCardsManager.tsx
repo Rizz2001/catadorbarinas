@@ -21,6 +21,7 @@ export function BentoCardsManager({
 }: BentoCardsManagerProps) {
   const showToast = useToast();
   const [saving, setSaving] = useState(false);
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(0);
 
   const updateCard = (idx: number, patch: Partial<BentoCardNode>) => {
     onCardsChange(cards.map((item, i) => (i === idx ? { ...item, ...patch } : item)));
@@ -39,12 +40,14 @@ export function BentoCardsManager({
       order: cards.length + 1,
     };
     onCardsChange([...cards, newCard]);
+    setExpandedIndex(cards.length);
   };
 
   const handleDelete = (idx: number) => {
     onCardsChange(
       cards.filter((_, i) => i !== idx).map((item, newIdx) => ({ ...item, order: newIdx + 1 }))
     );
+    setExpandedIndex((prev) => (prev === idx ? null : prev && prev > idx ? prev - 1 : prev));
   };
 
   const handleMove = (idx: number, dir: -1 | 1) => {
@@ -54,6 +57,7 @@ export function BentoCardsManager({
     const [moved] = clone.splice(idx, 1);
     clone.splice(target, 0, moved);
     onCardsChange(clone.map((item, newIdx) => ({ ...item, order: newIdx + 1 })));
+    setExpandedIndex(target);
   };
 
   const handleSave = async () => {
@@ -117,6 +121,8 @@ export function BentoCardsManager({
             card={card}
             index={idx}
             total={cards.length}
+            isOpen={expandedIndex === idx}
+            onToggleOpen={() => setExpandedIndex((prev) => (prev === idx ? null : idx))}
             onChange={(patch) => updateCard(idx, patch)}
             onMove={(dir) => handleMove(idx, dir)}
             onDelete={() => handleDelete(idx)}

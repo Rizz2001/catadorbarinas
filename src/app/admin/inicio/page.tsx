@@ -92,28 +92,31 @@ export default function AdminInicioCmsPage() {
         </Link>
       </div>
 
-      <TabList
-        value={activeTab}
-        onChange={(v) => setActiveTab(v as HomeCmsTab)}
-        overflow="scroll"
-        hasDivider
-      >
-        <Tab
-          value="nodes"
-          label="Nodos Bento y Confianza"
-          icon={<LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.5} />}
-        />
-        <Tab
-          value="categories"
-          label="Categorías Rápidas"
-          icon={<Tags className="h-3.5 w-3.5" strokeWidth={1.5} />}
-        />
-        <Tab
-          value="flash"
-          label="Ofertas Relámpago"
-          icon={<Flame className="h-3.5 w-3.5" strokeWidth={1.5} />}
-        />
-      </TabList>
+      <div className="overflow-x-auto scrollbar-none no-scrollbar pb-0.5">
+        <TabList
+          value={activeTab}
+          onChange={(v) => setActiveTab(v as HomeCmsTab)}
+          overflow="scroll"
+          hasDivider
+          className="px-1"
+        >
+          <Tab
+            value="nodes"
+            label="Nodos Bento y Confianza"
+            icon={<LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.5} />}
+          />
+          <Tab
+            value="categories"
+            label="Categorías Rápidas"
+            icon={<Tags className="h-3.5 w-3.5" strokeWidth={1.5} />}
+          />
+          <Tab
+            value="flash"
+            label="Ofertas Relámpago"
+            icon={<Flame className="h-3.5 w-3.5" strokeWidth={1.5} />}
+          />
+        </TabList>
+      </div>
 
       {activeTab === 'nodes' && (
         <div className="space-y-5">
