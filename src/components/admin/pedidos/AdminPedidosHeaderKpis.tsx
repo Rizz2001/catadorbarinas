@@ -27,6 +27,7 @@ interface AdminPedidosHeaderKpisProps {
   soundEnabled: boolean;
   notificationPermission?: NotificationPermission | null;
   onToggleSound: () => void;
+  onTestAlert: () => void;
   onOpenDeliveryCalc: () => void;
   onSync: () => void;
 }
@@ -40,6 +41,7 @@ export function AdminPedidosHeaderKpis({
   soundEnabled,
   notificationPermission = null,
   onToggleSound,
+  onTestAlert,
   onOpenDeliveryCalc,
   onSync,
 }: AdminPedidosHeaderKpisProps) {
@@ -123,6 +125,16 @@ export function AdminPedidosHeaderKpis({
                 <span>Silenciado</span>
               </>
             )}
+          </button>
+
+          <button
+            type="button"
+            onClick={onTestAlert}
+            title="Disparar prueba de sonido, Toast y notificación nativa del navegador"
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+          >
+            <BellRing className="h-3.5 w-3.5 text-amber-600" strokeWidth={1.5} />
+            <span>Probar</span>
           </button>
 
           <button type="button" onClick={onSync} className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white min-h-[36px] px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">

@@ -2,13 +2,19 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { ArrowLeft, FileText, MessageSquare } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import { PedidoConDetalles, EstadoPedido, EstadoPago } from '@/types';
 import { AdminOrderQueue, AdminOrderDetail, QuickDeliveryCalculatorModal } from '@/components/admin';
 import { ADMIN_QUICK_REPLIES, AdminPedidosHeaderKpis } from '@/components/admin/pedidos/AdminPedidosHeaderKpis';
 import { SegmentedControl, SegmentedControlItem } from '@/components/admin/ui';
 import { OrderLiveChat } from '@/components/orders';
-import { getAdminAlertsPreference, setAdminAlertsPreference, soundFx } from '@/lib/sound';
+import {
+  ADMIN_MESSAGE_INSERTED_EVENT,
+  ADMIN_ORDER_INSERTED_EVENT,
+  getAdminAlertsPreference,
+  setAdminAlertsPreference,
+  soundFx,
+  triggerNewOrderAlert,
+} from '@/lib/sound';
 import { cn } from '@/lib/utils';
 
 export default function AdminPedidosCommandCenterPage() {
@@ -43,33 +49,45 @@ export default function AdminPedidosCommandCenterPage() {
       if (typeof window !== 'undefined' && 'Notification' in window) setNotificationPermission(window.Notification.permission);
       loadOrders();
     }, 0);
-    const channel = supabase
-      .channel('admin-orders-stream')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedidos' }, () => { loadOrders(); })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pedidos' }, () => { loadOrders(); })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pedido_mensajes' }, (payload: { new: Record<string, unknown> }) => {
-        const msg = payload.new as unknown as { pedido_id: string; remitente_rol: string };
-        if (msg.remitente_rol !== 'cliente') return;
-        setOrders((prev) => prev.map((o) => (o.id === msg.pedido_id ? { ...o, mensajes_no_leidos: (o.mensajes_no_leidos || 0) + 1 } : o)));
-        setSelectedOrder((prev) => (prev && prev.id === msg.pedido_id ? { ...prev, mensajes_no_leidos: (prev.mensajes_no_leidos || 0) + 1 } : prev));
-      })
-      .subscribe();
-    return () => { clearTimeout(timer); supabase.removeChannel(channel); };
+    const handleOrderChange = () => { loadOrders(); };
+    const handleClientMessage = (event: Event) => {
+      const pedidoId = (event as CustomEvent<{ pedido_id?: string }>).detail?.pedido_id;
+      if (!pedidoId) return;
+      setOrders((prev) => prev.map((o) => (o.id === pedidoId ? { ...o, mensajes_no_leidos: (o.mensajes_no_leidos || 0) + 1 } : o)));
+      setSelectedOrder((prev) => (prev && prev.id === pedidoId ? { ...prev, mensajes_no_leidos: (prev.mensajes_no_leidos || 0) + 1 } : prev));
+    };
+    window.addEventListener(ADMIN_ORDER_INSERTED_EVENT, handleOrderChange);
+    window.addEventListener(ADMIN_MESSAGE_INSERTED_EVENT, handleClientMessage);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener(ADMIN_ORDER_INSERTED_EVENT, handleOrderChange);
+      window.removeEventListener(ADMIN_MESSAGE_INSERTED_EVENT, handleClientMessage);
+    };
   }, [loadOrders]);
 
-  const handleToggleAlerts = async () => {
+  const ensureBrowserPermission = async () => {
+    await soundFx.unlockAudioContext();
     if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'default') {
       const perm = await window.Notification.requestPermission();
       setNotificationPermission(perm);
-      setSoundEnabled(true);
-      setAdminAlertsPreference(true);
-      soundFx.playOrderAlert();
-      return;
+      return true;
     }
-    const next = !soundEnabled;
+    return false;
+  };
+
+  const handleToggleAlerts = async () => {
+    const requested = await ensureBrowserPermission();
+    const next = requested ? true : !soundEnabled;
     setSoundEnabled(next);
     setAdminAlertsPreference(next);
     if (next) soundFx.playOrderAlert();
+  };
+
+  const handleTestAlert = async () => {
+    await ensureBrowserPermission();
+    setSoundEnabled(true);
+    setAdminAlertsPreference(true);
+    triggerNewOrderAlert({ numeroOrden: 'TEST-001', clienteNombre: 'Prueba de Sistema', montoUsdFormatted: '$25.00', pedidoId: 'test-alert' });
   };
 
   const kpis = useMemo(() => {
@@ -135,7 +153,7 @@ export default function AdminPedidosCommandCenterPage() {
 
   return (
     <main className="px-4 sm:px-6 pt-4 sm:pt-6 pb-8 space-y-4 max-w-[1600px] mx-auto">
-      <AdminPedidosHeaderKpis totalOrdersCount={orders.length} kpis={kpis} soundEnabled={soundEnabled} notificationPermission={notificationPermission} onToggleSound={handleToggleAlerts} onOpenDeliveryCalc={() => setDeliveryCalcOpen(true)} onSync={loadOrders} />
+      <AdminPedidosHeaderKpis totalOrdersCount={orders.length} kpis={kpis} soundEnabled={soundEnabled} notificationPermission={notificationPermission} onToggleSound={handleToggleAlerts} onTestAlert={handleTestAlert} onOpenDeliveryCalc={() => setDeliveryCalcOpen(true)} onSync={loadOrders} />
 
       {mobileViewOpen && selectedOrder && (
         <div className="xl:hidden space-y-2.5">
@@ -143,41 +161,20 @@ export default function AdminPedidosCommandCenterPage() {
             <ArrowLeft className="w-4 h-4 shrink-0" strokeWidth={1.5} />
             <span>Volver a la cola ({orders.length})</span>
           </button>
-
           <SegmentedControl layout="fill" label={`Vista de orden #${selectedOrder.numero_orden}`} value={mobileTab} onChange={handleMobileTabChange}>
             <SegmentedControlItem value="detalle" label="Detalle y Despacho" icon={<FileText className="w-3.5 h-3.5" strokeWidth={1.5} />} />
-            <SegmentedControlItem
-              value="chat"
-              label="Chat en Vivo"
-              icon={
-                <span className="inline-flex items-center gap-1">
-                  <MessageSquare className="w-3.5 h-3.5" strokeWidth={1.5} />
-                  {unreadCount > 0 && <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">{unreadCount}</span>}
-                </span>
-              }
-            />
+            <SegmentedControlItem value="chat" label="Chat en Vivo" icon={<span className="inline-flex items-center gap-1"><MessageSquare className="w-3.5 h-3.5" strokeWidth={1.5} />{unreadCount > 0 && <span className="inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">{unreadCount}</span>}</span>} />
           </SegmentedControl>
         </div>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
         <div className={cn('xl:col-span-3 xl:h-[calc(100vh-220px)] xl:overflow-y-auto', !mobileViewOpen || !selectedOrder ? 'block' : 'hidden xl:block')}>
-          <AdminOrderQueue
-            orders={orders}
-            selectedOrderId={selectedOrder?.id || null}
-            onSelectOrder={(ord) => {
-              setSelectedOrder(ord); setMobileViewOpen(true); setMobileTab('detalle');
-              setOrders((prev) => prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o)));
-            }}
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-          />
+          <AdminOrderQueue orders={orders} selectedOrderId={selectedOrder?.id || null} onSelectOrder={(ord) => { setSelectedOrder(ord); setMobileViewOpen(true); setMobileTab('detalle'); setOrders((prev) => prev.map((o) => (o.id === ord.id ? { ...o, mensajes_no_leidos: 0 } : o))); }} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
         </div>
-
         <div className={cn('xl:col-span-5 xl:h-[calc(100vh-220px)] xl:overflow-y-auto', mobileViewOpen && selectedOrder && mobileTab === 'detalle' ? 'block' : 'hidden xl:block')}>
           <AdminOrderDetail order={selectedOrder} onUpdateStatus={handleUpdateStatus} onDeleteOrder={handleDeleteOrder} isUpdating={isUpdating} />
         </div>
-
         <div className={cn('xl:col-span-4 xl:h-[calc(100vh-220px)] xl:overflow-y-auto', mobileViewOpen && selectedOrder && mobileTab === 'chat' ? 'block' : 'hidden xl:block')}>
           {selectedOrder ? (
             <OrderLiveChat pedidoId={selectedOrder.id} usuarioRol="admin" usuarioNombre="Administrador Gran Catador" numeroOrden={selectedOrder.numero_orden} quickReplies={ADMIN_QUICK_REPLIES} />
