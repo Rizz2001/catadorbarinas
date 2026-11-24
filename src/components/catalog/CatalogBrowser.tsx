@@ -7,9 +7,10 @@ import { ProductCard } from '@/components/ecommerce/ProductCard';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { SmartVentasGroup, SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
 import { useCatalogQuery } from '@/hooks/useCatalogQuery';
-import { countActiveCatalogFilters, extractAvailableBrands, filterAndSortCatalogProducts } from '@/lib/catalogFilters';
+import { countActiveCatalogFilters, extractAvailableBrands, filterAndSortCatalogProducts, formatCatalogLabel } from '@/lib/catalogFilters';
 import { PriceRangeFilter, SortOption } from './catalogFilterTypes';
 import { CatalogSubcategoryBar } from './CatalogSubcategoryBar';
+import { CatalogActiveFiltersBar } from './CatalogActiveFiltersBar';
 import { CatalogFiltersDrawer } from './CatalogFiltersDrawer';
 
 interface CatalogBrowserProps {
@@ -82,7 +83,8 @@ export function CatalogBrowser({
   const activeGroups = groups.filter((g) => g.SmartVentas === 1 || g.SmartVentas === undefined);
   const activeGroupObj = activeGroups.find((g) => g.CodGrupo === activeGroup);
   const activeSubObj = subgroups.find((s) => s.CodSubgrupo === activeSubgroup);
-  const categoryTitle = activeSubObj ? `${activeGroupObj?.Nombre || ''} - ${activeSubObj.Nombre}` : activeGroupObj?.Nombre || 'Catálogo';
+  const formattedGroup = formatCatalogLabel(activeGroupObj?.Nombre) || 'Catálogo';
+  const categoryTitle = activeSubObj ? `${formattedGroup} · ${formatCatalogLabel(activeSubObj.Nombre)}` : formattedGroup;
 
   return (
     <div className="space-y-4 sm:space-y-5 min-w-0 max-w-full">
@@ -94,21 +96,22 @@ export function CatalogBrowser({
         onOpenFilters={() => setIsFiltersOpen(true)}
       />
 
-      {activeFiltersCount > 0 && (
-        <div className="flex items-center justify-between gap-3 px-1 text-xs text-slate-500">
-          <span className="tabular-nums font-medium">
-            {processedProducts.length} {processedProducts.length === 1 ? 'resultado' : 'resultados'} con filtros activos
-          </span>
-          <button
-            type="button"
-            onClick={handleResetFilters}
-            className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:text-slate-900 cursor-pointer"
-          >
-            <RotateCcw className="w-3.5 h-3.5" strokeWidth={1.75} />
-            Limpiar filtros
-          </button>
-        </div>
-      )}
+      <CatalogActiveFiltersBar
+        totalCount={processedProducts.length}
+        onlyInStock={onlyInStock}
+        onClearInStock={() => setOnlyInStock(false)}
+        onlyDeals={onlyDeals}
+        onClearDeals={() => setOnlyDeals(false)}
+        onlyBoxes={onlyBoxes}
+        onClearBoxes={() => setOnlyBoxes(false)}
+        selectedBrand={selectedBrand}
+        onClearBrand={() => setSelectedBrand('all')}
+        priceRange={priceRange}
+        onClearPriceRange={() => setPriceRange('all')}
+        sortBy={sortBy}
+        onClearSort={() => setSortBy('default')}
+        onResetAll={handleResetFilters}
+      />
 
       {isLoading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5 sm:gap-3.5">

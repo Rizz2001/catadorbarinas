@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Tag, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import {
   fetchGruposInv,
   fetchSubgruposInv,
   fetchArticulosSmartVentas,
 } from '@/services/foxdata.service';
 import { CatalogBrowser } from '@/components/catalog';
-import { resolveCatalogSubgroup } from '@/lib/catalogFilters';
+import { formatCatalogLabel, resolveCatalogSubgroup } from '@/lib/catalogFilters';
 import { OFFICIAL_LOGO_VERSIONED, OFFICIAL_OG_IMAGE } from '@/constants/config';
 
 export const revalidate = 60;
@@ -27,10 +27,12 @@ export async function generateMetadata({ params }: CatalogGroupPageProps): Promi
     fetchSubgruposInv(codGrupo),
   ]);
 
-  const groupName = groups.find((g: { CodGrupo: string }) => g.CodGrupo === codGrupo)?.Nombre || 'Catálogo';
-  const subName = codSubgrupoParam
+  const rawGroup = groups.find((g: { CodGrupo: string }) => g.CodGrupo === codGrupo)?.Nombre;
+  const rawSub = codSubgrupoParam
     ? subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupoParam)?.Nombre
     : undefined;
+  const groupName = formatCatalogLabel(rawGroup) || 'Catálogo';
+  const subName = rawSub ? formatCatalogLabel(rawSub) : undefined;
 
   const title = subName
     ? `${subName} (${groupName}) | Catálogo Gran Catador Barinas`
@@ -77,48 +79,60 @@ export default async function CatalogoGroupPage({
     ? subgroups.find((s: { CodSubgrupo: string }) => s.CodSubgrupo === codSubgrupoParam)
     : undefined;
 
-  return (
-    <main className="container mx-auto max-w-7xl px-3 sm:px-4 py-4 md:py-8 space-y-4 sm:space-y-6 overflow-x-clip">
-      <nav className="flex items-center gap-1.5 sm:gap-2 text-xs text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none">
-        <Link href="/" className="hover:text-catador-blue transition-colors">
-          Inicio
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5} />
-        <Link href="/catalogo" className="hover:text-catador-blue transition-colors">
-          Catálogo
-        </Link>
-        {activeGroup && (
-          <>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5} />
-            <Link
-              href={`/catalogo/${activeGroup.CodGrupo}`}
-              className={activeSub ? 'hover:text-catador-blue transition-colors' : 'font-bold text-slate-800'}
-            >
-              {activeGroup.Nombre}
-            </Link>
-          </>
-        )}
-        {activeSub && (
-          <>
-            <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.5} />
-            <span className="font-bold text-slate-800 truncate">{activeSub.Nombre}</span>
-          </>
-        )}
-      </nav>
+  const groupLabel = formatCatalogLabel(activeGroup?.Nombre) || 'Catálogo';
+  const subLabel = activeSub ? formatCatalogLabel(activeSub.Nombre) : undefined;
+  const headingTitle = subLabel || groupLabel;
+  const mobileBackHref = activeSub && activeGroup ? `/catalogo/${activeGroup.CodGrupo}` : '/catalogo';
+  const mobileBackLabel = activeSub ? groupLabel : 'Catálogo';
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-200 pb-3.5 sm:pb-4">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-catador-blue text-white shadow-2xs">
-            <Tag className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={1.5} />
-          </div>
-          <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight truncate">
-              {activeSub ? `${activeGroup?.Nombre} • ${activeSub.Nombre}` : (activeGroup?.Nombre || 'Catálogo General')}
-            </h1>
-            <p className="text-[11px] sm:text-xs text-slate-500 truncate">
-              Inventario en tiempo real sincronizado directamente con el Bodegón
-            </p>
-          </div>
+  return (
+    <main className="container mx-auto max-w-7xl px-3 sm:px-4 pt-3 pb-6 md:py-6 space-y-3 sm:space-y-4 overflow-x-clip">
+      <div className="space-y-1.5">
+        <Link
+          href={mobileBackHref}
+          className="sm:hidden inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 py-1 -ml-0.5 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+          <span>{mobileBackLabel}</span>
+        </Link>
+
+        <nav
+          aria-label="Ruta de navegación"
+          className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 overflow-x-auto whitespace-nowrap scrollbar-none"
+        >
+          <Link href="/" className="hover:text-catador-blue transition-colors">
+            Inicio
+          </Link>
+          <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.75} />
+          <Link href="/catalogo" className="hover:text-catador-blue transition-colors">
+            Catálogo
+          </Link>
+          {activeGroup && (
+            <>
+              <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.75} />
+              <Link
+                href={`/catalogo/${activeGroup.CodGrupo}`}
+                className={activeSub ? 'hover:text-catador-blue transition-colors' : 'font-semibold text-slate-900'}
+              >
+                {groupLabel}
+              </Link>
+            </>
+          )}
+          {subLabel && (
+            <>
+              <ChevronRight className="h-3.5 w-3.5 text-slate-300 shrink-0" strokeWidth={1.75} />
+              <span className="font-semibold text-slate-900 truncate">{subLabel}</span>
+            </>
+          )}
+        </nav>
+
+        <div className="flex items-baseline justify-between gap-3">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight truncate">
+            {headingTitle}
+          </h1>
+          <span className="shrink-0 text-xs sm:text-sm font-medium text-slate-500 tabular-nums">
+            {products.length} {products.length === 1 ? 'producto' : 'productos'}
+          </span>
         </div>
       </div>
 
@@ -134,4 +148,3 @@ export default async function CatalogoGroupPage({
     </main>
   );
 }
-

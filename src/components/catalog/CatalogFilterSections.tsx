@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { SmartVentasGroup, SmartVentasSubgroup } from '@/components/ecommerce/LiveCatalogSection';
-import { isAllSubgroup } from '@/lib/catalogFilters';
+import { formatCatalogLabel, isAllSubgroup } from '@/lib/catalogFilters';
 import {
   BrandFilterOption,
   PRICE_RANGE_OPTIONS,
@@ -88,7 +88,7 @@ export function CatalogFilterSections({
               onClick={() => onSelectSubgroup(sub.CodSubgrupo)}
               className={pillClass(selectedSubgroup === sub.CodSubgrupo)}
             >
-              {sub.Nombre}
+              {formatCatalogLabel(sub.Nombre)}
             </button>
           ))}
         </FilterGroup>
@@ -139,7 +139,7 @@ export function CatalogFilterSections({
         <FilterGroup title="Departamento">
           {groups.map((grp) => (
             <button key={grp.CodGrupo} type="button" onClick={() => onSelectGroup(grp.CodGrupo)} className={pillClass(selectedGroup === grp.CodGrupo)}>
-              {grp.Nombre}
+              {formatCatalogLabel(grp.Nombre)}
             </button>
           ))}
         </FilterGroup>

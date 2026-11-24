@@ -74,3 +74,36 @@ export function countActiveCatalogFilters(c: CatalogFilterCriteria): number {
     Number(c.sortBy !== 'default')
   );
 }
+
+const PRESERVED_UPPER = new Set([
+  'IPA', 'VIP', 'BBQ', 'PET', 'P.A.N.', 'PAN', 'ML', 'LT', 'KG', 'GR', 'USD', 'BS', 'UV', 'XL', 'XXL',
+]);
+
+const LOWERCASE_CONNECTORS = new Set([
+  'de', 'del', 'la', 'las', 'el', 'los', 'y', 'e', 'o', 'con', 'sin', 'en', 'a', 'para', 'por',
+]);
+
+/**
+ * Normaliza etiquetas crudas del ERP (ej. "WHISKY IMP.", "LICORES") a Title Case
+ * legible manteniendo siglas conocidas y conectores en español.
+ */
+export function formatCatalogLabel(raw?: string | null): string {
+  const trimmed = raw?.trim().replace(/\s+/g, ' ');
+  if (!trimmed) return '';
+
+  return trimmed
+    .split(' ')
+    .map((word, index) => {
+      const upper = word.toUpperCase();
+      const cleanUpper = upper.replace(/[.,/()-]/g, '');
+      if (PRESERVED_UPPER.has(upper) || PRESERVED_UPPER.has(cleanUpper)) {
+        return upper;
+      }
+      const lower = word.toLowerCase();
+      if (index > 0 && LOWERCASE_CONNECTORS.has(lower)) {
+        return lower;
+      }
+      return lower.replace(/(^|[/-])([a-záéíóúñü])/g, (_, sep: string, ch: string) => `${sep}${ch.toUpperCase()}`);
+    })
+    .join(' ');
+}
