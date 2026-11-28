@@ -1,11 +1,34 @@
 import { formatUsd, formatVes } from '@/lib/currency';
+import type { MetodoPago } from '@/types/supabase';
 
 const GRAPH_API_VERSION = 'v21.0';
+
+const PAYMENT_LABELS: Record<MetodoPago, string> = {
+  pago_movil: 'Pago Móvil',
+  zelle: 'Zelle',
+  efectivo_usd: 'Efectivo USD',
+  transferencia_bancaria: 'Transferencia Bancaria',
+  punto_venta: 'Punto de Venta',
+};
+
+export interface WhatsAppOrderItemSummary {
+  nombre: string;
+  cantidad: number;
+  modalidad?: 'unidad' | 'caja' | null;
+  unidadesPorCaja?: number | null;
+  subtotalUsd?: number;
+}
 
 export interface WhatsAppOrderAlertInput {
   numeroOrden: string;
   clienteNombre: string;
+  clienteCedula?: string | null;
   clienteTelefono: string;
+  items: WhatsAppOrderItemSummary[];
+  metodoPago?: MetodoPago | null;
+  referenciaPago?: string | null;
+  billetePagoUsd?: number | null;
+  vueltoCalculadoUsd?: number | null;
   totalUsd: number;
   totalVes: number;
   tipoEntrega: 'delivery' | 'pickup';
@@ -47,23 +70,67 @@ export function isWhatsAppConfigured(): boolean {
   return getWhatsAppConfig().configured;
 }
 
-function buildOrderTextBody(input: WhatsAppOrderAlertInput): string {
-  const deliveryLabel = input.tipoEntrega === 'pickup' ? 'Retiro en tienda' : 'Delivery';
+function formatPaymentLine(input: WhatsAppOrderAlertInput): string {
+  const base = input.metodoPago ? PAYMENT_LABELS[input.metodoPago] || input.metodoPago : 'Por confirmar';
+  if (input.metodoPago === 'efectivo_usd' && input.billetePagoUsd) {
+    const vuelto =
+      typeof input.vueltoCalculadoUsd === 'number' && input.vueltoCalculadoUsd > 0
+        ? ` · Vuelto: ${formatUsd(input.vueltoCalculadoUsd)}`
+        : '';
+    return `${base} (Paga con ${formatUsd(input.billetePagoUsd)}${vuelto})`;
+  }
+  if (input.referenciaPago) {
+    return `${base} (Ref: ${input.referenciaPago})`;
+  }
+  return base;
+}
+
+function formatItemsBlock(items: WhatsAppOrderItemSummary[]): string[] {
+  if (!items || items.length === 0) return ['• Sin detalle de productos'];
+  return items.map((item) => {
+    const modeTag =
+      item.modalidad === 'caja'
+        ? item.unidadesPorCaja && item.unidadesPorCaja > 1
+          ? ` (Caja x${item.unidadesPorCaja})`
+          : ' (Caja)'
+        : ' (Und)';
+    const priceTag = typeof item.subtotalUsd === 'number' ? ` — ${formatUsd(item.subtotalUsd)}` : '';
+    return `• ${item.cantidad}x ${item.nombre}${modeTag}${priceTag}`;
+  });
+}
+
+export function buildOrderTextBody(input: WhatsAppOrderAlertInput): string {
+  const isPickup = input.tipoEntrega === 'pickup';
   const lines = [
     `*NUEVO PEDIDO #${input.numeroOrden} — EL CATADOR.*`,
-    `Cliente: ${input.clienteNombre}`,
-    `Teléfono: ${input.clienteTelefono}`,
-    `Total: ${formatUsd(input.totalUsd)} (${formatVes(input.totalVes)})`,
-    `Modalidad: ${deliveryLabel}${input.zonaBarinas ? ` · ${input.zonaBarinas}` : ''}`,
+    '',
+    `*Cliente:* ${input.clienteNombre}`,
+    `*Cédula:* ${input.clienteCedula || 'No indicada'}`,
+    `*Teléfono:* ${input.clienteTelefono}`,
+    '',
+    '*Productos:*',
+    ...formatItemsBlock(input.items),
+    '',
+    isPickup
+      ? '*Entrega:* Retiro en tienda (C.C. Ciudad Catador Local N1)'
+      : `*Entrega:* Delivery${input.zonaBarinas ? ` · ${input.zonaBarinas}` : ''}`,
   ];
 
-  if (input.direccionEntrega) {
-    lines.push(`Dirección: ${input.direccionEntrega}`);
+  if (!isPickup && input.direccionEntrega) {
+    lines.push(`*Dirección:* ${input.direccionEntrega}`);
   }
-  if (input.latitudEntrega && input.longitudEntrega) {
-    lines.push(`GPS: https://maps.google.com/?q=${input.latitudEntrega},${input.longitudEntrega}`);
+  if (!isPickup && input.latitudEntrega && input.longitudEntrega) {
+    lines.push(`*GPS:* https://maps.google.com/?q=${input.latitudEntrega},${input.longitudEntrega}`);
   }
-  lines.push('Abre el panel: https://elcatadorbarinas.vercel.app/admin/pedidos');
+
+  lines.push(
+    '',
+    `*Método de pago:* ${formatPaymentLine(input)}`,
+    `*Total:* ${formatUsd(input.totalUsd)} (${formatVes(input.totalVes)})`,
+    '',
+    'Panel: https://elcatadorbarinas.vercel.app/admin/pedidos'
+  );
+
   return lines.join('\n');
 }
 
@@ -86,27 +153,15 @@ async function postGraphMessage(
 
   if (res.ok) return { ok: true };
 
-  const errJson = (await res.json().catch(() => ({}))) as {
-    error?: { message?: string; code?: number };
-  };
-  return {
-    ok: false,
-    error: errJson.error?.message || `HTTP ${res.status}`,
-  };
+  const errJson = (await res.json().catch(() => ({}))) as { error?: { message?: string } };
+  return { ok: false, error: errJson.error?.message || `HTTP ${res.status}` };
 }
 
-/**
- * Envía una alerta de nuevo pedido al WhatsApp del administrador (o lista separada por comas).
- * Usa plantilla aprobada de Meta cuando WHATSAPP_TEMPLATE_NAME está configurado,
- * y cae automáticamente a texto enriquecido si la plantilla aún no está aprobada.
- */
 export async function sendWhatsAppOrderAlertToAdmins(
   input: WhatsAppOrderAlertInput
 ): Promise<WhatsAppSendResult> {
   const cfg = getWhatsAppConfig();
-  if (!cfg.configured) {
-    return { sent: 0, failed: 0, errors: [] };
-  }
+  if (!cfg.configured) return { sent: 0, failed: 0, errors: [] };
 
   const deliveryLabel = input.tipoEntrega === 'pickup' ? 'Retiro en tienda' : 'Delivery';
   const textBody = buildOrderTextBody(input);
@@ -162,9 +217,8 @@ export async function sendWhatsAppOrderAlertToAdmins(
         text: { preview_url: false, body: textBody },
       });
 
-      if (textResult.ok) {
-        sent += 1;
-      } else {
+      if (textResult.ok) sent += 1;
+      else {
         failed += 1;
         errors.push(`Text(${to}): ${textResult.error}`);
       }

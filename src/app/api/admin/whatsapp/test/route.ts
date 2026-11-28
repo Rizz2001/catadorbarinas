@@ -22,13 +22,23 @@ export async function POST() {
   }
 
   const result = await sendWhatsAppOrderAlertToAdmins({
-    numeroOrden: 'TEST-001',
-    clienteNombre: 'Prueba El Catador',
-    clienteTelefono: '0424-0000000',
-    totalUsd: 25,
-    totalVes: 22611.25,
+    numeroOrden: 'TEST-002',
+    clienteNombre: 'Juan Pérez (Prueba)',
+    clienteCedula: 'V-24123456',
+    clienteTelefono: '0422-0012375',
+    items: [
+      { nombre: 'Polar Pilsen 355ml', cantidad: 1, modalidad: 'caja', unidadesPorCaja: 36, subtotalUsd: 28 },
+      { nombre: 'Hielo 5Kg', cantidad: 2, modalidad: 'unidad', subtotalUsd: 4.5 },
+    ],
+    metodoPago: 'pago_movil',
+    referenciaPago: '987654',
+    totalUsd: 32.5,
+    totalVes: 29394.63,
     tipoEntrega: 'delivery',
     zonaBarinas: 'Alto Barinas',
+    direccionEntrega: 'Av. Francia, Res. Las Palmas',
+    latitudEntrega: 8.6226,
+    longitudEntrega: -70.2075,
   });
 
   if (result.sent === 0) {
