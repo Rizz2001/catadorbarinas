@@ -19,34 +19,34 @@ export interface AdminNavGroup {
     label: string;
     icon: ElementType;
     exact: boolean;
+    showPendingBadge?: boolean;
   }>;
 }
 
 export const ADMIN_NAV_GROUPS: AdminNavGroup[] = [
   {
-    groupLabel: 'Operaciones en Vivo',
+    groupLabel: 'Operaciones',
     items: [
-      { href: '/admin/pedidos', label: 'Despacho y Pedidos', icon: Truck, exact: false },
-      { href: '/admin/busquedas', label: 'Inteligencia de Búsquedas', icon: Search, exact: true },
+      { href: '/admin/pedidos', label: 'Pedidos', icon: Truck, exact: false, showPendingBadge: true },
+      { href: '/admin/busquedas', label: 'Búsquedas', icon: Search, exact: true },
     ],
   },
   {
-    groupLabel: 'Catálogo y Portada',
+    groupLabel: 'Tienda y Catálogo',
     items: [
-      { href: '/admin/inicio', label: 'Portada e Inicio (CMS)', icon: LayoutGrid, exact: true },
-      { href: '/admin/categorias', label: 'Categorías Visuales', icon: FolderKanban, exact: true },
-      { href: '/admin/catalogo-config', label: 'Artículos, Cajas y Secciones', icon: Sliders, exact: true },
-      { href: '/admin/productos', label: 'Fotografías WebP (SKU)', icon: Camera, exact: true },
-      { href: '/admin/banners', label: 'Banners y Departamentos', icon: ImageIcon, exact: true },
-      { href: '/admin/aliados', label: 'Marcas Aliadas y FAQ', icon: Award, exact: true },
+      { href: '/admin/inicio', label: 'Portada', icon: LayoutGrid, exact: true },
+      { href: '/admin/categorias', label: 'Categorías', icon: FolderKanban, exact: true },
+      { href: '/admin/catalogo-config', label: 'Catálogo', icon: Sliders, exact: true },
+      { href: '/admin/productos', label: 'Fotos', icon: Camera, exact: true },
+      { href: '/admin/banners', label: 'Banners', icon: ImageIcon, exact: true },
+      { href: '/admin/aliados', label: 'Marcas y FAQ', icon: Award, exact: true },
     ],
   },
   {
-    groupLabel: 'Sistema y Accesos',
+    groupLabel: 'Sistema',
     items: [
-      { href: '/admin/usuarios', label: 'Usuarios y Permisos', icon: Users, exact: true },
-      { href: '/admin/configuracion', label: 'Negocio, BCV y Delivery GPS', icon: Settings, exact: true },
+      { href: '/admin/usuarios', label: 'Usuarios', icon: Users, exact: true },
+      { href: '/admin/configuracion', label: 'Configuración', icon: Settings, exact: true },
     ],
   },
 ];
-

@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser } from '@/lib/supabase/api-auth';
+import { formatUsd, formatVes } from '@/lib/currency';
+import { sendPushToAllAdmins } from '@/services/push.service';
 import {
   createOrder,
   getAllOrders,
@@ -93,6 +95,22 @@ export async function POST(request: NextRequest) {
   try {
     const payload = sanitizeOrderPayload(rawBody, auth.context.user.id);
     const newOrder = await createOrder(payload);
+
+    after(async () => {
+      try {
+        const orderNumber = newOrder.numero_orden || newOrder.id.slice(0, 8).toUpperCase();
+        const deliveryLabel = newOrder.tipo_entrega === 'pickup' ? 'Retiro en tienda' : 'Delivery';
+        await sendPushToAllAdmins({
+          title: `Nuevo Pedido #${orderNumber}`,
+          body: `${newOrder.cliente_nombre} · ${formatUsd(newOrder.total_usd)} (${formatVes(newOrder.total_ves)}) · ${deliveryLabel}`,
+          url: '/admin/pedidos',
+          tag: `pedido-${newOrder.id}`,
+        });
+      } catch (pushErr) {
+        console.warn('[WebPush] Error enviando notificación de nuevo pedido:', pushErr);
+      }
+    });
+
     return NextResponse.json({ success: true, order: newOrder }, { status: 201 });
   } catch (error) {
     if (error instanceof OrderError) {

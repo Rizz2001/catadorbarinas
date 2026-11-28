@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { ExternalLink, Flame, LayoutGrid, Loader2, Tags } from 'lucide-react';
-import { TabList, Tab } from '@/components/admin/ui';
+import { ExternalLink, Flame, LayoutGrid, Tags } from 'lucide-react';
+import { AdminPageHeader, TabList, Tab } from '@/components/admin/ui';
 import { buildHomeCmsPayload } from '@/adapters';
 import {
   BentoCardNode,
@@ -62,58 +62,60 @@ export default function AdminInicioCmsPage() {
 
   if (loading) {
     return (
-      <div className="p-10 flex items-center justify-center min-h-[50vh] gap-3">
-        <Loader2 className="h-6 w-6 animate-spin text-catador-blue" strokeWidth={1.5} />
-        <span className="text-xs font-bold text-slate-500">
-          Cargando configuración visual de portada...
-        </span>
-      </div>
+      <main className="p-4 sm:p-6 space-y-5 max-w-6xl animate-pulse">
+        <div className="space-y-2 border-b border-slate-200/80 pb-4">
+          <div className="h-3 w-28 rounded bg-slate-200" />
+          <div className="h-6 w-56 rounded bg-slate-200" />
+          <div className="h-3.5 w-80 max-w-full rounded bg-slate-100" />
+        </div>
+        <div className="h-11 rounded-2xl bg-white border border-slate-200/80" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-44 rounded-2xl bg-white border border-slate-200/80" />
+          <div className="h-44 rounded-2xl bg-white border border-slate-200/80" />
+        </div>
+      </main>
     );
   }
 
   return (
     <main className="p-4 sm:p-6 space-y-5 max-w-6xl">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
-        <div>
-          <h1 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight leading-none">
-            Apariencia y Secciones de Portada (Inicio CMS)
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Administra los nodos Bento/Confianza (JSONB), categorías rápidas y campañas de ofertas relámpago.
-          </p>
-        </div>
+      <AdminPageHeader
+        section="Portada"
+        title="Portada de la Tienda"
+        description="Personaliza las tarjetas destacadas del Hero, categorías rápidas, barra de confianza y ofertas relámpago."
+        actions={
+          <Link
+            href="/"
+            className="min-h-[36px] px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 inline-flex items-center gap-1.5 transition-colors"
+          >
+            <span>Abrir Portada</span>
+            <ExternalLink className="h-3.5 w-3.5 text-slate-400" strokeWidth={1.75} />
+          </Link>
+        }
+      />
 
-        <Link
-          href="/"
-          className="min-h-[40px] px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-xs font-extrabold text-slate-800 inline-flex items-center gap-1.5 self-start sm:self-auto shadow-2xs"
-        >
-          <span>Ver Tienda en Vivo</span>
-          <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
-        </Link>
-      </div>
-
-      <div className="overflow-x-auto scrollbar-none no-scrollbar pb-0.5">
+      <div className="bg-white rounded-2xl border border-slate-200/80 px-2 sm:px-4 pt-1.5 overflow-x-auto scrollbar-none no-scrollbar">
         <TabList
           value={activeTab}
           onChange={(v) => setActiveTab(v as HomeCmsTab)}
           overflow="scroll"
-          hasDivider
+          hasDivider={false}
           className="px-1"
         >
           <Tab
             value="nodes"
-            label="Nodos Bento y Confianza"
-            icon={<LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.5} />}
+            label="Tarjetas Bento y Confianza"
+            icon={<LayoutGrid className="h-3.5 w-3.5" strokeWidth={1.75} />}
           />
           <Tab
             value="categories"
             label="Categorías Rápidas"
-            icon={<Tags className="h-3.5 w-3.5" strokeWidth={1.5} />}
+            icon={<Tags className="h-3.5 w-3.5" strokeWidth={1.75} />}
           />
           <Tab
             value="flash"
             label="Ofertas Relámpago"
-            icon={<Flame className="h-3.5 w-3.5" strokeWidth={1.5} />}
+            icon={<Flame className="h-3.5 w-3.5" strokeWidth={1.75} />}
           />
         </TabList>
       </div>

@@ -41,6 +41,11 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: [OFFICIAL_LOGO_VERSIONED],
       apple: [{ url: OFFICIAL_LOGO_VERSIONED, type: 'image/png' }],
     },
+    appleWebApp: {
+      capable: true,
+      title: 'El Catador',
+      statusBarStyle: 'black-translucent',
+    },
     keywords: [
       'EL CATADOR.',
       'El Catador Barinas',

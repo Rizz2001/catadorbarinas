@@ -26,6 +26,7 @@ export function TabList({
   value,
   onChange,
   overflow = 'scroll',
+  hasDivider = true,
   className,
   children,
 }: TabListProps) {
@@ -34,8 +35,9 @@ export function TabList({
       <div
         role="tablist"
         className={cn(
-          'flex border-b border-gray-200 gap-3 sm:gap-4',
-          overflow === 'scroll' ? 'overflow-x-auto scrollbar-none no-scrollbar hide-scrollbar px-1 pb-0.5' : 'flex-wrap',
+          'flex gap-3 sm:gap-5',
+          hasDivider && 'border-b border-slate-200/80',
+          overflow === 'scroll' ? 'overflow-x-auto scrollbar-none no-scrollbar hide-scrollbar px-1' : 'flex-wrap',
           className
         )}
       >
@@ -65,8 +67,8 @@ export function Tab({ value, label, icon }: TabProps) {
       onClick={() => ctx.onChange(value)}
       className={
         isActive
-          ? 'flex items-center gap-2 py-3 text-sm font-medium text-blue-600 border-b-2 border-blue-600 whitespace-nowrap shrink-0 transition-colors cursor-pointer'
-          : 'flex items-center gap-2 py-3 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:text-gray-700 hover:border-gray-300 whitespace-nowrap shrink-0 transition-colors cursor-pointer'
+          ? 'flex items-center gap-2 py-3 text-[13px] font-semibold text-[#00227B] border-b-2 border-[#00227B] whitespace-nowrap shrink-0 transition-colors cursor-pointer'
+          : 'flex items-center gap-2 py-3 text-[13px] font-medium text-slate-500 border-b-2 border-transparent hover:text-slate-800 hover:border-slate-300 whitespace-nowrap shrink-0 transition-colors cursor-pointer'
       }
     >
       {icon ? <span className="shrink-0 flex items-center">{icon}</span> : null}
