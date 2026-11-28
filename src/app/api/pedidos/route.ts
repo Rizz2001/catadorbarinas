@@ -2,6 +2,7 @@ import { after, NextRequest, NextResponse } from 'next/server';
 import { requireAuthenticatedUser } from '@/lib/supabase/api-auth';
 import { formatUsd, formatVes } from '@/lib/currency';
 import { sendPushToAllAdmins } from '@/services/push.service';
+import { sendWhatsAppOrderAlertToAdmins } from '@/services/whatsapp.service';
 import {
   createOrder,
   getAllOrders,
@@ -97,18 +98,33 @@ export async function POST(request: NextRequest) {
     const newOrder = await createOrder(payload);
 
     after(async () => {
-      try {
-        const orderNumber = newOrder.numero_orden || newOrder.id.slice(0, 8).toUpperCase();
-        const deliveryLabel = newOrder.tipo_entrega === 'pickup' ? 'Retiro en tienda' : 'Delivery';
-        await sendPushToAllAdmins({
+      const orderNumber = newOrder.numero_orden || newOrder.id.slice(0, 8).toUpperCase();
+      const deliveryLabel = newOrder.tipo_entrega === 'pickup' ? 'Retiro en tienda' : 'Delivery';
+
+      await Promise.allSettled([
+        sendPushToAllAdmins({
           title: `Nuevo Pedido #${orderNumber}`,
           body: `${newOrder.cliente_nombre} · ${formatUsd(newOrder.total_usd)} (${formatVes(newOrder.total_ves)}) · ${deliveryLabel}`,
           url: '/admin/pedidos',
           tag: `pedido-${newOrder.id}`,
-        });
-      } catch (pushErr) {
-        console.warn('[WebPush] Error enviando notificación de nuevo pedido:', pushErr);
-      }
+        }).catch((pushErr) => {
+          console.warn('[WebPush] Error enviando notificación de nuevo pedido:', pushErr);
+        }),
+        sendWhatsAppOrderAlertToAdmins({
+          numeroOrden: orderNumber,
+          clienteNombre: newOrder.cliente_nombre,
+          clienteTelefono: newOrder.cliente_telefono,
+          totalUsd: newOrder.total_usd,
+          totalVes: newOrder.total_ves,
+          tipoEntrega: newOrder.tipo_entrega,
+          zonaBarinas: newOrder.zona_barinas,
+          direccionEntrega: newOrder.direccion_entrega,
+          latitudEntrega: newOrder.latitud_entrega,
+          longitudEntrega: newOrder.longitud_entrega,
+        }).catch((waErr) => {
+          console.warn('[WhatsApp] Error enviando alerta de nuevo pedido:', waErr);
+        }),
+      ]);
     });
 
     return NextResponse.json({ success: true, order: newOrder }, { status: 201 });
